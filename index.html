@@ -1651,6 +1651,7 @@
       defaultCategory: 'pro',
       defaultUrgency: 'normal',
       defaultIncludeHistory: false,
+      notificationsEnabled: false,
     };
     let settings = { ...defaultSettings, ...JSON.parse(localStorage.getItem('taskflow-settings') || '{}') };
     function saveSettings() {
@@ -1858,12 +1859,113 @@
       return expanded;
     }
 
+    // ============ NOTIFICATIONS ============
+    function getNotifState() {
+      try { return JSON.parse(localStorage.getItem('taskflow-notif-state') || '{}'); }
+      catch (e) { return {}; }
+    }
+    function saveNotifState(state) {
+      localStorage.setItem('taskflow-notif-state', JSON.stringify(state));
+    }
+    function getTodayStr() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    }
+    // Tâches "todo" effectives du jour (occurrences récurrentes incluses)
+    function getTodoTasksForNotif() {
+      const todayStr = getTodayStr();
+      const expanded = expandRecurringTasks(tasks.filter(t => t.status === 'todo'));
+      return {
+        today: expanded.filter(t => t.deadline === todayStr),
+        overdue: expanded.filter(t => t.deadline && t.deadline < todayStr),
+      };
+    }
+    function getNotificationStatusNote() {
+      if (!('Notification' in window)) return 'Notifications non prises en charge par ce navigateur.';
+      if (Notification.permission === 'denied') return '⚠ Notifications bloquées — autorisez-les dans les réglages du navigateur ou du téléphone.';
+      if (settings.notificationsEnabled && Notification.permission === 'granted') return '✓ Activées — vérification à chaque ouverture de l\'app.';
+      return 'Désactivées.';
+    }
+    function sendAppNotification(title, body, tag) {
+      const opts = { body, icon: 'icon-192.png', badge: 'icon-192.png', tag, lang: 'fr' };
+      if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          if (reg) reg.showNotification(title, opts);
+          else new Notification(title, opts);
+        }).catch(() => { try { new Notification(title, opts); } catch (e) {} });
+      } else {
+        try { new Notification(title, opts); } catch (e) {}
+      }
+    }
+    function toggleNotifications(btn) {
+      if (!('Notification' in window)) {
+        showToast('⚠ Notifications non prises en charge sur cet appareil');
+        return;
+      }
+      if (!settings.notificationsEnabled) {
+        Notification.requestPermission().then(perm => {
+          if (perm === 'granted') {
+            settings.notificationsEnabled = true;
+            saveSettings();
+            btn.classList.add('on');
+            checkAndNotify(true);
+            showToast('✓ Notifications activées');
+          } else {
+            showToast('⚠ Notifications refusées par le navigateur');
+          }
+          const note = document.getElementById('notifStatusNote');
+          if (note) note.textContent = getNotificationStatusNote();
+        });
+      } else {
+        settings.notificationsEnabled = false;
+        saveSettings();
+        btn.classList.remove('on');
+        const note = document.getElementById('notifStatusNote');
+        if (note) note.textContent = getNotificationStatusNote();
+        showToast('Notifications désactivées');
+      }
+    }
+    // Vérifie et envoie au maximum 1 notif "du jour" et 1 notif "en retard" par jour
+    function checkAndNotify(force) {
+      if (!settings.notificationsEnabled) return;
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const todayStr = getTodayStr();
+      const state = getNotifState();
+      const { today, overdue } = getTodoTasksForNotif();
+
+      if (today.length > 0 && (force || state.lastTodayDate !== todayStr)) {
+        const body = today.length === 1
+          ? `1 tâche à traiter : ${today[0].title}`
+          : `${today.length} tâches à traiter aujourd'hui`;
+        sendAppNotification('📋 Tâches du jour', body, 'taches-today');
+        state.lastTodayDate = todayStr;
+      }
+      if (overdue.length > 0 && (force || state.lastLateDate !== todayStr)) {
+        const body = overdue.length === 1
+          ? `1 tâche en retard non terminée`
+          : `${overdue.length} tâches en retard non terminées`;
+        sendAppNotification('⏰ Rappel : tâches en retard', body, 'taches-late');
+        state.lastLateDate = todayStr;
+      }
+      saveNotifState(state);
+    }
+    // Badge sur l'icône de l'app (nombre de tâches du jour à traiter)
+    function updateAppBadge() {
+      if (!('setAppBadge' in navigator)) return;
+      const { today } = getTodoTasksForNotif();
+      try {
+        if (today.length > 0) navigator.setAppBadge(today.length);
+        else navigator.clearAppBadge();
+      } catch (e) {}
+    }
+
     // ============ RENDER ============
     function render() {
       renderStats();
       renderAddTask();
       renderFilters();
       renderTaskList();
+      updateAppBadge();
     }
 
     function makePieChart(slices, total, chartId) {
@@ -3609,6 +3711,22 @@
             </div>
           </div>
 
+          <!-- Notifications -->
+          <div class="settings-section">
+            <div class="settings-section-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+              Notifications
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                Rappels des tâches
+                <small>Tâches du jour à l'ouverture, et rappel 1x/jour si en retard</small>
+              </div>
+              <button class="settings-toggle ${settings.notificationsEnabled ? 'on' : ''}" onclick="toggleNotifications(this)"></button>
+            </div>
+            <p id="notifStatusNote" style="font-size:0.75rem;color:#94a3b8;margin-top:0.25rem;">${getNotificationStatusNote()}</p>
+          </div>
+
           <!-- Export / Import -->
           <div class="settings-section">
             <div class="settings-section-title">
@@ -3858,6 +3976,10 @@ function doPost(e) {
       // Auto-load from cloud on startup
       loadFromCloud();
     }
+    checkAndNotify();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkAndNotify();
+    });
 
     // ============ PWA: Service Worker ============
     if ('serviceWorker' in navigator) {
