@@ -92,6 +92,29 @@
       gap: 1.5rem;
     }
     
+    /* Layout: filters sidebar (desktop) / stacked (mobile) */
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-areas: "top" "filters" "list";
+      gap: 1.5rem;
+    }
+    .layout-top { grid-area: top; display: flex; flex-direction: column; gap: 1.5rem; min-width: 0; }
+    .layout-list { grid-area: list; min-width: 0; }
+    .task-sort-bar { margin-bottom: 0.75rem; }
+    #filtersContainer { grid-area: filters; }
+    @media (min-width: 901px) {
+      .layout-grid {
+        grid-template-columns: 230px 1fr;
+        grid-template-areas: "top top" "filters list";
+        align-items: start;
+      }
+      #filtersContainer { position: sticky; top: 1rem; }
+      #filtersContainer .filter-row { flex-direction: column; align-items: stretch; }
+      #filtersContainer .filter-group { flex-direction: column; }
+      #filtersContainer .filter-btn { width: 100%; justify-content: space-between; }
+    }
+
     /* Stats + Calendar row */
     .stats-row {
       display: grid;
@@ -140,6 +163,62 @@
       font-weight: 700;
       color: #334155;
     }
+    .chart-box.list-box {
+      align-items: stretch;
+      justify-content: flex-start;
+      width: 100%;
+    }
+    .mini-task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .mini-task-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.375rem 0.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #f8fafc;
+      cursor: pointer;
+      font-size: 0.78rem;
+      color: #334155;
+      text-align: left;
+      transition: background 0.15s;
+    }
+    .mini-task-item:hover { background: #eef2ff; }
+    .mini-task-item .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .mini-task-item .txt {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .mini-task-item .when {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+    .mini-task-empty {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    @keyframes flashHighlight {
+      0%, 100% { box-shadow: none; }
+      30% { box-shadow: 0 0 0 3px #818cf8; }
+    }
+    .task-card.flash-highlight { animation: flashHighlight 1.5s ease; }
     .chart-tooltip {
       position: absolute;
       background: #1e293b;
@@ -1605,39 +1684,47 @@
   </header>
 
   <main>
-    <!-- Charts + Calendar -->
-    <div class="stats-row" id="statsRow" style="display:none;">
-      <div class="charts" id="chartsContainer"></div>
-      <div class="mini-calendar" id="miniCalendar"></div>
-    </div>
-    
-    <!-- Add Task -->
-    <div id="addTaskContainer"></div>
-    
-    <!-- Filters -->
-    <div class="filters hidden" id="filtersContainer">
-      <div class="filter-row">
-        <div class="filter-group" id="statusFilters"></div>
+    <div class="layout-grid">
+      <div class="layout-top">
+        <!-- Charts + Calendar -->
+        <div class="stats-row" id="statsRow" style="display:none;">
+          <div class="charts" id="chartsContainer"></div>
+          <div class="mini-calendar" id="miniCalendar"></div>
+        </div>
+
+        <!-- Add Task -->
+        <div id="addTaskContainer"></div>
       </div>
-      <div class="filter-row">
-        <div class="filter-group" id="categoryFilters"></div>
-      </div>
-      <div class="filter-row">
-        <div class="filter-group" id="urgencyFilters"></div>
-        <div class="sort-select">
-          <select id="sortSelect">
-            <option value="deadline">Date limite</option>
-            <option value="createdAt">Date de création</option>
-            <option value="urgency">Urgence</option>
-            <option value="title">Titre</option>
-          </select>
-          <button class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()" title="Inverser l'ordre"></button>
+
+      <!-- Filters -->
+      <div class="filters hidden" id="filtersContainer">
+        <div class="filter-row">
+          <div class="filter-group" id="statusFilters"></div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-group" id="categoryFilters"></div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-group" id="urgencyFilters"></div>
         </div>
       </div>
+
+      <!-- Task List -->
+      <div class="layout-list">
+        <div class="filter-row task-sort-bar">
+          <div class="sort-select">
+            <select id="sortSelect">
+              <option value="deadline">Date limite</option>
+              <option value="createdAt">Date de création</option>
+              <option value="urgency">Urgence</option>
+              <option value="title">Titre</option>
+            </select>
+            <button class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()" title="Inverser l'ordre"></button>
+          </div>
+        </div>
+        <div id="taskListContainer"></div>
+      </div>
     </div>
-    
-    <!-- Task List -->
-    <div id="taskListContainer"></div>
   </main>
 
   <footer>
@@ -2055,35 +2142,56 @@
       const proCount = todoTasks.filter(t => (t.category || 'pro') === 'pro').length;
       const persoCount = todoTasks.filter(t => (t.category || 'pro') === 'perso').length;
       
-      const statusPie = makePieChart([
-        { label: 'Normal', value: normalCount, color: '#10b981', onclick: "statClickNormal()" },
-        { label: 'Urgent', value: urgentCount, color: '#f59e0b', onclick: "statClickUrgent()" },
-        { label: 'En retard', value: overdueCount, color: '#ef4444', onclick: "statClickLate()" },
-      ], totalTodo, 'statusPie');
-      
-      const catPie = makePieChart([
-        { label: 'Pro', value: proCount, color: '#3b82f6', onclick: "statClickPro()" },
-        { label: 'Perso', value: persoCount, color: '#ec4899', onclick: "statClickPerso()" },
-      ], totalTodo, 'catPie');
-      
+      const todayItems = todoTasks
+        .filter(t => t.deadline === todayStr)
+        .sort((a, b) => (a.urgency === 'urgent' ? 0 : 1) - (b.urgency === 'urgent' ? 0 : 1));
+
+      const recentItems = [...tasks]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 6);
+
+      const dotColor = (t) => t.status === 'done' ? '#94a3b8' : (t.urgency === 'urgent' ? '#f59e0b' : '#10b981');
+
+      const renderMiniItem = (t, whenLabel) => `
+        <button class="mini-task-item" onclick="focusTask('${t.id}')" title="${(t.title || '').replace(/"/g, '&quot;')}">
+          <span class="dot" style="background:${dotColor(t)}"></span>
+          <span class="txt">${t.title}</span>
+          <span class="when">${whenLabel}</span>
+        </button>
+      `;
+
       container.innerHTML = `
-        <div class="chart-box">
-          <div class="chart-title">Statut</div>
-          <div class="chart-svg-wrap">
-            ${statusPie}
-            <div class="chart-center-label">${totalTodo}</div>
+        <div class="chart-box list-box">
+          <div class="chart-title">Tâches du jour (${todayItems.length})</div>
+          <div class="mini-task-list">
+            ${todayItems.length
+              ? todayItems.map(t => renderMiniItem(t, t.urgency === 'urgent' ? 'Urgent' : '')).join('')
+              : '<div class="mini-task-empty">Aucune tâche aujourd’hui</div>'}
           </div>
         </div>
-        <div class="chart-box">
-          <div class="chart-title">Catégorie</div>
-          <div class="chart-svg-wrap">
-            ${catPie}
-            <div class="chart-center-label">${totalTodo}</div>
+        <div class="chart-box list-box">
+          <div class="chart-title">Dernières tâches créées</div>
+          <div class="mini-task-list">
+            ${recentItems.length
+              ? recentItems.map(t => renderMiniItem(t, formatDate(t.createdAt))).join('')
+              : '<div class="mini-task-empty">Aucune tâche</div>'}
           </div>
         </div>
       `;
       
       renderCalendar();
+    }
+
+    function focusTask(id) {
+      filterStatus = 'all'; filterUrgency = 'all'; filterCategory = 'all'; filterLate = false; filterDate = null;
+      render();
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`task-${id}`);
+        if (!el) return;
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('flash-highlight');
+        setTimeout(() => el.classList.remove('flash-highlight'), 1500);
+      });
     }
 
     function renderCalendar() {
@@ -2624,7 +2732,7 @@
               </button>
             `}
             <div class="comments-section" id="comments-${task.id}">
-              ${comments.map((c, i) => ({ c, i })).slice().reverse().map(({ c, i }) => `
+              ${comments.map((c, i) => `
                 <div class="comment-item">
                   ${icons.message}
                   <div style="flex:1;min-width:0;">
