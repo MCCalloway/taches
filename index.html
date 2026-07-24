@@ -95,9 +95,9 @@
     /* Stats + Calendar row */
     .stats-row {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr 260px;
       gap: 1rem;
-      align-items: start;
+      align-items: stretch;
     }
     @media (max-width: 768px) {
       .stats-row { grid-template-columns: 1fr; }
@@ -105,10 +105,9 @@
 
     /* Charts */
     .charts {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
     }
     .chart-box {
       background: rgba(255,255,255,0.9);
@@ -118,7 +117,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 170px;
+      justify-content: center;
+      min-width: 0;
     }
     .chart-title {
       font-size: 0.75rem;
@@ -1068,6 +1068,13 @@
       border-radius: 12px;
       padding: 0.75rem;
       width: 260px;
+      max-width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    @media (max-width: 768px) {
+      .mini-calendar { width: 100%; }
     }
     .mini-cal-header {
       display: flex;
@@ -1563,6 +1570,9 @@
       #searchInput { width: 100%; flex: 1; }
       .search-box { flex: 1; display: block; }
       .sync-indicator span:last-child { display: none; }
+      .chart-box { padding: 0.5rem; }
+      .chart-svg-wrap, .chart-svg-wrap svg { width: 100px; height: 100px; }
+      .chart-title { font-size: 0.7rem; }
     }
   </style>
 </head>
