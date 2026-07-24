@@ -104,12 +104,13 @@
     .task-sort-bar { margin-bottom: 0.75rem; }
     #filtersContainer { grid-area: filters; }
     @media (min-width: 901px) {
+      main { max-width: 1200px; }
       .layout-grid {
         grid-template-columns: 230px 1fr;
         grid-template-areas: "top top" "filters list";
         align-items: start;
       }
-      #filtersContainer { position: sticky; top: 1rem; }
+      #filtersContainer { position: sticky; top: 92px; z-index: 10; }
       #filtersContainer .filter-row { flex-direction: column; align-items: stretch; }
       #filtersContainer .filter-group { flex-direction: column; }
       #filtersContainer .filter-btn { width: 100%; justify-content: space-between; }
@@ -1968,14 +1969,31 @@
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     }
-    // Tâches "todo" effectives du jour (occurrences récurrentes incluses)
+    // Tâches "todo" effectives du jour (occurrences récurrentes incluses, en excluant
+    // explicitement les occurrences déjà marquées terminées/supprimées pour ce jour précis)
     function getTodoTasksForNotif() {
       const todayStr = getTodayStr();
-      const expanded = expandRecurringTasks(tasks.filter(t => t.status === 'todo'));
-      return {
-        today: expanded.filter(t => t.deadline === todayStr),
-        overdue: expanded.filter(t => t.deadline && t.deadline < todayStr),
-      };
+      const today = [];
+      const overdue = [];
+      tasks.forEach(t => {
+        if (t.status !== 'todo') return;
+        if (t.recurrence) {
+          const occurrences = getRecurrenceOccurrences(t);
+          const excluded = [...(t.completedDates || []), ...(t.deletedDates || [])];
+          const pending = occurrences.filter(d => !excluded.includes(d));
+          if (pending.includes(todayStr)) {
+            today.push({ ...t, deadline: todayStr });
+          }
+          const pastPending = pending.filter(d => d < todayStr);
+          if (pastPending.length > 0) {
+            overdue.push({ ...t, deadline: pastPending.sort().pop() });
+          }
+        } else {
+          if (t.deadline === todayStr) today.push(t);
+          else if (t.deadline && t.deadline < todayStr) overdue.push(t);
+        }
+      });
+      return { today, overdue };
     }
     function getNotificationStatusNote() {
       if (!('Notification' in window)) return 'Notifications non prises en charge par ce navigateur.';
@@ -2142,8 +2160,7 @@
       const proCount = todoTasks.filter(t => (t.category || 'pro') === 'pro').length;
       const persoCount = todoTasks.filter(t => (t.category || 'pro') === 'perso').length;
       
-      const todayItems = todoTasks
-        .filter(t => t.deadline === todayStr)
+      const todayItems = getTodoTasksForNotif().today
         .sort((a, b) => (a.urgency === 'urgent' ? 0 : 1) - (b.urgency === 'urgent' ? 0 : 1));
 
       const recentItems = [...tasks]
