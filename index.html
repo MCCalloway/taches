@@ -456,6 +456,50 @@
       color: #be185d;
       border-color: #fbcfe8;
     }
+
+    .tag-field { position: relative; }
+    .tags-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      margin-bottom: 0.375rem;
+    }
+    .tags-chips:empty { display: none; }
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: #eef2ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+    }
+    .tag-chip svg { color: #818cf8; }
+    .tag-chip button {
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: #818cf8;
+    }
+    .tag-chip button:hover { color: #4338ca; }
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: #eef2ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+    }
     
     .history-preview {
       background: #eef2ff;
@@ -1875,6 +1919,77 @@
       return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'));
     }
 
+    function getAllTags() {
+      const set = new Set();
+      tasks.forEach(t => {
+        (t.tags || []).forEach(tag => { if (tag && tag.trim()) set.add(tag.trim()); });
+      });
+      return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'));
+    }
+
+    // Ajoute un ou plusieurs tags (séparés par des virgules) à une liste, sans doublon
+    function addTagsToList(raw, list) {
+      raw.split(',').forEach(part => {
+        const tag = part.trim();
+        if (tag && !list.some(t => t.toLowerCase() === tag.toLowerCase())) list.push(tag);
+      });
+    }
+
+    function renderTagsChips(containerId, tagsArray, removeFnName) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = tagsArray.map((t, i) => `
+        <span class="tag-chip">
+          ${icons.tag} ${t}
+          <button type="button" onclick="${removeFnName}(${i})" title="Supprimer le tag">${icons.xSmall}</button>
+        </span>
+      `).join('');
+    }
+
+    // Configure la saisie de tags avec autocomplétion (utilisé pour création et édition)
+    function setupTagInput({ inputId, suggestionsId, chipsId, fieldSelector, list, removeFnName, addFnName }) {
+      const input = document.getElementById(inputId);
+      const suggestionsDiv = document.getElementById(suggestionsId);
+      if (!input || !suggestionsDiv) return;
+      const allTags = getAllTags();
+
+      const refresh = () => {
+        const val = input.value.trim().toLowerCase();
+        const filtered = allTags.filter(t => !list.some(x => x.toLowerCase() === t.toLowerCase()) && (!val || t.toLowerCase().includes(val)));
+        if (filtered.length > 0) {
+          suggestionsDiv.innerHTML = filtered.map(t => `
+            <div class="suggestion-item" onclick="${addFnName}('${t.replace(/'/g, "\\'")}')">
+              <span>${icons.tag} ${t}</span>
+            </div>
+          `).join('');
+          suggestionsDiv.classList.remove('hidden');
+        } else {
+          suggestionsDiv.classList.add('hidden');
+        }
+      };
+
+      input.addEventListener('input', refresh);
+      input.addEventListener('focus', refresh);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          if (input.value.trim()) {
+            addTagsToList(input.value, list);
+            input.value = '';
+            renderTagsChips(chipsId, list, removeFnName);
+            refresh();
+          }
+        } else if (e.key === 'Backspace' && !input.value && list.length) {
+          list.splice(list.length - 1, 1);
+          renderTagsChips(chipsId, list, removeFnName);
+        }
+      });
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest(fieldSelector)) suggestionsDiv.classList.add('hidden');
+      });
+      renderTagsChips(chipsId, list, removeFnName);
+    }
+
     // ============ RECURRENCE HELPERS ============
     const DAY_LABELS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
     const DAY_SHORT = ['L','M','Me','J','V','S','D'];
@@ -2391,6 +2506,12 @@
               <label>Description</label>
               <textarea id="taskDescription" placeholder="Détails, contexte, instructions..." rows="2" style="resize:vertical;"></textarea>
             </div>
+            <div class="full-width tag-field" id="tagField">
+              <label>${icons.tag} Tags (optionnel)</label>
+              <div class="tags-chips" id="tagsChips"></div>
+              <input type="text" id="taskTagInput" placeholder="Ajouter un tag et appuyer sur Entrée..." autocomplete="off">
+              <div class="suggestions hidden" id="tagSuggestions"></div>
+            </div>
           </div>
           <div class="form-grid">
             <div>
@@ -2480,6 +2601,17 @@
         if (!e.target.closest('.contact-field')) {
           suggestionsDiv.classList.add('hidden');
         }
+      });
+
+      // Setup tag autocomplete
+      setupTagInput({
+        inputId: 'taskTagInput',
+        suggestionsId: 'tagSuggestions',
+        chipsId: 'tagsChips',
+        fieldSelector: '#tagField',
+        list: currentTags,
+        removeFnName: 'removeCreateTag',
+        addFnName: 'addCreateTagSuggestion',
       });
       
       document.getElementById('taskTitle').focus();
@@ -2587,7 +2719,8 @@
         const q = searchQuery.toLowerCase();
         filtered = filtered.filter(t => 
           t.title.toLowerCase().includes(q) || 
-          (t.contact && t.contact.toLowerCase().includes(q))
+          (t.contact && t.contact.toLowerCase().includes(q)) ||
+          (t.tags && t.tags.some(tag => tag.toLowerCase().includes(q)))
         );
       }
       
@@ -2705,6 +2838,7 @@
                   <span class="category-badge ${task.category || 'pro'}">${(task.category || 'pro') === 'pro' ? icons.briefcase + ' Pro' : icons.home + ' Perso'}</span>
                   ${!isDone && deadlineInfo ? `<span class="task-meta-item ${deadlineInfo.class}">${icons.calendar} ${deadlineInfo.text}</span>` : ''}
                   ${task.recurrence ? `<span class="recurrence-badge">${icons.repeat} ${getRecurrenceLabel(task)}${task._remainingCount ? ' · ' + task._remainingCount + ' restante' + (task._remainingCount > 1 ? 's' : '') : ''}</span>` : ''}
+                  ${(task.tags || []).map(tag => `<span class="tag-badge" style="cursor:pointer;" onclick="searchByTag('${tag.replace(/'/g, "\\'")}')" title="Filtrer par ce tag">${icons.tag} ${tag}</span>`).join('')}
                 </div>
                 ${isDone && task.completedAt ? `
                   <div class="task-completed-at">
@@ -2856,6 +2990,7 @@
     function openEditModal(id) {
       completingTask = tasks.find(t => t.id === id);
       modalMode = 'edit';
+      editTags = [...(completingTask.tags || [])];
       renderModal();
       document.getElementById('modalOverlay').classList.remove('hidden');
     }
@@ -2882,6 +3017,12 @@
         recurrence = { startDate, endDate, days };
       }
       
+      // Récupère le tag éventuellement encore tapé (non validé par Entrée) dans le champ
+      const pendingEditTagInput = document.getElementById('editTagInput');
+      if (pendingEditTagInput && pendingEditTagInput.value.trim()) {
+        addTagsToList(pendingEditTagInput.value, editTags);
+      }
+
       const task = tasks.find(t => t.id === completingTask.id);
       if (task) {
         task.title = title;
@@ -2890,6 +3031,7 @@
         task.description = description || undefined;
         task.urgency = editUrgency;
         task.category = editCategory;
+        task.tags = [...editTags];
         if (recurrence) {
           task.recurrence = recurrence;
         } else {
@@ -2934,14 +3076,29 @@
       });
     }
 
+    let editTags = [];
+    function removeEditTag(i) {
+      editTags.splice(i, 1);
+      renderTagsChips('editTagsChips', editTags, 'removeEditTag');
+    }
+    function addEditTagSuggestion(tag) {
+      addTagsToList(tag, editTags);
+      const input = document.getElementById('editTagInput');
+      if (input) { input.value = ''; input.focus(); }
+      renderTagsChips('editTagsChips', editTags, 'removeEditTag');
+      document.getElementById('editTagSuggestions')?.classList.add('hidden');
+    }
+
     // ============ ACTIONS ============
     function expandForm() {
       isFormExpanded = true;
+      currentTags = [];
       render();
     }
 
     function collapseForm() {
       isFormExpanded = false;
+      currentTags = [];
       render();
     }
 
@@ -2987,6 +3144,19 @@
           btn.classList.add('active', urgency);
         }
       });
+    }
+
+    let currentTags = [];
+    function removeCreateTag(i) {
+      currentTags.splice(i, 1);
+      renderTagsChips('tagsChips', currentTags, 'removeCreateTag');
+    }
+    function addCreateTagSuggestion(tag) {
+      addTagsToList(tag, currentTags);
+      const input = document.getElementById('taskTagInput');
+      if (input) { input.value = ''; input.focus(); }
+      renderTagsChips('tagsChips', currentTags, 'removeCreateTag');
+      document.getElementById('tagSuggestions')?.classList.add('hidden');
     }
 
     function selectContact(contact) {
@@ -3053,6 +3223,12 @@
       const includeHistoryBox = document.getElementById('includeHistory');
       const history = (includeHistoryBox && includeHistoryBox.checked) ? getContactHistory(contact) : [];
       
+      // Récupère le tag éventuellement encore tapé (non validé par Entrée) dans le champ
+      const pendingTagInput = document.getElementById('taskTagInput');
+      if (pendingTagInput && pendingTagInput.value.trim()) {
+        addTagsToList(pendingTagInput.value, currentTags);
+      }
+
       const task = {
         id: generateId(),
         title,
@@ -3064,6 +3240,7 @@
         status: 'todo',
         createdAt: new Date().toISOString(),
         contactHistory: history,
+        tags: [...currentTags],
       };
       if (recurrence) task.recurrence = recurrence;
       
@@ -3071,6 +3248,7 @@
       saveTasks();
       currentUrgency = settings.defaultUrgency;
       currentCategory = settings.defaultCategory;
+      currentTags = [];
       isFormExpanded = false;
       render();
     }
@@ -3189,6 +3367,13 @@
       searchQuery = e.target.value;
       render();
     });
+
+    function searchByTag(tag) {
+      searchQuery = tag;
+      const input = document.getElementById('searchInput');
+      if (input) input.value = tag;
+      render();
+    }
 
     function toggleSortDir() {
       sortAsc = !sortAsc;
@@ -3314,6 +3499,13 @@
             
             <label>Description</label>
             <textarea id="editDescription" rows="2" style="resize:vertical;" placeholder="Détails, contexte, instructions...">${(task.description || '').replace(/</g,'&lt;')}</textarea>
+
+            <label>${icons.tag} Tags (optionnel)</label>
+            <div class="tag-field" id="editTagField">
+              <div class="tags-chips" id="editTagsChips"></div>
+              <input type="text" id="editTagInput" placeholder="Ajouter un tag et appuyer sur Entrée..." autocomplete="off">
+              <div class="suggestions hidden" id="editTagSuggestions"></div>
+            </div>
             
             <label>Catégorie</label>
             <div class="category-buttons" style="margin-top:0;">
@@ -3354,6 +3546,15 @@
             </div>
           </div>
         `;
+        setupTagInput({
+          inputId: 'editTagInput',
+          suggestionsId: 'editTagSuggestions',
+          chipsId: 'editTagsChips',
+          fieldSelector: '#editTagField',
+          list: editTags,
+          removeFnName: 'removeEditTag',
+          addFnName: 'addEditTagSuggestion',
+        });
         setTimeout(() => document.getElementById('editTitle')?.focus(), 100);
       } else if (modalMode === 'terminate') {
         modal.innerHTML = `
@@ -3399,6 +3600,9 @@
             
             <label>Titre <span class="required">*</span></label>
             <input type="text" id="followUpTitle" placeholder="Ex: Relancer le client...">
+
+            <label style="margin-top:0.75rem;">Description</label>
+            <textarea id="followUpDescription" placeholder="Détails, contexte, instructions..." rows="2" style="resize:vertical;"></textarea>
             
             <div class="form-row" style="margin-top:0.75rem;">
               <div>
@@ -3480,6 +3684,7 @@
     function createFollowUp() {
       const comment = document.getElementById('completionComment').value.trim();
       const title = document.getElementById('followUpTitle').value.trim();
+      const description = document.getElementById('followUpDescription')?.value.trim();
       const deadline = document.getElementById('followUpDeadline').value;
       
       if (!title) { document.getElementById('followUpTitle').focus(); return; }
@@ -3540,6 +3745,7 @@
         title,
         contact: completingTask.contact,
         deadline,
+        description: description || undefined,
         urgency: followUpUrgency,
         category: completingTask.category || 'pro',
         status: 'todo',
