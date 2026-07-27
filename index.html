@@ -2682,7 +2682,14 @@
       const deadlineInfo = !isDone ? getDeadlineInfo(task.deadline) : null;
       const isOverdue = !isDone && deadlineInfo && deadlineInfo.class === 'overdue';
       const hasHistory = task.contactHistory && task.contactHistory.length > 0;
-      const comments = task.comments || [];
+      // Pour une tâche récurrente, un commentaire ajouté sur une occurrence donnée
+      // (task.deadline = date de l'occurrence affichée) ne doit être visible que sur
+      // cette occurrence-là. Les anciens commentaires sans date d'occurrence (créés
+      // avant ce correctif) restent affichés partout pour ne pas perdre de données.
+      const allComments = task.comments || [];
+      const comments = allComments
+        .map((c, originalIndex) => ({ ...c, originalIndex }))
+        .filter(c => !task.recurrence || !c.occurrenceDate || c.occurrenceDate === task.deadline);
       const commentCount = comments.length;
       
       return `
@@ -2749,19 +2756,19 @@
               </button>
             `}
             <div class="comments-section" id="comments-${task.id}">
-              ${comments.map((c, i) => `
+              ${comments.map((c) => `
                 <div class="comment-item">
                   ${icons.message}
                   <div style="flex:1;min-width:0;">
                     <p>${c.text}</p>
                     <div class="comment-date">${formatDate(c.date, true)}</div>
                   </div>
-                  <button class="comment-delete" onclick="deleteComment('${task.id}', ${i})" title="Supprimer">${icons.xSmall}</button>
+                  <button class="comment-delete" onclick="deleteComment('${task.id}', ${c.originalIndex})" title="Supprimer">${icons.xSmall}</button>
                 </div>
               `).join('')}
               <div class="add-comment-row">
-                <input type="text" id="comment-input-${task.id}" placeholder="Écrire un commentaire..." onkeydown="if(event.key==='Enter')addComment('${task.id}')">
-                <button class="add-comment-btn" onclick="addComment('${task.id}')">${icons.send}</button>
+                <input type="text" id="comment-input-${task.id}" placeholder="Écrire un commentaire..." onkeydown="if(event.key==='Enter')addComment('${task.id}', '${task.deadline || ''}')">
+                <button class="add-comment-btn" onclick="addComment('${task.id}', '${task.deadline || ''}')">${icons.send}</button>
               </div>
             </div>
 
@@ -2808,7 +2815,7 @@
       }
     }
 
-    function addComment(id) {
+    function addComment(id, occurrenceDate) {
       const input = document.getElementById(`comment-input-${id}`);
       const text = input.value.trim();
       if (!text) return;
@@ -2816,7 +2823,9 @@
       const task = tasks.find(t => t.id === id);
       if (!task) return;
       if (!task.comments) task.comments = [];
-      task.comments.push({ text, date: new Date().toISOString() });
+      const newComment = { text, date: new Date().toISOString() };
+      if (task.recurrence && occurrenceDate) newComment.occurrenceDate = occurrenceDate;
+      task.comments.push(newComment);
       saveTasks();
       render();
       // Réouvrir la section commentaires
@@ -3084,6 +3093,24 @@
         task.status = 'todo';
         task.completionComment = undefined;
         task.completedAt = undefined;
+        // Tâche récurrente entièrement terminée : on rouvre la dernière occurrence
+        // complétée, sinon la tâche reste "à faire" sans qu'aucune occurrence ne
+        // redevienne visible (elle gonflerait le compteur "À faire" sans jamais
+        // apparaître dans la liste).
+        if (task.recurrence && task.completedDates && task.completedDates.length) {
+          let dateToReopen = null;
+          if (task.completionLog && task.completionLog.length) {
+            dateToReopen = task.completionLog[task.completionLog.length - 1].date;
+            task.completionLog = task.completionLog.slice(0, -1);
+          } else {
+            const deleted = task.deletedDates || [];
+            const candidates = task.completedDates.filter(d => !deleted.includes(d)).sort();
+            dateToReopen = candidates[candidates.length - 1];
+          }
+          if (dateToReopen) {
+            task.completedDates = task.completedDates.filter(d => d !== dateToReopen);
+          }
+        }
         saveTasks();
         render();
       }
@@ -3491,12 +3518,17 @@
       const history = getContactHistory(completingTask.contact);
       
       // Convert comments from the completed task into history entries
-      const commentHistory = (completingTask.comments || []).map(c => ({
-        taskId: completingTask.id,
-        taskTitle: completingTask.title,
-        comment: c.text,
-        completedAt: c.date
-      }));
+      // (pour une tâche récurrente, on ne reprend que les commentaires de
+      // l'occurrence qui vient d'être terminée)
+      const completedOccurrenceDate = completingTask._displayDeadline || completingTask.deadline;
+      const commentHistory = (completingTask.comments || [])
+        .filter(c => !completingTask.recurrence || !c.occurrenceDate || c.occurrenceDate === completedOccurrenceDate)
+        .map(c => ({
+          taskId: completingTask.id,
+          taskTitle: completingTask.title,
+          comment: c.text,
+          completedAt: c.date
+        }));
       
       // Merge: comment history + contact history, sorted by date desc
       const fullHistory = [...commentHistory, ...history]
@@ -3713,6 +3745,12 @@
             }
             
             // Create a new standalone task with this occurrence's date
+            // Les commentaires propres à cette occurrence suivent la tâche extraite ;
+            // ils quittent la tâche récurrente d'origine pour ne plus s'y afficher.
+            const occurrenceComments = (original.comments || []).filter(c => c.occurrenceDate === displayDeadline);
+            if (occurrenceComments.length) {
+              original.comments = original.comments.filter(c => c.occurrenceDate !== displayDeadline);
+            }
             const newTask = {
               id: generateId(),
               title: original.title,
@@ -3723,7 +3761,7 @@
               status: 'todo',
               createdAt: new Date().toISOString(),
               contactHistory: original.contactHistory || [],
-              comments: [],
+              comments: occurrenceComments.map(c => { const { occurrenceDate, ...rest } = c; return rest; }),
             };
             tasks.unshift(newTask);
             
