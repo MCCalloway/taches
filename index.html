@@ -393,14 +393,6 @@
     }
     .suggestion-item:hover, .suggestion-item.selected { background: #eef2ff; }
     .suggestion-item svg { color: #94a3b8; margin-right: 0.5rem; }
-    .suggestion-item .history-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      font-size: 0.75rem;
-      color: #818cf8;
-    }
-    
     .urgency-buttons {
       display: flex;
       gap: 0.5rem;
@@ -531,30 +523,6 @@
       color: #4338ca;
       border: 1px solid #c7d2fe;
     }
-    
-    .history-preview {
-      background: #eef2ff;
-      border: 1px solid #c7d2fe;
-      border-radius: 12px;
-      padding: 0.75rem;
-      margin-top: 1rem;
-    }
-    .history-preview-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #4f46e5;
-      margin-bottom: 0.5rem;
-    }
-    .history-preview-item {
-      font-size: 0.75rem;
-      color: #4338ca;
-      margin-bottom: 0.25rem;
-    }
-    .history-preview-item .date { color: #818cf8; margin-right: 0.5rem; }
-    .history-preview-note { font-size: 0.75rem; color: #818cf8; margin-top: 0.5rem; }
     
     .form-actions {
       display: flex;
@@ -862,48 +830,6 @@
       background: #f8fafc;
       border-color: #cbd5e1;
     }
-    
-    .history-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-      margin-top: 0.5rem;
-      padding: 0;
-      background: none;
-      border: none;
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #6366f1;
-      cursor: pointer;
-    }
-    .history-toggle:hover { color: #4338ca; }
-    
-    .history-entries {
-      margin-top: 0.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.375rem;
-      animation: slideIn 0.2s ease-out;
-    }
-    .history-entry {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      background: #eef2ff;
-      border: 1px solid #c7d2fe;
-      border-radius: 12px;
-    }
-    .history-entry svg { color: #818cf8; flex-shrink: 0; margin-top: 2px; }
-    .history-entry-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .history-entry-title { font-size: 0.75rem; font-weight: 600; color: #4338ca; }
-    .history-entry-date { font-size: 0.75rem; color: #818cf8; }
-    .history-entry-comment { font-size: 0.75rem; color: #4f46e5; margin-top: 0.125rem; }
     
     /* Empty State */
     .empty-state {
@@ -1923,7 +1849,6 @@
       defaultSortAsc: true,
       defaultCategory: 'pro',
       defaultUrgency: 'normal',
-      defaultIncludeHistory: false,
       notificationsEnabled: false,
     };
     let settings = { ...defaultSettings, ...JSON.parse(localStorage.getItem('taskflow-settings') || '{}') };
@@ -2028,20 +1953,6 @@
       if (diffDays === 1) return { text: 'Demain', class: 'soon' };
       if (diffDays <= 3) return { text: `Dans ${diffDays}j`, class: 'soon' };
       return { text: formatDate(deadline), class: '' };
-    }
-
-    function getContactHistory(contactName) {
-      if (!contactName || !contactName.trim()) return [];
-      const normalized = contactName.trim().toLowerCase();
-      return tasks
-        .filter(t => t.contact && t.contact.trim().toLowerCase() === normalized && t.status === 'done' && t.completionComment)
-        .map(t => ({
-          taskId: t.id,
-          taskTitle: t.title,
-          comment: t.completionComment,
-          completedAt: t.completedAt || t.createdAt
-        }))
-        .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
     }
 
     // Construit la fiche d'un contact/entreprise à partir de l'ensemble des tâches
@@ -2830,7 +2741,6 @@
               ${DAY_LABELS.map((d, i) => `<button type="button" class="day-btn" data-day="${i}" onclick="toggleDay(this)">${d}</button>`).join('')}
             </div>
           </div>
-          <div id="historyPreview"></div>
           <div class="form-actions">
             <button class="btn btn-primary" onclick="addTask()">${icons.plus} Ajouter</button>
             <button class="btn btn-secondary" onclick="collapseForm()">Annuler</button>
@@ -2847,21 +2757,15 @@
         const filtered = val ? contacts.filter(c => c.toLowerCase().includes(val)) : contacts;
         
         if (filtered.length > 0) {
-          suggestionsDiv.innerHTML = filtered.map(c => {
-            const historyCount = getContactHistory(c).length;
-            return `
-              <div class="suggestion-item" onclick="selectContact('${c.replace(/'/g, "\\'")}')">
-                <span>${icons.building} ${c}</span>
-                ${historyCount > 0 ? `<span class="history-badge">${icons.history} ${historyCount}</span>` : ''}
-              </div>
-            `;
-          }).join('');
+          suggestionsDiv.innerHTML = filtered.map(c => `
+            <div class="suggestion-item" onclick="selectContact('${c.replace(/'/g, "\\'")}')">
+              <span>${icons.building} ${c}</span>
+            </div>
+          `).join('');
           suggestionsDiv.classList.remove('hidden');
         } else {
           suggestionsDiv.classList.add('hidden');
         }
-        
-        updateHistoryPreview();
       });
       
       contactInput.addEventListener('focus', () => {
@@ -3106,7 +3010,6 @@
       const isDone = task.status === 'done';
       const deadlineInfo = !isDone ? getDeadlineInfo(task.deadline) : null;
       const isOverdue = !isDone && deadlineInfo && deadlineInfo.class === 'overdue';
-      const hasHistory = task.contactHistory && task.contactHistory.length > 0;
       // Pour une tâche récurrente, un commentaire ajouté sur une occurrence donnée
       // (task.deadline = date de l'occurrence affichée) ne doit être visible que sur
       // cette occurrence-là. Les anciens commentaires sans date d'occurrence (créés
@@ -3203,27 +3106,6 @@
                 <button class="add-comment-btn" onclick="addComment('${task.id}', '${task.deadline || ''}')">${icons.send}</button>
               </div>
             </div>
-
-            ${hasHistory ? `
-              <button class="history-toggle" onclick="toggleHistory('${task.id}')">
-                ${icons.history} Historique (${task.contactHistory.length})
-                <span id="history-chevron-${task.id}">${icons.chevronDown}</span>
-              </button>
-              <div class="history-entries hidden" id="history-${task.id}">
-                ${task.contactHistory.map(entry => `
-                  <div class="history-entry">
-                    ${icons.message}
-                    <div>
-                      <div class="history-entry-header">
-                        <span class="history-entry-title">${entry.taskTitle}</span>
-                        <span class="history-entry-date">${formatDate(entry.completedAt, true)}</span>
-                      </div>
-                      <div class="history-entry-comment">${entry.comment}</div>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            ` : ''}
           </div>
         </div>
       `;
@@ -3460,35 +3342,6 @@
     function selectContact(contact) {
       document.getElementById('taskContact').value = contact;
       document.getElementById('contactSuggestions').classList.add('hidden');
-      updateHistoryPreview();
-    }
-
-    function updateHistoryPreview() {
-      const contact = document.getElementById('taskContact').value;
-      const history = getContactHistory(contact);
-      const previewDiv = document.getElementById('historyPreview');
-      
-      if (history.length > 0) {
-        previewDiv.innerHTML = `
-          <div class="history-preview">
-            <div class="history-preview-header">
-              ${icons.history} Historique pour « ${contact} » — ${history.length} commentaire${history.length > 1 ? 's' : ''} précédent${history.length > 1 ? 's' : ''}
-            </div>
-            ${history.slice(0, 3).map(entry => `
-              <div class="history-preview-item">
-                <span class="date">${formatDate(entry.completedAt)}</span>
-                <strong>${entry.taskTitle}</strong> — ${entry.comment}
-              </div>
-            `).join('')}
-            <label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;cursor:pointer;font-size:0.8rem;color:#4338ca;">
-              <input type="checkbox" id="includeHistory" ${settings.defaultIncludeHistory ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;accent-color:#4f46e5;">
-              Récupérer cet historique dans la nouvelle tâche
-            </label>
-          </div>
-        `;
-      } else {
-        previewDiv.innerHTML = '';
-      }
     }
 
     function addTask() {
@@ -3518,9 +3371,6 @@
         deadline = startDate; // Use start date as deadline for recurring
       }
       
-      const includeHistoryBox = document.getElementById('includeHistory');
-      const history = (includeHistoryBox && includeHistoryBox.checked) ? getContactHistory(contact) : [];
-      
       // Récupère le tag éventuellement encore tapé (non validé par Entrée) dans le champ
       const pendingTagInput = document.getElementById('taskTagInput');
       if (pendingTagInput && pendingTagInput.value.trim()) {
@@ -3537,7 +3387,6 @@
         category: currentCategory,
         status: 'todo',
         createdAt: new Date().toISOString(),
-        contactHistory: history,
         tags: [...currentTags],
       };
       if (recurrence) task.recurrence = recurrence;
@@ -3589,18 +3438,6 @@
         }
         saveTasks();
         render();
-      }
-    }
-
-    function toggleHistory(id) {
-      const historyDiv = document.getElementById(`history-${id}`);
-      const chevron = document.getElementById(`history-chevron-${id}`);
-      if (historyDiv.classList.contains('hidden')) {
-        historyDiv.classList.remove('hidden');
-        chevron.innerHTML = icons.chevronUp;
-      } else {
-        historyDiv.classList.add('hidden');
-        chevron.innerHTML = icons.chevronDown;
       }
     }
 
@@ -3999,7 +3836,7 @@
           <div class="modal-body">
             <label>${icons.message} Commentaire de clôture</label>
             <textarea id="completionComment" placeholder="Résultat, notes..."></textarea>
-            ${task.contact ? `<div class="modal-note">Ce commentaire sera conservé dans l'historique de <strong>« ${task.contact} »</strong></div>` : ''}
+            ${task.contact ? `<div class="modal-note">Ce commentaire sera visible dans la fiche de <strong>« ${task.contact} »</strong></div>` : ''}
             <div class="modal-actions">
               <button class="btn btn-success" onclick="terminateTask()">${icons.checkCircle} Terminer</button>
               <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
@@ -4046,7 +3883,7 @@
               </div>
             </div>
             
-            ${task.contact ? `<div class="modal-note" style="margin-top:0.75rem;">Le contact <strong>« ${task.contact} »</strong> et l'historique seront repris dans la nouvelle tâche.</div>` : ''}
+            ${task.contact ? `<div class="modal-note" style="margin-top:0.75rem;">Le contact <strong>« ${task.contact} »</strong> sera repris dans la nouvelle tâche.</div>` : ''}
             
             <div class="modal-actions">
               <button class="btn btn-blue" onclick="createFollowUp()">${icons.refresh} Terminer et créer le suivi</button>
@@ -4147,26 +3984,6 @@
         }
       }
       
-      // Get updated contact history (from completed tasks with completion comments)
-      const history = getContactHistory(completingTask.contact);
-      
-      // Convert comments from the completed task into history entries
-      // (pour une tâche récurrente, on ne reprend que les commentaires de
-      // l'occurrence qui vient d'être terminée)
-      const completedOccurrenceDate = completingTask._displayDeadline || completingTask.deadline;
-      const commentHistory = (completingTask.comments || [])
-        .filter(c => !completingTask.recurrence || !c.occurrenceDate || c.occurrenceDate === completedOccurrenceDate)
-        .map(c => ({
-          taskId: completingTask.id,
-          taskTitle: completingTask.title,
-          comment: c.text,
-          completedAt: c.date
-        }));
-      
-      // Merge: comment history + contact history, sorted by date desc
-      const fullHistory = [...commentHistory, ...history]
-        .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
-
       // Create follow-up task
       const newTask = {
         id: generateId(),
@@ -4178,7 +3995,6 @@
         category: completingTask.category || 'pro',
         status: 'todo',
         createdAt: now,
-        contactHistory: fullHistory
       };
       
       tasks.unshift(newTask);
@@ -4394,7 +4210,6 @@
               category: original.category || 'pro',
               status: 'todo',
               createdAt: new Date().toISOString(),
-              contactHistory: original.contactHistory || [],
               comments: occurrenceComments.map(c => { const { occurrenceDate, ...rest } = c; return rest; }),
             };
             tasks.unshift(newTask);
@@ -4508,13 +4323,6 @@
                 <option value="normal" ${settings.defaultUrgency === 'normal' ? 'selected' : ''}>Normal</option>
                 <option value="urgent" ${settings.defaultUrgency === 'urgent' ? 'selected' : ''}>Urgent</option>
               </select>
-            </div>
-            <div class="settings-row">
-              <div class="settings-row-label">
-                Reprendre l'historique
-                <small>Cocher par défaut la case de reprise des anciens commentaires</small>
-              </div>
-              <button class="settings-toggle ${settings.defaultIncludeHistory ? 'on' : ''}" onclick="toggleSetting('defaultIncludeHistory', this)"></button>
             </div>
           </div>
 
