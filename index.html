@@ -18,7 +18,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: #f5f7f9;
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #faf5ff 100%);
       min-height: 100vh;
       color: #1e293b;
     }
@@ -82,8 +82,28 @@
       transform: translateY(-50%);
       color: #94a3b8;
     }
+    .search-clear-btn {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: #e2e8f0;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .search-clear-btn:hover { background: #cbd5e1; color: #334155; }
+    .search-clear-btn.visible { display: flex; }
     #searchInput {
-      padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+      padding: 0.5rem 2rem 0.5rem 2.5rem;
       width: 100%;
       background: #f1f5f9;
       border: 1px solid transparent;
@@ -958,6 +978,7 @@
     }
     .modal-icon.green { background: #d1fae5; color: #059669; }
     .modal-icon.blue { background: #dbeafe; color: #2563eb; }
+    .modal-icon.indigo { background: #e0e7ff; color: #4338ca; }
     .modal-title { font-size: 1.125rem; font-weight: 600; color: #1e293b; }
     .modal-subtitle {
       font-size: 0.875rem;
@@ -1387,6 +1408,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      background: rgba(148,163,184,0.08);
       padding: 0.375rem;
       border-radius: 12px;
       flex-shrink: 0;
@@ -1597,6 +1619,34 @@
     .rec-choice-btn strong { display: block; font-size: 0.85rem; }
     .rec-choice-btn span { font-size: 0.75rem; color: #94a3b8; }
 
+    .period-mode-btns {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.375rem;
+      flex-wrap: wrap;
+    }
+    .period-mode-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 0.5rem 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .period-mode-btn:hover { border-color: #818cf8; background: #f8fafc; }
+    .period-mode-btn.active {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      color: #4338ca;
+      font-weight: 600;
+    }
+
     /* Settings button */
     .settings-btn {
       width: 32px; height: 32px;
@@ -1723,6 +1773,9 @@
         <div class="search-box">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <input type="text" id="searchInput" placeholder="Rechercher...">
+          <button type="button" class="search-clear-btn" id="searchClearBtn" onclick="clearSearch()" title="Effacer la recherche">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
         </div>
       </div>
       <div class="header-right">
@@ -1760,6 +1813,9 @@
         </div>
         <div class="filter-row">
           <div class="filter-group" id="urgencyFilters"></div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-group" id="periodFilters"></div>
         </div>
       </div>
 
@@ -1819,6 +1875,8 @@
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
     let filterDate = null;
+    let filterPeriod = null; // { mode: 'before'|'after'|'between', from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' }
+    let periodDraft = null;
     let filterCategory = settings.defaultFilterCategory;
     let filterLate = false;
     let isFormExpanded = false;
@@ -2238,6 +2296,7 @@
       renderFilters();
       renderTaskList();
       updateAppBadge();
+      updateSearchClearBtn();
     }
 
     function makePieChart(slices, total, chartId) {
@@ -2357,7 +2416,7 @@
     }
 
     function focusTask(id) {
-      filterStatus = 'all'; filterUrgency = 'all'; filterCategory = 'all'; filterLate = false; filterDate = null;
+      filterStatus = 'all'; filterUrgency = 'all'; filterCategory = 'all'; filterLate = false; filterDate = null; filterPeriod = null;
       render();
       requestAnimationFrame(() => {
         const el = document.getElementById(`task-${id}`);
@@ -2471,12 +2530,74 @@
         filterDate = null;
       } else {
         filterDate = dateStr;
+        filterPeriod = null;
       }
       render();
     }
 
     function clearDateFilter() {
       filterDate = null;
+      render();
+    }
+
+    // ============ FILTRE PAR PÉRIODE (avant / après / entre) ============
+    function filterTasksByPeriod(list) {
+      if (!filterPeriod) return list;
+      return list.filter(t => {
+        if (!t.deadline) return false;
+        if (filterPeriod.mode === 'before') return t.deadline <= filterPeriod.from;
+        if (filterPeriod.mode === 'after') return t.deadline >= filterPeriod.from;
+        if (filterPeriod.mode === 'between') return t.deadline >= filterPeriod.from && t.deadline <= filterPeriod.to;
+        return true;
+      });
+    }
+
+    function getPeriodFilterLabel(fp) {
+      const d = ds => formatDate(ds + 'T00:00:00');
+      if (fp.mode === 'before') return `Avant le ${d(fp.from)}`;
+      if (fp.mode === 'after') return `Après le ${d(fp.from)}`;
+      if (fp.mode === 'between') return `Du ${d(fp.from)} au ${d(fp.to)}`;
+      return 'Période';
+    }
+
+    function openPeriodFilterModal() {
+      if (filterPeriod) {
+        periodDraft = { ...filterPeriod };
+      } else {
+        // Pré-remplit avec la date sélectionnée dans le mini-calendrier, si présente
+        periodDraft = { mode: 'before', from: filterDate || '', to: '' };
+      }
+      modalMode = 'period';
+      renderModal();
+      document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function setPeriodDraftMode(mode) {
+      periodDraft.mode = mode;
+      renderModal();
+    }
+
+    function applyPeriodFilter() {
+      if (!periodDraft.from) return;
+      if (periodDraft.mode === 'between') {
+        if (!periodDraft.to) return;
+        if (periodDraft.to < periodDraft.from) {
+          const tmp = periodDraft.from;
+          periodDraft.from = periodDraft.to;
+          periodDraft.to = tmp;
+        }
+      }
+      filterPeriod = { ...periodDraft };
+      filterDate = null;
+      periodDraft = null;
+      closeModal();
+      render();
+    }
+
+    function clearPeriodFilter() {
+      filterPeriod = null;
+      periodDraft = null;
+      closeModal();
       render();
     }
 
@@ -2673,7 +2794,7 @@
       // "Terminées", jamais dans "À faire".
       const now = new Date();
       const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-      let base = expandRecurringTasks([...tasks], filterDate || null);
+      let base = filterTasksByPeriod(expandRecurringTasks([...tasks], filterDate || null));
       
       const counts = {
         all: base.length,
@@ -2746,6 +2867,12 @@
         </button>
       `;
       
+      document.getElementById('periodFilters').innerHTML = `
+        <button class="filter-btn ${filterPeriod ? 'active' : ''}" onclick="openPeriodFilterModal()">
+          ${icons.calendar} <span>${filterPeriod ? getPeriodFilterLabel(filterPeriod) : 'Période'}</span>
+        </button>
+      `;
+
       document.getElementById('sortSelect').value = sortBy;
       document.getElementById('sortDirBtn').innerHTML = sortAsc ? icons.sortAsc : icons.sortDesc;
     }
@@ -2793,6 +2920,9 @@
         filtered = filtered.filter(t => t.deadline === filterDate);
       }
       
+      // Filter by period (avant le / après le / entre le et le)
+      filtered = filterTasksByPeriod(filtered);
+      
       // Sort
       const urgencyOrder = { urgent: 0, normal: 1 };
       const dir = sortAsc ? 1 : -1;
@@ -2822,7 +2952,7 @@
         return result * dir;
       });
       
-      const hasFilters = filterStatus !== 'all' || filterUrgency !== 'all' || filterCategory !== 'all' || filterLate || searchQuery.trim() || filterDate;
+      const hasFilters = filterStatus !== 'all' || filterUrgency !== 'all' || filterCategory !== 'all' || filterLate || searchQuery.trim() || filterDate || filterPeriod;
       
       // Date filter banner
       const dateBanner = filterDate ? `
@@ -2832,9 +2962,18 @@
         </div>
       ` : '';
 
+      // Period filter banner
+      const periodBanner = filterPeriod ? `
+        <div class="date-filter-banner">
+          ${icons.calendar} Échéances : ${getPeriodFilterLabel(filterPeriod)}
+          <button class="date-filter-clear" onclick="clearPeriodFilter()">✕ Retirer le filtre</button>
+        </div>
+      ` : '';
+
       if (filtered.length === 0) {
         container.innerHTML = `
           ${dateBanner}
+          ${periodBanner}
           <div class="empty-state">
             <div class="empty-icon">${hasFilters ? icons.search : icons.clipboard}</div>
             <h3>${hasFilters ? 'Aucune tâche trouvée' : 'Aucune tâche pour le moment'}</h3>
@@ -2846,6 +2985,7 @@
       
       container.innerHTML = `
         ${dateBanner}
+        ${periodBanner}
         <div class="task-list">
           ${filtered.map(task => renderTaskCard(task)).join('')}
         </div>
@@ -3413,13 +3553,29 @@
 
     document.getElementById('searchInput').addEventListener('input', (e) => {
       searchQuery = e.target.value;
+      updateSearchClearBtn();
       render();
     });
+
+    function updateSearchClearBtn() {
+      const btn = document.getElementById('searchClearBtn');
+      if (btn) btn.classList.toggle('visible', !!searchQuery.trim());
+    }
+
+    function clearSearch() {
+      searchQuery = '';
+      const input = document.getElementById('searchInput');
+      if (input) input.value = '';
+      updateSearchClearBtn();
+      render();
+      document.getElementById('searchInput')?.focus();
+    }
 
     function searchByTag(tag) {
       searchQuery = tag;
       const input = document.getElementById('searchInput');
       if (input) input.value = tag;
+      updateSearchClearBtn();
       render();
     }
 
@@ -3439,6 +3595,7 @@
     function closeModal() {
       document.getElementById('modalOverlay').classList.add('hidden');
       completingTask = null;
+      periodDraft = null;
     }
 
     function renderModal() {
@@ -3447,6 +3604,54 @@
       
       if (modalMode === 'settings') {
         renderSettingsModal();
+        return;
+      }
+
+      if (modalMode === 'period') {
+        const pd = periodDraft || { mode: 'before', from: '', to: '' };
+        modal.innerHTML = `
+          <div class="modal-header">
+            <div class="modal-header-left">
+              <div class="modal-icon indigo">${icons.calendar}</div>
+              <div>
+                <div class="modal-title">Filtrer par période</div>
+                <div class="modal-subtitle">Selon la date d'échéance</div>
+              </div>
+            </div>
+            <button class="modal-close" onclick="closeModal()">${icons.x}</button>
+          </div>
+          <div class="modal-body">
+            <label>Type de période</label>
+            <div class="period-mode-btns">
+              <button type="button" class="period-mode-btn ${pd.mode === 'before' ? 'active' : ''}" onclick="setPeriodDraftMode('before')">Avant le</button>
+              <button type="button" class="period-mode-btn ${pd.mode === 'after' ? 'active' : ''}" onclick="setPeriodDraftMode('after')">Après le</button>
+              <button type="button" class="period-mode-btn ${pd.mode === 'between' ? 'active' : ''}" onclick="setPeriodDraftMode('between')">Entre le ... et le ...</button>
+            </div>
+
+            ${pd.mode === 'between' ? `
+              <div class="form-row" style="margin-top:0.75rem;">
+                <div>
+                  <label>${icons.calendar} Du</label>
+                  <input type="date" id="periodFrom" value="${pd.from || ''}" oninput="periodDraft.from=this.value">
+                </div>
+                <div>
+                  <label>${icons.calendar} Au</label>
+                  <input type="date" id="periodTo" value="${pd.to || ''}" oninput="periodDraft.to=this.value">
+                </div>
+              </div>
+            ` : `
+              <label style="margin-top:0.75rem;">${icons.calendar} ${pd.mode === 'before' ? 'Avant le' : 'Après le'}</label>
+              <input type="date" id="periodFrom" value="${pd.from || ''}" oninput="periodDraft.from=this.value">
+            `}
+
+            <div class="modal-actions">
+              <button class="btn btn-primary" onclick="applyPeriodFilter()">${icons.check} Appliquer</button>
+              <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+            </div>
+            ${filterPeriod ? `<button class="btn btn-secondary" style="width:100%;margin-top:0.5rem;" onclick="clearPeriodFilter()">${icons.x} Retirer le filtre</button>` : ''}
+          </div>
+        `;
+        setTimeout(() => document.getElementById('periodFrom')?.focus(), 100);
         return;
       }
 
