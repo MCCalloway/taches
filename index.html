@@ -1043,6 +1043,73 @@
       margin-top: 0.375rem;
     }
     .modal-note strong { color: #64748b; }
+
+    /* Fiche entreprise/contact */
+    .sheet-stats {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .sheet-stat {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.6rem 0.75rem;
+      text-align: center;
+    }
+    .sheet-stat-num { font-size: 1.25rem; font-weight: 800; color: #1e293b; }
+    .sheet-stat-label { font-size: 0.7rem; color: #94a3b8; margin-top: 0.125rem; }
+    .sheet-section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #475569;
+      margin: 1rem 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    .sheet-section-title:first-of-type { margin-top: 0; }
+    .sheet-empty {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      padding: 0.5rem 0;
+    }
+    .sheet-task {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.75rem 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+    .sheet-task.done { background: #f0fdf4; border-color: #bbf7d0; }
+    .sheet-task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .sheet-task-title { font-size: 0.875rem; font-weight: 600; color: #1e293b; }
+    .sheet-task-date { font-size: 0.7rem; color: #94a3b8; white-space: nowrap; }
+    .sheet-task-desc {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+    .sheet-task-comments { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .sheet-task-comment {
+      display: flex;
+      gap: 0.4rem;
+      align-items: flex-start;
+      font-size: 0.75rem;
+      color: #475569;
+      background: white;
+      border-radius: 8px;
+      padding: 0.4rem 0.5rem;
+    }
+    .sheet-task-comment svg { color: #94a3b8; flex-shrink: 0; margin-top: 2px; }
+    .sheet-task-comment-date { font-size: 0.7rem; color: #94a3b8; margin-top: 0.1rem; }
     
     .modal-actions {
       display: flex;
@@ -1975,6 +2042,50 @@
           completedAt: t.completedAt || t.createdAt
         }))
         .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+    }
+
+    // Construit la fiche d'un contact/entreprise à partir de l'ensemble des tâches
+    // (en cours et terminées) qui lui sont associées. La fiche est entièrement
+    // dérivée des tâches existantes : aucune donnée séparée à créer ni à saisir.
+    function getContactSheet(contactName) {
+      if (!contactName || !contactName.trim()) return { todo: [], done: [] };
+      const normalized = contactName.trim().toLowerCase();
+      const matching = tasks.filter(t => t.contact && t.contact.trim().toLowerCase() === normalized);
+
+      const toEntry = (t) => {
+        const comments = (t.comments || []).map(c => ({ text: c.text, date: c.date }));
+        if (t.completionComment) {
+          comments.push({ text: t.completionComment, date: t.completedAt || t.createdAt });
+        }
+        (t.completionLog || []).forEach(l => {
+          if (l.comment) comments.push({ text: l.comment, date: l.completedAt || l.date });
+        });
+        comments.sort((a, b) => new Date(b.date) - new Date(a.date));
+        return {
+          id: t.id,
+          title: t.title,
+          description: t.description || '',
+          createdAt: t.createdAt,
+          deadline: t.deadline,
+          completedAt: t.completedAt,
+          comments,
+        };
+      };
+
+      const todo = matching.filter(t => t.status !== 'done').map(toEntry)
+        .sort((a, b) => new Date(a.deadline || a.createdAt) - new Date(b.deadline || b.createdAt));
+      const done = matching.filter(t => t.status === 'done').map(toEntry)
+        .sort((a, b) => new Date(b.completedAt || b.createdAt) - new Date(a.completedAt || a.createdAt));
+
+      return { todo, done };
+    }
+
+    let viewingContact = null;
+    function openContactSheet(contactName) {
+      viewingContact = contactName;
+      modalMode = 'contactSheet';
+      renderModal();
+      document.getElementById('modalOverlay').classList.remove('hidden');
     }
 
     function getAllContacts() {
@@ -3014,7 +3125,7 @@
               <div style="flex:1;min-width:0;">
                 <div class="task-title">${task.title}</div>
                 <div class="task-meta">
-                  ${task.contact ? `<span class="task-meta-item">${icons.building} ${task.contact}</span>` : ''}
+                  ${task.contact ? `<span class="task-meta-item" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openContactSheet('${task.contact.replace(/'/g, "\\'")}')" title="Voir la fiche">${icons.building} ${task.contact}</span>` : ''}
                 </div>
                 ${(!isDone && deadlineInfo) || task.recurrence ? `
                   <div class="task-meta" style="margin-top:0.25rem;">
@@ -3595,6 +3706,7 @@
       document.getElementById('modalOverlay').classList.add('hidden');
       completingTask = null;
       periodDraft = null;
+      viewingContact = null;
     }
 
     function renderModal() {
@@ -3603,6 +3715,70 @@
       
       if (modalMode === 'settings') {
         renderSettingsModal();
+        return;
+      }
+
+      if (modalMode === 'contactSheet') {
+        const contact = viewingContact;
+        const sheet = getContactSheet(contact);
+
+        const renderSheetTask = (t, done) => `
+          <div class="sheet-task ${done ? 'done' : ''}">
+            <div class="sheet-task-header">
+              <span class="sheet-task-title">${t.title}</span>
+              <span class="sheet-task-date">${done ? (t.completedAt ? 'Terminée le ' + formatDate(t.completedAt, true) : '') : (t.deadline ? 'Échéance ' + formatDate(t.deadline) : '')}</span>
+            </div>
+            ${t.description ? `<div class="sheet-task-desc">${t.description}</div>` : ''}
+            ${t.comments.length > 0 ? `
+              <div class="sheet-task-comments">
+                ${t.comments.map(c => `
+                  <div class="sheet-task-comment">
+                    ${icons.message}
+                    <div>
+                      <div>${c.text}</div>
+                      <div class="sheet-task-comment-date">${c.date ? formatDate(c.date, true) : ''}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+
+        modal.innerHTML = `
+          <div class="modal-header">
+            <div class="modal-header-left">
+              <div class="modal-icon indigo">${icons.building}</div>
+              <div>
+                <div class="modal-title">Fiche entreprise/contact</div>
+                <div class="modal-subtitle">${contact}</div>
+              </div>
+            </div>
+            <button class="modal-close" onclick="closeModal()">${icons.x}</button>
+          </div>
+          <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+            <div class="sheet-stats">
+              <div class="sheet-stat">
+                <div class="sheet-stat-num">${sheet.todo.length}</div>
+                <div class="sheet-stat-label">En cours</div>
+              </div>
+              <div class="sheet-stat">
+                <div class="sheet-stat-num">${sheet.done.length}</div>
+                <div class="sheet-stat-label">Terminées</div>
+              </div>
+            </div>
+
+            <div class="sheet-section-title">${icons.clock} Tâches en cours</div>
+            ${sheet.todo.length > 0 ? sheet.todo.map(t => renderSheetTask(t, false)).join('') : `<div class="sheet-empty">Aucune tâche en cours pour ce contact.</div>`}
+
+            <div class="sheet-section-title">${icons.checkCircle} Tâches terminées</div>
+            ${sheet.done.length > 0 ? sheet.done.map(t => renderSheetTask(t, true)).join('') : `<div class="sheet-empty">Aucune tâche terminée pour ce contact.</div>`}
+
+            <div class="modal-actions">
+              <button class="btn btn-secondary" style="width:100%;" onclick="closeModal()">Fermer</button>
+            </div>
+          </div>
+        `;
         return;
       }
 
