@@ -105,13 +105,13 @@
     #searchInput {
       padding: 0.5rem 2rem 0.5rem 2.5rem;
       width: 100%;
-      background: #f1f5f9;
+      background: #e2e8f0;
       border: 1px solid transparent;
       border-radius: 12px;
       font-size: 0.875rem;
       outline: none;
     }
-    #searchInput:focus { box-shadow: 0 0 0 2px rgba(99,102,241,0.2); }
+    #searchInput:focus { box-shadow: 0 0 0 1px rgb(0 0 0 / 20%); }
     
     /* Main */
     main {
@@ -3028,7 +3028,7 @@
               <div style="flex:1;min-width:0;">
                 <div class="task-title">${task.title}</div>
                 <div class="task-meta">
-                  ${task.contact ? `<span class="task-meta-item" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openContactSheet('${task.contact.replace(/'/g, "\\'")}')" title="Voir la fiche">${icons.building} ${task.contact}</span>` : ''}
+                  ${task.contact ? `<span class="task-meta-item" style="cursor:pointer;" onclick="openContactSheet('${task.contact.replace(/'/g, "\\'")}')" title="Voir la fiche">${icons.building} ${task.contact}</span>` : ''}
                 </div>
                 ${(!isDone && deadlineInfo) || task.recurrence ? `
                   <div class="task-meta" style="margin-top:0.25rem;">
