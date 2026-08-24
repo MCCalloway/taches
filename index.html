@@ -1724,6 +1724,152 @@
       margin: 1rem 0;
     }
 
+    /* Summary / Bilan */
+    .summary-period {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .summary-quick { display: flex; gap: 0.375rem; flex-wrap: wrap; margin-bottom: 0.625rem; }
+    .summary-quick-btn {
+      padding: 0.375rem 0.625rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .summary-quick-btn:hover { border-color: #818cf8; background: #f8fafc; }
+    .summary-quick-btn.active {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      color: #4338ca;
+      font-weight: 600;
+    }
+    .summary-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .summary-dates > div { min-width: 0; }
+    .summary-dates label { font-size: 0.7rem; margin-bottom: 0.2rem; }
+    .summary-dates input { padding: 0.4rem 0.5rem; font-size: 0.8rem; }
+    .summary-period-label {
+      font-size: 0.8rem;
+      color: #475569;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      text-align: center;
+    }
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .summary-stat {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.5rem 0.25rem;
+      text-align: center;
+    }
+    .summary-stat .num { display: block; font-size: 1.15rem; font-weight: 800; color: #4338ca; }
+    .summary-stat span:last-child { font-size: 0.62rem; color: #94a3b8; display: block; margin-top: 0.1rem; }
+    @media (max-width: 480px) {
+      .summary-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+    .summary-group { margin-bottom: 1rem; }
+    .summary-group:last-of-type { margin-bottom: 0; }
+    .summary-group-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.375rem;
+      border-bottom: 2px solid #eef2ff;
+    }
+    .summary-group-title svg { color: #6366f1; flex-shrink: 0; }
+    .summary-group-title .count {
+      margin-left: auto;
+      background: #e0e7ff;
+      color: #4338ca;
+      border-radius: 6px;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .summary-task {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 0.6rem 0.75rem;
+      margin-bottom: 0.4rem;
+    }
+    .summary-task:last-child { margin-bottom: 0; }
+    .summary-task-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .summary-task-title { font-size: 0.85rem; font-weight: 600; color: #1e293b; flex: 1; min-width: 0; }
+    .summary-task-when {
+      font-size: 0.7rem;
+      color: #059669;
+      font-weight: 500;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .summary-task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+      align-items: center;
+    }
+    .summary-task-meta .category-badge { font-size: 0.68rem; padding: 0.1rem 0.45rem; }
+    .summary-task-meta .task-meta-item { font-size: 0.7rem; }
+    .summary-comment {
+      display: flex;
+      gap: 0.4rem;
+      align-items: flex-start;
+      margin-top: 0.4rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+    }
+    .summary-comment.completion { background: #ecfdf5; border: 1px solid #a7f3d0; }
+    .summary-comment.other { background: white; border: 1px solid #e2e8f0; }
+    .summary-comment svg { color: #10b981; flex-shrink: 0; margin-top: 2px; }
+    .summary-comment.other svg { color: #94a3b8; }
+    .summary-comment-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: #047857;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.1rem;
+    }
+    .summary-comment p { color: #065f46; line-height: 1.35; }
+    .summary-comment.other p { color: #475569; }
+    .summary-comment span { font-size: 0.65rem; color: #94a3b8; display: block; margin-top: 0.15rem; }
+    .summary-comment-list { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.4rem; }
+    .summary-comment-list:empty { display: none; }
+    .summary-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #94a3b8;
+    }
+    .summary-empty .emoji { font-size: 2.25rem; margin-bottom: 0.5rem; }
+    .summary-empty p { font-size: 0.85rem; }
+
     /* Utilities */
     .hidden { display: none !important; }
     
@@ -1774,6 +1920,9 @@
           <span class="sync-dot gray"></span>
           <span>Local</span>
         </div>
+        <button class="settings-btn" onclick="openSummary()" title="Bilan des tâches terminées">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </button>
         <button class="settings-btn" onclick="openSettings()" title="Paramètres">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         </button>
@@ -1829,7 +1978,7 @@
   </main>
 
   <footer>
-    Données sauvegardées localement · <a href="#" onclick="openSettings();return false" style="color:#6366f1;text-decoration:none;">Paramètres</a>
+    Données sauvegardées localement · <a href="#" onclick="openSummary();return false" style="color:#6366f1;text-decoration:none;">Bilan</a> · <a href="#" onclick="openSettings();return false" style="color:#6366f1;text-decoration:none;">Paramètres</a>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </footer>
 
@@ -1913,6 +2062,8 @@
       tag: `<svg width="15" height="15" ${sv}><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`,
       alertCircle: `<svg width="15" height="15" ${sv}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
       repeat: `<svg width="14" height="14" ${sv}><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>`,
+      fileText: `<svg width="20" height="20" ${sv}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+      copy: `<svg width="14" height="14" ${sv}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>`,
     };
 
     // ============ HELPERS ============
@@ -3548,9 +3699,15 @@
     function renderModal() {
       const modal = document.getElementById('modal');
       const task = completingTask;
-      
+      modal.style.maxWidth = (modalMode === 'summary') ? '680px' : '';
+
       if (modalMode === 'settings') {
         renderSettingsModal();
+        return;
+      }
+
+      if (modalMode === 'summary') {
+        renderSummaryModal();
         return;
       }
 
@@ -4238,6 +4395,272 @@
       }
     }
 
+    // ============ BILAN / RÉSUMÉ DES TÂCHES TERMINÉES ============
+    // Récapitulatif des tâches terminées sur une période choisie
+    // (semaine précédente ou plage personnalisée), avec les commentaires
+    // de clôture et les commentaires associés, regroupés par contact.
+    let summaryFrom = '';
+    let summaryTo = '';
+    let summaryQuick = 'lastWeek';
+
+    function toISODateLocal(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function openSummary() {
+      setSummaryQuick('lastWeek');
+      modalMode = 'summary';
+      completingTask = null;
+      viewingContact = null;
+      renderModal();
+      document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function setSummaryQuick(mode) {
+      summaryQuick = mode;
+      const today = new Date();
+      const dow = today.getDay(); // 0=Dim ... 6=Sam
+      const daysSinceMon = dow === 0 ? 6 : dow - 1;
+      const thisMon = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysSinceMon);
+      let from, to;
+      if (mode === 'lastWeek') {
+        from = new Date(thisMon); from.setDate(thisMon.getDate() - 7);
+        to = new Date(thisMon); to.setDate(thisMon.getDate() - 1);
+      } else if (mode === 'thisWeek') {
+        from = new Date(thisMon);
+        to = new Date(today);
+      } else if (mode === 'lastMonth') {
+        from = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        to = new Date(today.getFullYear(), today.getMonth(), 0);
+      } else if (mode === 'thisMonth') {
+        from = new Date(today.getFullYear(), today.getMonth(), 1);
+        to = new Date(today);
+      } else {
+        return;
+      }
+      summaryFrom = toISODateLocal(from);
+      summaryTo = toISODateLocal(to);
+      if (modalMode === 'summary') renderModal();
+    }
+
+    function setSummaryDate(which, value) {
+      if (!value) return;
+      if (which === 'from') summaryFrom = value; else summaryTo = value;
+      summaryQuick = 'custom';
+      renderModal();
+    }
+
+    // Renvoie les tâches terminées dont la date d'achèvement (completedAt)
+    // tombe dans la période [fromDate ; toDate] (inclus).
+    // Pour les tâches récurrentes, chaque occurrence terminée compte
+    // comme une entrée distincte (via completionLog).
+    function getCompletedInPeriod(fromDate, toDate) {
+      if (!fromDate || !toDate) return [];
+      const fromMs = new Date(fromDate + 'T00:00:00').getTime();
+      const toMs = new Date(toDate + 'T23:59:59').getTime();
+      const results = [];
+      tasks.forEach(t => {
+        if (t.recurrence) {
+          const completedDates = getCompletedOccurrenceDates(t);
+          const logByDate = {};
+          (t.completionLog || []).forEach(e => { logByDate[e.date] = e; });
+          completedDates.forEach(date => {
+            const logEntry = logByDate[date];
+            // completedAt réel si connu, sinon on se rabat sur la date d'occurrence
+            const completedAt = (logEntry && logEntry.completedAt) ? logEntry.completedAt : (date + 'T12:00:00');
+            const ms = new Date(completedAt).getTime();
+            if (ms < fromMs || ms > toMs) return;
+            const occComments = (t.comments || [])
+              .filter(c => !c.occurrenceDate || c.occurrenceDate === date)
+              .map(c => ({ text: c.text, date: c.date }));
+            results.push({
+              title: t.title,
+              contact: t.contact || '',
+              category: t.category || 'pro',
+              completedAt,
+              deadline: date,
+              completionComment: logEntry ? (logEntry.comment || '') : '',
+              comments: occComments,
+            });
+          });
+        } else if (t.status === 'done' && t.completedAt) {
+          const ms = new Date(t.completedAt).getTime();
+          if (ms < fromMs || ms > toMs) return;
+          const comments = (t.comments || []).map(c => ({ text: c.text, date: c.date }));
+          results.push({
+            title: t.title,
+            contact: t.contact || '',
+            category: t.category || 'pro',
+            completedAt: t.completedAt,
+            deadline: t.deadline || '',
+            completionComment: t.completionComment || '',
+            comments,
+          });
+        }
+      });
+      results.sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));
+      return results;
+    }
+
+    function buildSummaryGroups(results) {
+      const NO_CONTACT_KEY = '__noc__';
+      const groups = {};
+      results.forEach(r => {
+        const key = r.contact.trim() ? r.contact.trim() : NO_CONTACT_KEY;
+        (groups[key] = groups[key] || []).push(r);
+      });
+      const groupKeys = Object.keys(groups).sort((a, b) => {
+        if (a === NO_CONTACT_KEY) return 1;
+        if (b === NO_CONTACT_KEY) return -1;
+        return a.localeCompare(b, 'fr');
+      });
+      return { groups, groupKeys, NO_CONTACT_KEY };
+    }
+
+    function renderSummaryModal() {
+      const modal = document.getElementById('modal');
+      if (!summaryFrom || !summaryTo) setSummaryQuick('lastWeek');
+      const results = getCompletedInPeriod(summaryFrom, summaryTo);
+      const { groups, groupKeys, NO_CONTACT_KEY } = buildSummaryGroups(results);
+      const proCount = results.filter(r => r.category === 'pro').length;
+      const persoCount = results.filter(r => r.category === 'perso').length;
+
+      const renderTask = (r) => `
+        <div class="summary-task">
+          <div class="summary-task-head">
+            <span class="summary-task-title">${r.title}</span>
+            <span class="summary-task-when">${icons.checkCircle} ${formatDate(r.completedAt, true)}</span>
+          </div>
+          <div class="summary-task-meta">
+            <span class="category-badge ${r.category}">${r.category === 'pro' ? icons.briefcase + ' Pro' : icons.home + ' Perso'}</span>
+            ${r.deadline ? `<span class="task-meta-item">${icons.calendar} Échéance ${formatDate(r.deadline)}</span>` : ''}
+          </div>
+          ${r.completionComment ? `
+            <div class="summary-comment completion">
+              ${icons.message}
+              <div style="min-width:0;">
+                <div class="summary-comment-label">Commentaire de clôture</div>
+                <p>${r.completionComment}</p>
+              </div>
+            </div>` : ''}
+          ${r.comments.length ? `
+            <div class="summary-comment-list">
+              ${r.comments.map(c => `
+                <div class="summary-comment other">
+                  ${icons.message}
+                  <div style="min-width:0;">
+                    <p>${c.text}</p>
+                    ${c.date ? `<span>${formatDate(c.date, true)}</span>` : ''}
+                  </div>
+                </div>
+              `).join('')}
+            </div>` : ''}
+        </div>
+      `;
+
+      modal.innerHTML = `
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="modal-icon indigo">${icons.fileText}</div>
+            <div>
+              <div class="modal-title">Bilan des tâches terminées</div>
+              <div class="modal-subtitle">Récapitulatif sur une période</div>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">${icons.x}</button>
+        </div>
+        <div class="modal-body" style="max-height:78vh;overflow-y:auto;">
+          <div class="summary-period">
+            <div class="summary-quick">
+              <button type="button" class="summary-quick-btn ${summaryQuick==='lastWeek'?'active':''}" onclick="setSummaryQuick('lastWeek')">Semaine dernière</button>
+              <button type="button" class="summary-quick-btn ${summaryQuick==='thisWeek'?'active':''}" onclick="setSummaryQuick('thisWeek')">Cette semaine</button>
+              <button type="button" class="summary-quick-btn ${summaryQuick==='lastMonth'?'active':''}" onclick="setSummaryQuick('lastMonth')">Mois dernier</button>
+              <button type="button" class="summary-quick-btn ${summaryQuick==='thisMonth'?'active':''}" onclick="setSummaryQuick('thisMonth')">Ce mois</button>
+            </div>
+            <div class="summary-dates">
+              <div>
+                <label>${icons.calendar} Du</label>
+                <input type="date" id="summaryFromInput" value="${summaryFrom}" onchange="setSummaryDate('from', this.value)">
+              </div>
+              <div>
+                <label>${icons.calendar} Au</label>
+                <input type="date" id="summaryToInput" value="${summaryTo}" onchange="setSummaryDate('to', this.value)">
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-period-label">Du ${formatDate(summaryFrom + 'T00:00:00')} au ${formatDate(summaryTo + 'T00:00:00')}</div>
+
+          <div class="summary-stats">
+            <div class="summary-stat"><span class="num">${results.length}</span><span>Terminées</span></div>
+            <div class="summary-stat"><span class="num">${groupKeys.length}</span><span>Contact(s)</span></div>
+            <div class="summary-stat"><span class="num">${proCount}</span><span>Pro</span></div>
+            <div class="summary-stat"><span class="num">${persoCount}</span><span>Perso</span></div>
+          </div>
+
+          ${results.length === 0 ? `
+            <div class="summary-empty">
+              <div class="emoji">🗂️</div>
+              <p>Aucune tâche terminée sur cette période.</p>
+            </div>
+          ` : groupKeys.map(key => {
+            const isNoContact = key === NO_CONTACT_KEY;
+            const label = isNoContact ? 'Sans contact' : key;
+            const iconHtml = isNoContact ? icons.tag : icons.building;
+            return `
+              <div class="summary-group">
+                <div class="summary-group-title">${iconHtml} <span>${label}</span> <span class="count">${groups[key].length}</span></div>
+                ${groups[key].map(renderTask).join('')}
+              </div>
+            `;
+          }).join('')}
+
+          <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="copySummary()" ${results.length === 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>${icons.copy} Copier le bilan</button>
+            <button class="btn btn-primary" onclick="closeModal()">Fermer</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function copySummary() {
+      const results = getCompletedInPeriod(summaryFrom, summaryTo);
+      const { groups, groupKeys, NO_CONTACT_KEY } = buildSummaryGroups(results);
+      const lines = [];
+      lines.push(`Bilan des tâches terminées — du ${formatDate(summaryFrom + 'T00:00:00')} au ${formatDate(summaryTo + 'T00:00:00')}`);
+      lines.push(`${results.length} tâche${results.length > 1 ? 's' : ''} terminée${results.length > 1 ? 's' : ''}`);
+      groupKeys.forEach(key => {
+        lines.push('');
+        lines.push(key === NO_CONTACT_KEY ? 'Sans contact' : key);
+        groups[key].forEach(r => {
+          let line = `• ${r.title}`;
+          if (r.completedAt) line += ` (terminée le ${formatDate(r.completedAt, true)})`;
+          lines.push(line);
+          if (r.completionComment) lines.push(`   → ${r.completionComment}`);
+          r.comments.forEach(c => lines.push(`   · ${c.text}`));
+        });
+      });
+      const text = lines.join('\n');
+      const ok = () => showToast('✓ Bilan copié dans le presse-papier');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopyText(text));
+      } else {
+        fallbackCopyText(text);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast('✓ Bilan copié'); }
+      catch (e) { showToast('⚠ Copie impossible'); }
+      document.body.removeChild(ta);
+    }
+
     // ============ SETTINGS MODAL ============
     function openSettings() {
       completingTask = null;
@@ -4604,5 +5027,5 @@ function doPost(e) {
       });
     }
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a30083453a8ffc1f',t:'MTc4NzU1NTE3MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
