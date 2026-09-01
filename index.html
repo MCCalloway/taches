@@ -5029,14 +5029,14 @@
     }
 
     // ============ CLIPBOARD SYNC ============
-    function showToast(message) {
+    function showToast(message, duration = 2500) {
       const existing = document.querySelector('.footer-toast');
       if (existing) existing.remove();
       const toast = document.createElement('div');
       toast.className = 'footer-toast';
       toast.textContent = message;
       document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2500);
+      setTimeout(() => toast.remove(), duration);
     }
 
     async function copyData() {
@@ -5489,6 +5489,28 @@
       modalMode = 'settings';
       renderModal();
       document.getElementById('modalOverlay').classList.remove('hidden');
+      // Vérifie en arrière-plan la version du script cloud (section Récap e-mail)
+      if (cloudUrl) setTimeout(displayScriptVersion, 150);
+    }
+
+    // Affiche la version du script cloud dans la section Récap e-mail
+    async function displayScriptVersion() {
+      const el = document.getElementById('scriptVersionStatus');
+      if (!el) return;
+      const status = await checkScriptEmailSupport();
+      if (status === 'ok') {
+        el.textContent = 'Version du script cloud : à jour ✓';
+        el.style.color = '#059669';
+      } else if (status === 'old') {
+        el.textContent = 'Version du script cloud : TROP ANCIENNE — recopiez le dernier code et redéployez en choisissant « Version : Nouvelle »';
+        el.style.color = '#dc2626';
+      } else if (status === 'unreachable') {
+        el.textContent = 'Version du script cloud : inaccessible (vérifiez l\'URL et l\'accès « Tout le monde »)';
+        el.style.color = '#d97706';
+      } else {
+        el.textContent = 'Version du script cloud : injoignable (réseau)';
+        el.style.color = '#d97706';
+      }
     }
 
     function renderSettingsModal() {
@@ -5553,7 +5575,7 @@
 
           <!-- Création de tâche -->
           <div class="settings-section">
-            <div class="settings-section-title">${icons.plus} Création de tâche</div>
+            <div class="settings-section-title">${icons.plus} Création de tâches</div>
             <div class="settings-row">
               <div class="settings-row-label">Catégorie par défaut</div>
               <select class="settings-select" onchange="updateSetting('defaultCategory', this.value)">
@@ -5584,107 +5606,6 @@
               <button class="settings-toggle ${settings.notificationsEnabled ? 'on' : ''}" onclick="toggleNotifications(this)"></button>
             </div>
             <p id="notifStatusNote" style="font-size:0.75rem;color:#94a3b8;margin-top:0.25rem;">${getNotificationStatusNote()}</p>
-          </div>
-
-          <!-- Récap e-mail automatique -->
-          <div class="settings-section">
-            <div class="settings-section-title">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              Récap e-mail automatique
-            </div>
-            ${cloudUrl ? `
-            <div class="settings-row">
-              <div class="settings-row-label">
-                Envoi automatique
-                <small>Planifié par Google Apps Script, même application fermée</small>
-              </div>
-              <button class="settings-toggle ${emailRecap.enabled ? 'on' : ''}" id="emailRecapToggle" onclick="this.classList.toggle('on')" title="Activer/désactiver"></button>
-            </div>
-            <div class="settings-row">
-              <div class="settings-row-label">Destinataire</div>
-              <input type="email" class="settings-input" id="emailRecapAddr" value="${emailRecap.email}" placeholder="vous@exemple.fr">
-            </div>
-            <div class="settings-row">
-              <div class="settings-row-label">Fréquence</div>
-              <select class="settings-select" id="emailRecapFreq" onchange="document.getElementById('emailRecapDayRow').style.display=this.value==='weekly'?'':'none'">
-                <option value="daily" ${emailRecap.frequency === 'daily' ? 'selected' : ''}>Chaque jour</option>
-                <option value="weekly" ${emailRecap.frequency !== 'daily' ? 'selected' : ''}>Chaque semaine</option>
-              </select>
-            </div>
-            <div class="settings-row" id="emailRecapDayRow" style="${emailRecap.frequency === 'weekly' ? '' : 'display:none;'}">
-              <div class="settings-row-label">Jour d'envoi</div>
-              <select class="settings-select" id="emailRecapDay">
-                ${['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((d, i) => `<option value="${i + 1}" ${emailRecap.day === i + 1 ? 'selected' : ''}>${d}</option>`).join('')}
-              </select>
-            </div>
-            <div class="settings-row">
-              <div class="settings-row-label">Heure d'envoi <small>Approximative (fenêtre d'une heure)</small></div>
-              <select class="settings-select" id="emailRecapHour">
-                ${Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${emailRecap.hour === h ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')}
-              </select>
-            </div>
-            <div class="settings-row">
-              <div class="settings-row-label">Contenu du récap</div>
-              <select class="settings-select" id="emailRecapContent">
-                <option value="all" ${emailRecap.content === 'all' ? 'selected' : ''}>Toutes les tâches à faire</option>
-                <option value="attention" ${emailRecap.content === 'attention' ? 'selected' : ''}>Retards et urgentes seulement</option>
-                <option value="week" ${emailRecap.content === 'week' ? 'selected' : ''}>Échéances des 7 prochains jours</option>
-              </select>
-            </div>
-            <div class="settings-row">
-              <div class="settings-row-label">
-                Inclure les tâches terminées
-                <small>Depuis le dernier envoi (24 h ou 7 jours selon la fréquence)</small>
-              </div>
-              <button class="settings-toggle ${emailRecap.includeDone ? 'on' : ''}" id="emailRecapDoneToggle" onclick="this.classList.toggle('on')" title="Inclure/exclure"></button>
-            </div>
-            <div class="footer-actions" style="justify-content:flex-start;margin-top:0.75rem;">
-              <button class="footer-btn footer-btn-accent" onclick="saveEmailRecapConfig(false)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Enregistrer
-              </button>
-              <button class="footer-btn" onclick="saveEmailRecapConfig(true)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                Tester l'envoi
-              </button>
-              <button class="footer-btn" onclick="runEmailDiagnostic()" title="Tester la connexion au script cloud">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                Diagnostic
-              </button>
-            </div>
-            <div id="emailDiagResult" class="hidden" style="margin-top:0.5rem;font-size:0.72rem;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem 0.625rem;white-space:pre-wrap;word-break:break-all;"></div>
-            <p class="modal-note" style="margin-top:0.5rem;">Le récap reflète la <strong>dernière synchronisation cloud</strong> de vos tâches. Si le déclencheur refuse de se créer : dans l'éditeur Apps Script, sélectionnez la fonction <strong>emailRecapTrigger</strong> et cliquez une fois sur <strong>Exécuter</strong>, puis autorisez toutes les permissions.</p>
-            ` : `
-            <p style="font-size:0.8rem;color:#64748b;margin-bottom:0.75rem;">
-              Nécessite la synchronisation cloud (Google Sheets). <a href="#" onclick="openCloudSetup();return false;" style="color:#4f46e5;">Configurer →</a>
-            </p>
-            `}
-          </div>
-
-          <!-- Export / Import -->
-          <div class="settings-section">
-            <div class="settings-section-title">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Données
-            </div>
-            <div class="footer-actions" style="justify-content:flex-start;">
-              <button class="footer-btn" onclick="exportData()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Exporter
-              </button>
-              <button class="footer-btn" onclick="document.getElementById('importFile').click()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                Importer
-              </button>
-              <button class="footer-btn footer-btn-accent" onclick="copyData()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                Copier
-              </button>
-              <button class="footer-btn footer-btn-accent" onclick="pasteData()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-                Coller
-              </button>
-            </div>
           </div>
 
           <!-- Synchronisation Cloud -->
@@ -5724,6 +5645,109 @@
                 </div>
               </details>
             ` : ''}
+          </div>
+
+          <!-- Récap e-mail automatique -->
+          <div class="settings-section">
+            <div class="settings-section-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Récap e-mail automatique
+            </div>
+            ${cloudUrl ? `
+            <div id="scriptVersionStatus" class="modal-note" style="margin:0 0 0.5rem;">Version du script cloud : vérification…</div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                Envoi automatique
+                <small>Planifié par Google Apps Script, même application fermée</small>
+              </div>
+              <button class="settings-toggle ${emailRecap.enabled ? 'on' : ''}" id="emailRecapToggle" onclick="this.classList.toggle('on')" title="Activer/désactiver"></button>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">Destinataire</div>
+              <input type="email" class="settings-input" id="emailRecapAddr" value="${emailRecap.email}" placeholder="vous@exemple.fr">
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">Fréquence</div>
+              <select class="settings-select" id="emailRecapFreq" onchange="document.getElementById('emailRecapDayRow').style.display=this.value==='weekly'?'':'none'">
+                <option value="daily" ${emailRecap.frequency === 'daily' ? 'selected' : ''}>Chaque jour</option>
+                <option value="weekly" ${emailRecap.frequency !== 'daily' ? 'selected' : ''}>Chaque semaine</option>
+              </select>
+            </div>
+            <div class="settings-row" id="emailRecapDayRow" style="${emailRecap.frequency === 'weekly' ? '' : 'display:none;'}">
+              <div class="settings-row-label">Jour d'envoi</div>
+              <select class="settings-select" id="emailRecapDay">
+                ${['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((d, i) => `<option value="${i + 1}" ${emailRecap.day === i + 1 ? 'selected' : ''}>${d}</option>`).join('')}
+              </select>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">Heure d'envoi <small>Approximative (fenêtre d'une heure)</small></div>
+              <select class="settings-select" id="emailRecapHour">
+                ${Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${emailRecap.hour === h ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')}
+              </select>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">Contenu du récap</div>
+              <select class="settings-select" id="emailRecapContent">
+                <option value="all" ${emailRecap.content === 'all' ? 'selected' : ''}>Toutes les tâches à faire</option>
+                <option value="today" ${emailRecap.content === 'today' ? 'selected' : ''}>Uniquement les tâches du jour</option>
+                <option value="week" ${emailRecap.content === 'week' ? 'selected' : ''}>Échéances des 7 prochains jours</option>
+                <option value="attention" ${emailRecap.content === 'attention' ? 'selected' : ''}>Retards et urgentes seulement</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                Inclure les tâches terminées
+                <small>Depuis le dernier envoi (24 h ou 7 jours selon la fréquence)</small>
+              </div>
+              <button class="settings-toggle ${emailRecap.includeDone ? 'on' : ''}" id="emailRecapDoneToggle" onclick="this.classList.toggle('on')" title="Inclure/exclure"></button>
+            </div>
+            <div class="footer-actions" style="justify-content:flex-start;margin-top:0.75rem;">
+              <button class="footer-btn footer-btn-accent" onclick="saveEmailRecapConfig(false)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Enregistrer
+              </button>
+              <button class="footer-btn" onclick="saveEmailRecapConfig(true)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Tester l'envoi
+              </button>
+              <button class="footer-btn" onclick="runEmailDiagnostic()" title="Tester la connexion au script cloud">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                Diagnostic
+              </button>
+            </div>
+            <div id="emailDiagResult" class="hidden" style="margin-top:0.5rem;font-size:0.72rem;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem 0.625rem;white-space:pre-wrap;word-break:break-all;"></div>
+            <p class="modal-note" style="margin-top:0.5rem;">Le récap reflète la <strong>dernière synchronisation cloud</strong> de vos tâches. Si le déclencheur refuse de se créer : dans l'éditeur Apps Script, sélectionnez la fonction <strong>activerRecap</strong> et cliquez une fois sur <strong>Exécuter</strong>, puis autorisez toutes les permissions.</p>
+            ` : `
+            <p style="font-size:0.8rem;color:#64748b;margin-bottom:0.75rem;">
+              Nécessite la synchronisation cloud (Google Sheets). <a href="#" onclick="openCloudSetup();return false;" style="color:#4f46e5;">Configurer →</a>
+            </p>
+            `}
+          </div>
+
+          <!-- Export / Import -->
+          <div class="settings-section">
+            <div class="settings-section-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Données
+            </div>
+            <div class="footer-actions" style="justify-content:flex-start;">
+              <button class="footer-btn" onclick="exportData()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Exporter
+              </button>
+              <button class="footer-btn" onclick="document.getElementById('importFile').click()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Importer
+              </button>
+              <button class="footer-btn footer-btn-accent" onclick="copyData()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copier
+              </button>
+              <button class="footer-btn footer-btn-accent" onclick="pasteData()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                Coller
+              </button>
+            </div>
           </div>
 
         </div>
@@ -5794,7 +5818,7 @@ function doGet(e) {
       }
     }
     try {
-      return jsonOut({ ok: true, version: 2, config: loadEmailConfig() });
+      return jsonOut({ ok: true, version: 4, config: loadEmailConfig() });
     } catch (err) {
       return jsonOut({ ok: false, error: 'Lecture impossible : ' + errMsg(err) });
     }
@@ -5808,7 +5832,7 @@ function doGet(e) {
 // (une page d erreur HTML serait bloquée par le navigateur et semblerait
 // être un problème réseau).
 function handleEmailConfigSet(p) {
-  var result = { ok: true, sent: false };
+  var result = { ok: true, version: 4, sent: false };
   var config = null;
   try {
     config = JSON.parse(p.set);
@@ -5904,6 +5928,21 @@ function installEmailTrigger(config) {
     builder.onWeekDay(days[idx]).atHour(config.hour || 8);
   }
   builder.create();
+}
+
+// À exécuter UNE FOIS depuis l'éditeur Apps Script (liste des fonctions
+// puis bouton « Exécuter ») si le déclencheur refuse de se créer depuis
+// l'application (erreur d'autorisation ScriptApp). L'éditeur réclame alors
+// les autorisations manquantes et installe le déclencheur avec vos droits.
+// Inutile de redéployer : le déclencheur persiste une fois créé.
+function activerRecap() {
+  var config = loadEmailConfig();
+  if (!config || !config.enabled || !config.email) {
+    Logger.log("Aucun récap actif trouvé — enregistrez d'abord la configuration depuis l'application, puis relancez cette fonction.");
+    return;
+  }
+  installEmailTrigger(config);
+  Logger.log("Déclencheur installé : envoi " + (config.frequency === "daily" ? "chaque jour" : "chaque semaine") + " vers " + (config.hour || 8) + " h — destinataire : " + config.email);
 }
 
 // Fonction exécutée automatiquement par le déclencheur
@@ -6042,6 +6081,8 @@ function buildRecapData(config) {
     var isUrgent = t.urgency === 'urgent';
     if (config.content === 'attention') {
       if (!isLate && !isUrgent) continue;
+    } else if (config.content === 'today') {
+      if (!t.deadline || t.deadline !== today) continue;
     } else if (config.content === 'week') {
       if (!t.deadline || t.deadline > in7) continue;
     }
@@ -6493,16 +6534,16 @@ function sendRecapEmail(config, isTest) {
           return;
         }
         if (status === 'old') {
-          showToast('⚠ Script cloud obsolète — mettez-le à jour (Configuration cloud → « Activer le récap e-mail ») et redéployez une nouvelle version');
+          showToast('⚠ Version du script cloud trop ancienne — recopiez le DERNIER code (Configuration cloud → Copier), puis redéployez en choisissant bien « Version : Nouvelle »', 6000);
           return;
         }
         pushEmailRecapConfig(config, test);
       });
     }
 
-    // Vérifie que le script déployé prend en charge le récap e-mail (version 2+).
-    // Retourne 'ok' | 'old' (script obsolète) | 'unreachable' (réponse non JSON :
-    // page de connexion Google, erreur du script…) | 'network' (requête impossible)
+    // Vérifie que le script déployé prend en charge le récap e-mail (version 3+ :
+    // enregistrement via GET). Retourne 'ok' | 'old' (version trop ancienne) |
+    // 'unreachable' (réponse non JSON) | 'network' (requête impossible)
     async function checkScriptEmailSupport() {
       try {
         const url = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword) + '&action=emailconfig';
@@ -6510,7 +6551,7 @@ function sendRecapEmail(config, isTest) {
         const text = await response.text();
         let data = null;
         try { data = JSON.parse(text); } catch (e) { data = null; }
-        if (data && data.ok && data.version >= 2) return 'ok';
+        if (data && data.ok && data.version >= 4) return 'ok';
         if (data) return 'old';
         return 'unreachable';
       } catch (err) {
@@ -6536,12 +6577,23 @@ function sendRecapEmail(config, isTest) {
           showToast('⚠ Le script cloud a renvoyé une erreur — vérifiez que la dernière version du code est bien déployée (nouvelle version) et autorisée');
           return;
         }
+        // Un script version < 3 répond « ok » mais IGNORE la commande
+        // d'enregistrement : il faut recopier le dernier code et redéployer
+        if (data.ok && !(data.version >= 4)) {
+          showToast('⚠ Le script déployé est trop ancien (version ' + (data.version || '?') + ') — recopiez le DERNIER code et redéployez en choisissant « Version : Nouvelle »', 6000);
+          const diag = document.getElementById('emailDiagResult');
+          if (diag) {
+            diag.classList.remove('hidden');
+            diag.textContent = 'Résultat de la dernière action :\nScript cloud : version ' + (data.version || '?') + ' — TROP ANCIENNE\n→ Recopiez le dernier code Apps Script (Configuration cloud → « Activer le récap e-mail » → Copier) puis :\n→ Déployer → Gérer les déploiements → ✏️ → Version : « Nouvelle » → Déployer';
+          }
+          return;
+        }
         if (data && data.ok) {
           emailRecap = { ...config };
           saveEmailRecapLocal();
           let msg;
           if (data.triggerError) {
-            msg = '⚠ Récap enregistré mais déclencheur NON créé (' + data.triggerError + ') — dans l\'éditeur Apps Script, exécutez une fois la fonction emailRecapTrigger et autorisez';
+            msg = '⚠ Récap enregistré mais déclencheur NON créé — dans l\'éditeur Apps Script, exécutez la fonction activerRecap (bouton Exécuter) et autorisez';
           } else if (test) {
             msg = data.sent ? '✓ E-mail de test envoyé à ' + config.email : '⚠ E-mail non envoyé' + (data.error ? ' : ' + data.error : '');
           } else if (config.enabled) {
@@ -6549,9 +6601,23 @@ function sendRecapEmail(config, isTest) {
           } else {
             msg = '✓ Récap e-mail désactivé';
           }
-          showToast(msg);
+          showToast(msg, 6000);
+          // Résultat complet et durable dans la zone de diagnostic
+          const diag = document.getElementById('emailDiagResult');
+          if (diag) {
+            diag.classList.remove('hidden');
+            const lines = ['Résultat de la dernière action :'];
+            lines.push('Enregistré : oui');
+            lines.push(data.triggerError ? 'Déclencheur : ERREUR — ' + data.triggerError : 'Déclencheur : créé/mis à jour ✓');
+            if (test) {
+              lines.push(data.sent
+                ? 'E-mail de test : envoyé ✓ (vérifiez la boîte de ' + config.email + ', y compris les spams)'
+                : 'E-mail de test : NON envoyé' + (data.error ? ' — ' + data.error : ' (raison inconnue)'));
+            }
+            diag.textContent = lines.join('\n');
+          }
         } else {
-          showToast('⚠ ' + ((data && data.error) || 'Réponse inattendue du script'));
+          showToast('⚠ ' + ((data && data.error) || 'Réponse inattendue du script'), 6000);
         }
       } catch (err) {
         console.error('Email config error:', err);
@@ -6593,11 +6659,13 @@ function sendRecapEmail(config, isTest) {
         lines.push('Statut HTTP : ' + response.status);
         let parsed = null;
         try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
-        if (parsed && parsed.ok && parsed.version >= 2) {
-          lines.push('Script : version ' + parsed.version + ' ✓ (récap e-mail pris en charge)');
+        if (parsed && parsed.ok && parsed.version >= 4) {
+          lines.push('Script : version ' + parsed.version + ' ✓ (à jour, récap e-mail pris en charge)');
           lines.push('Récap configuré : ' + (parsed.config && parsed.config.enabled ? 'activé — ' + (parsed.config.email || '(sans adresse)') : 'désactivé'));
+        } else if (parsed && parsed.ok) {
+          lines.push('Script : version ' + (parsed.version || '?') + ' — TROP ANCIENNE. Recopiez le dernier code et redéployez en choisissant « Version : Nouvelle ».');
         } else if (parsed) {
-          lines.push('Réponse JSON mais PAS la version attendue → ancien script déployé, il faut redéployer une nouvelle version.');
+          lines.push('Réponse JSON inattendue → ancien script déployé, il faut redéployer une nouvelle version.');
         } else {
           lines.push('Réponse non JSON (page Google) → probablement une erreur du script ou une page de connexion (accès pas réglé sur « Tout le monde »).');
         }
@@ -6640,5 +6708,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a343d8963c2de1c4',t:'MTc4ODI2MTIxMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a34432d68e084f23',t:'MTc4ODI2NDkwNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
