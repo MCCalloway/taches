@@ -5647,8 +5647,13 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 Tester l'envoi
               </button>
+              <button class="footer-btn" onclick="runEmailDiagnostic()" title="Tester la connexion au script cloud">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                Diagnostic
+              </button>
             </div>
-            <p class="modal-note" style="margin-top:0.5rem;">Le récap reflète la <strong>dernière synchronisation cloud</strong> de vos tâches.</p>
+            <div id="emailDiagResult" class="hidden" style="margin-top:0.5rem;font-size:0.72rem;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem 0.625rem;white-space:pre-wrap;word-break:break-all;"></div>
+            <p class="modal-note" style="margin-top:0.5rem;">Le récap reflète la <strong>dernière synchronisation cloud</strong> de vos tâches. Si le déclencheur refuse de se créer : dans l'éditeur Apps Script, sélectionnez la fonction <strong>emailRecapTrigger</strong> et cliquez une fois sur <strong>Exécuter</strong>, puis autorisez toutes les permissions.</p>
             ` : `
             <p style="font-size:0.8rem;color:#64748b;margin-bottom:0.75rem;">
               Nécessite la synchronisation cloud (Google Sheets). <a href="#" onclick="openCloudSetup();return false;" style="color:#4f46e5;">Configurer →</a>
@@ -5777,8 +5782,17 @@ function readTasks() {
 
 function doGet(e) {
   if (!checkPassword(e)) return jsonOut({ error: 'Mot de passe incorrect' });
-  // Lecture de la configuration du récap e-mail (action=emailconfig)
-  if (e && e.parameter && e.parameter.action === 'emailconfig') {
+  var p = (e && e.parameter) || {};
+  if (p.action === 'emailconfig') {
+    // Enregistrement (+ test) via GET — paramètre « set » = JSON de la config.
+    // Ce canal est le plus fiable depuis un navigateur.
+    if (p.set) {
+      try {
+        return jsonOut(handleEmailConfigSet(p));
+      } catch (err) {
+        return jsonOut({ ok: false, error: 'Erreur inattendue : ' + errMsg(err) });
+      }
+    }
     try {
       return jsonOut({ ok: true, version: 2, config: loadEmailConfig() });
     } catch (err) {
@@ -5787,6 +5801,38 @@ function doGet(e) {
   }
   return ContentService.createTextOutput(JSON.stringify(readTasks()))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Enregistre la config, met à jour le déclencheur, envoie un test si demandé.
+// Chaque étape est protégée : aucune erreur ne fait planter le script
+// (une page d erreur HTML serait bloquée par le navigateur et semblerait
+// être un problème réseau).
+function handleEmailConfigSet(p) {
+  var result = { ok: true, sent: false };
+  var config = null;
+  try {
+    config = JSON.parse(p.set);
+  } catch (err) {
+    return { ok: false, error: 'Configuration invalide : ' + errMsg(err) };
+  }
+  try {
+    saveEmailConfig(config);
+  } catch (err) {
+    return { ok: false, error: 'Enregistrement impossible : ' + errMsg(err) };
+  }
+  try {
+    installEmailTrigger(config);
+  } catch (err) {
+    result.triggerError = errMsg(err);
+  }
+  if (p.test === '1') {
+    try {
+      result.sent = sendRecapEmail(config, true);
+    } catch (err) {
+      result.error = errMsg(err);
+    }
+  }
+  return result;
 }
 
 function doPost(e) {
@@ -5798,33 +5844,17 @@ function doPost(e) {
     getSheet().getRange('A1').setValue(e.postData.contents);
     return jsonOut({ success: true });
   }
-  // Configuration du récap e-mail (+ envoi de test éventuel).
-  // Chaque étape est protégée : une erreur est renvoyée en JSON à
-  // l'application plutôt que de faire planter le script (page HTML).
+  // Configuration du récap e-mail via POST (compatibilité) :
+  // la même logique protégée que le canal GET
   if (body && body.action === 'emailconfig') {
-    var config = body.config || {};
-    var result = { ok: true, sent: false };
     try {
-      saveEmailConfig(config);
+      return jsonOut(handleEmailConfigSet({
+        set: JSON.stringify(body.config || {}),
+        test: body.test ? '1' : '0'
+      }));
     } catch (err) {
-      return jsonOut({ ok: false, error: 'Enregistrement impossible : ' + errMsg(err) });
+      return jsonOut({ ok: false, error: 'Erreur inattendue : ' + errMsg(err) });
     }
-    // La création du déclencheur peut échouer si le script n'a pas été
-    // (re)autorisé avec la permission « déclencheurs » : on le signale
-    // sans bloquer le reste.
-    try {
-      installEmailTrigger(config);
-    } catch (err) {
-      result.triggerError = errMsg(err);
-    }
-    if (body.test) {
-      try {
-        result.sent = sendRecapEmail(config, true);
-      } catch (err) {
-        result.error = errMsg(err);
-      }
-    }
-    return jsonOut(result);
   }
   return jsonOut({ error: 'Action inconnue' });
 }
@@ -6491,13 +6521,11 @@ function sendRecapEmail(config, isTest) {
 
     async function pushEmailRecapConfig(config, test) {
       try {
-        const url = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword);
-        const response = await fetch(url, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'emailconfig', config: config, test: !!test }),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          redirect: 'follow'
-        });
+        // Enregistrement via GET (canal le plus fiable depuis un navigateur ;
+        // la vérification et la lecture utilisent déjà GET avec succès)
+        const base = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword);
+        const url = base + '&action=emailconfig&set=' + encodeURIComponent(JSON.stringify(config)) + (test ? '&test=1' : '');
+        const response = await fetch(url, { redirect: 'follow' });
         const text = await response.text();
         let data = null;
         try { data = JSON.parse(text); } catch (e) { data = null; }
@@ -6513,7 +6541,7 @@ function sendRecapEmail(config, isTest) {
           saveEmailRecapLocal();
           let msg;
           if (data.triggerError) {
-            msg = '⚠ Récap enregistré mais déclencheur NON créé (' + data.triggerError + ') — redéployez une nouvelle version en revalidant l\'autorisation';
+            msg = '⚠ Récap enregistré mais déclencheur NON créé (' + data.triggerError + ') — dans l\'éditeur Apps Script, exécutez une fois la fonction emailRecapTrigger et autorisez';
           } else if (test) {
             msg = data.sent ? '✓ E-mail de test envoyé à ' + config.email : '⚠ E-mail non envoyé' + (data.error ? ' : ' + data.error : '');
           } else if (config.enabled) {
@@ -6527,7 +6555,7 @@ function sendRecapEmail(config, isTest) {
         }
       } catch (err) {
         console.error('Email config error:', err);
-        showToast('⚠ Impossible de joindre le script cloud — vérifiez votre connexion et l\'URL de déploiement');
+        showToast('⚠ Impossible de joindre le script cloud (' + ((err && err.message) || 'erreur réseau') + ') — vérifiez l\'URL de déploiement');
       }
     }
 
@@ -6546,6 +6574,39 @@ function sendRecapEmail(config, isTest) {
       } catch (err) {
         // silencieux : l'application garde sa copie locale
       }
+    }
+
+    // Diagnostic de connexion au script cloud : affiche l'URL utilisée,
+    // le statut HTTP et un extrait de la réponse (ou l'erreur réseau exacte)
+    async function runEmailDiagnostic() {
+      const out = document.getElementById('emailDiagResult');
+      if (out) {
+        out.classList.remove('hidden');
+        out.textContent = '⏳ Test en cours…';
+      }
+      const lines = [];
+      lines.push('URL : ' + cloudUrl);
+      const base = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword);
+      try {
+        const response = await fetch(base + '&action=emailconfig', { redirect: 'follow' });
+        const text = await response.text();
+        lines.push('Statut HTTP : ' + response.status);
+        let parsed = null;
+        try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
+        if (parsed && parsed.ok && parsed.version >= 2) {
+          lines.push('Script : version ' + parsed.version + ' ✓ (récap e-mail pris en charge)');
+          lines.push('Récap configuré : ' + (parsed.config && parsed.config.enabled ? 'activé — ' + (parsed.config.email || '(sans adresse)') : 'désactivé'));
+        } else if (parsed) {
+          lines.push('Réponse JSON mais PAS la version attendue → ancien script déployé, il faut redéployer une nouvelle version.');
+        } else {
+          lines.push('Réponse non JSON (page Google) → probablement une erreur du script ou une page de connexion (accès pas réglé sur « Tout le monde »).');
+        }
+        lines.push('Corps : ' + (text.length > 160 ? text.substring(0, 160) + '…' : text));
+      } catch (err) {
+        lines.push('Échec de la requête : ' + ((err && err.message) || err));
+        lines.push('→ Le script est injoignable depuis ce navigateur : vérifiez la connexion, l\'URL, ou que le script ne plante pas (page d\'erreur bloquée par le navigateur).');
+      }
+      if (out) out.textContent = lines.join('\n');
     }
 
     // ============ SCROLL TO TOP ============
@@ -6579,5 +6640,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a343ab34892c2438',t:'MTc4ODI1OTM1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a343d8963c2de1c4',t:'MTc4ODI2MTIxMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
