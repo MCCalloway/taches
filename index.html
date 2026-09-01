@@ -1903,6 +1903,169 @@
       .scroll-top-btn { bottom: 1rem; right: 1rem; width: 40px; height: 40px; }
     }
 
+    /* Sélecteur de mode (Mode Projet / Mode Tâches) */
+    .view-switcher {
+      display: flex;
+      gap: 0.25rem;
+      background: #e2e8f0;
+      border-radius: 12px;
+      padding: 0.25rem;
+    }
+    .view-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 0;
+    }
+    .view-btn:hover { background: rgba(255,255,255,0.5); color: #1e293b; }
+    .view-btn.active {
+      background: white;
+      color: #4338ca;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+      font-weight: 600;
+    }
+    .view-btn svg { flex-shrink: 0; }
+
+    /* Mode Projet : grille de cartes par entreprise/contact */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+    .project-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 0.75rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      min-width: 0;
+    }
+    .project-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-color: #c7d2fe;
+    }
+    .project-card-name {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+      min-width: 0;
+    }
+    .project-card-name svg { color: #6366f1; flex-shrink: 0; }
+    .project-card-name span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .project-card-stats { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .project-stat {
+      padding: 0.125rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: #e0e7ff;
+      color: #4338ca;
+      white-space: nowrap;
+    }
+    .project-stat.overdue { background: #fee2e2; color: #dc2626; }
+    .project-stat.ok { background: #ecfdf5; color: #059669; }
+    .project-card.inactive { opacity: 0.6; background: #f8fafc; }
+    .project-card.inactive .project-card-name { color: #64748b; }
+    .project-card.inactive .project-card-name svg { color: #94a3b8; }
+
+    /* Mode Projet : colonne de filtres masquée, liste en pleine largeur,
+       contrôles de tri masqués (ils ne s'appliquent qu'à la liste de tâches) */
+    .layout-grid.project-view {
+      grid-template-columns: 1fr;
+      grid-template-areas: "top" "list";
+    }
+    /* Mode Projet : contenu en pleine largeur de l'écran */
+    main.project-wide { max-width: none; }
+    .task-sort-bar.project-mode #sortSelect,
+    .task-sort-bar.project-mode #sortDirBtn { display: none; }
+
+    /* Vue gestion de projet d'un contact (mode Projet) */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.4rem 0.8rem;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 0.75rem;
+    }
+    .back-btn:hover { background: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
+    .contact-project-header {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 1rem;
+    }
+    .contact-project-name {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e293b;
+      min-width: 0;
+      word-break: break-word;
+    }
+    .contact-project-name svg { color: #6366f1; flex-shrink: 0; }
+    .contact-project-stats { display: flex; gap: 0.375rem; flex-wrap: wrap; margin-left: auto; }
+    .cp-stat {
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #e0e7ff;
+      color: #4338ca;
+      white-space: nowrap;
+    }
+    .cp-stat.danger { background: #fee2e2; color: #dc2626; }
+    .cp-stat.ok { background: #ecfdf5; color: #059669; }
+    .cp-section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 1.25rem 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    .cp-section-title svg { color: #94a3b8; }
+
     /* Utilities */
     .hidden { display: none !important; }
     
@@ -1964,6 +2127,9 @@
   <main>
     <div class="layout-grid">
       <div class="layout-top">
+        <!-- Sélecteur de mode (Mode Projet / Mode Tâches) -->
+        <div id="viewSwitcherContainer"></div>
+
         <!-- Charts + Calendar -->
         <div class="stats-row" id="statsRow" style="display:none;">
           <div class="charts" id="chartsContainer"></div>
@@ -1989,7 +2155,7 @@
 
       <!-- Task List -->
       <div class="layout-list">
-        <div class="filter-row task-sort-bar">
+        <div class="filter-row task-sort-bar" id="taskSortBar">
           <div class="sort-select">
             <div class="filter-row">
              <div class="filter-group" id="periodFilters"></div>
@@ -2034,6 +2200,7 @@
       defaultSortAsc: true,
       defaultCategory: 'pro',
       defaultUrgency: 'normal',
+      defaultView: 'tasks',
       notificationsEnabled: false,
     };
     let settings = { ...defaultSettings, ...JSON.parse(localStorage.getItem('taskflow-settings') || '{}') };
@@ -2053,6 +2220,12 @@
     let filterDate = null;
     let filterPeriod = null; // { mode: 'before'|'after'|'between', from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' }
     let periodDraft = null;
+    let taskView = settings.defaultView || 'tasks'; // 'tasks' (liste) | 'project' (grille par contact) | 'contact' (gestion de projet d'un contact)
+    let projectContact = null; // contact affiché dans la vue « gestion de projet »
+    let ctFormExpanded = false; // formulaire d'ajout rapide dans la vue contact
+    let ctCategory = settings.defaultCategory;
+    let ctUrgency = settings.defaultUrgency;
+    let ctTags = [];
     let filterCategory = settings.defaultFilterCategory;
     let filterLate = false;
     let isFormExpanded = false;
@@ -2101,6 +2274,7 @@
       repeat: `<svg width="14" height="14" ${sv}><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>`,
       fileText: `<svg width="20" height="20" ${sv}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
       copy: `<svg width="14" height="14" ${sv}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>`,
+      arrowLeft: `<svg width="14" height="14" ${sv}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
     };
 
     // ============ HELPERS ============
@@ -2501,6 +2675,11 @@
     function render() {
       renderStats();
       renderAddTask();
+      renderViewSwitcher();
+      // Hors Mode Tâches (grille projet ou fiche contact) : une seule colonne,
+      // sans la colonne de filtres, et contenu en pleine largeur
+      document.querySelector('.layout-grid')?.classList.toggle('project-view', taskView !== 'tasks');
+      document.querySelector('main')?.classList.toggle('project-wide', taskView !== 'tasks');
       renderFilters();
       renderTaskList();
       updateAppBadge();
@@ -2568,7 +2747,8 @@
     function renderStats() {
       const row = document.getElementById('statsRow');
       const container = document.getElementById('chartsContainer');
-      if (tasks.length === 0) {
+      // Mini-listes et calendrier : uniquement en Mode Tâches
+      if (tasks.length === 0 || taskView !== 'tasks') {
         row.style.display = 'none';
         return;
       }
@@ -2625,6 +2805,11 @@
 
     function focusTask(id) {
       filterStatus = 'all'; filterUrgency = 'all'; filterCategory = 'all'; filterLate = false; filterDate = null; filterPeriod = null;
+      if (taskView !== 'tasks') {
+        taskView = 'tasks';
+        settings.defaultView = 'tasks';
+        saveSettings();
+      }
       render();
       requestAnimationFrame(() => {
         const el = document.getElementById(`task-${id}`);
@@ -2838,7 +3023,15 @@
 
     function renderAddTask() {
       const container = document.getElementById('addTaskContainer');
-      
+
+      // Bouton d'ajout global : uniquement en Mode Tâches
+      // (le Mode Projet propose la création directement dans la fiche contact)
+      if (taskView !== 'tasks') {
+        container.classList.add('hidden');
+        return;
+      }
+      container.classList.remove('hidden');
+
       if (!isFormExpanded) {
         container.innerHTML = `
           <button class="add-task-btn" onclick="expandForm()">
@@ -2996,8 +3189,11 @@
           ${icons.fileText.replace(/20"/g, '15"')} <span>Résumé</span>
         </button>
       `;
+      // Hors Mode Tâches (grille projet ou fiche contact), le tri ne s'applique pas
+      document.getElementById('taskSortBar')?.classList.toggle('project-mode', taskView !== 'tasks');
 
-      if (tasks.length === 0) {
+      // Hors Mode Tâches, les filtres de la colonne latérale ne s'appliquent pas
+      if (tasks.length === 0 || taskView !== 'tasks') {
         container.classList.add('hidden');
         return;
       }
@@ -3103,7 +3299,19 @@
 
     function renderTaskList() {
       const container = document.getElementById('taskListContainer');
-      
+
+      // Mode Projet : grille par entreprise/contact à la place de la liste
+      if (taskView === 'project') {
+        renderProjectView();
+        return;
+      }
+
+      // Mode Projet > fiche contact : vue gestion de projet de ce contact
+      if (taskView === 'contact') {
+        renderContactProjectView();
+        return;
+      }
+
       // Expand recurring tasks (show occurrence for filterDate if set, else next)
       let filtered = expandRecurringTasks([...tasks], filterDate || null);
       
@@ -3735,6 +3943,404 @@
     function toggleSortDir() {
       sortAsc = !sortAsc;
       render();
+    }
+
+    // ============ MODES (Tâches / Projet) ============
+    const NO_CONTACT_KEY = '__sans_contact__';
+
+    function setTaskView(view) {
+      if (taskView === view) return;
+      taskView = view;
+      // Quitte la fiche contact : réinitialise son état local
+      projectContact = null;
+      ctFormExpanded = false;
+      ctTags = [];
+      settings.defaultView = view;
+      saveSettings();
+      render();
+    }
+
+    function renderViewSwitcher() {
+      const el = document.getElementById('viewSwitcherContainer');
+      if (!el) return;
+      el.innerHTML = `
+        <div class="view-switcher">
+          <button class="view-btn ${taskView !== 'tasks' ? 'active' : ''}" onclick="setTaskView('project')">
+            ${icons.building} Mode Projet
+          </button>
+          <button class="view-btn ${taskView === 'tasks' ? 'active' : ''}" onclick="setTaskView('tasks')">
+            ${icons.layoutList} Mode Tâches
+          </button>
+        </div>
+      `;
+    }
+
+    // Clic sur une carte de la grille : vue « gestion de projet » du contact
+    // (tâches en cours et terminées + création rapide pour ce contact)
+    function openContactTasks(contactKey) {
+      projectContact = contactKey;
+      ctFormExpanded = false;
+      ctTags = [];
+      ctCategory = settings.defaultCategory;
+      ctUrgency = settings.defaultUrgency;
+      taskView = 'contact';
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function backToProjects() {
+      projectContact = null;
+      ctFormExpanded = false;
+      ctTags = [];
+      taskView = 'project';
+      render();
+    }
+
+    // ---- Formulaire d'ajout rapide dans la fiche contact ----
+    function expandCtForm() {
+      ctFormExpanded = true;
+      render();
+    }
+
+    function collapseCtForm() {
+      ctFormExpanded = false;
+      ctTags = [];
+      render();
+    }
+
+    function toggleCtRecurrencePanel() {
+      const panel = document.getElementById('ctRecurrencePanel');
+      const deadlineField = document.getElementById('ctDeadlineField');
+      const cb = document.getElementById('ctRecurring');
+      if (cb.checked) {
+        panel.classList.remove('hidden');
+        if (deadlineField) deadlineField.classList.add('hidden');
+      } else {
+        panel.classList.add('hidden');
+        if (deadlineField) deadlineField.classList.remove('hidden');
+      }
+    }
+
+    // Jours sélectionnés dans le panneau de récurrence de la fiche contact
+    // (sélecteur dédié pour ne pas interférer avec le formulaire du Mode Tâches)
+    function getCtSelectedDays() {
+      const btns = document.querySelectorAll('#ctDaysGrid .day-btn.active');
+      return Array.from(btns).map(b => parseInt(b.dataset.day));
+    }
+
+    function setCtCategory(cat) {
+      ctCategory = cat;
+      document.querySelectorAll('#ctAddContainer .category-btn').forEach(btn => {
+        btn.classList.remove('active', 'pro', 'perso');
+        if (btn.dataset.cat === cat) btn.classList.add('active', cat);
+      });
+    }
+
+    function setCtUrgency(urgency) {
+      ctUrgency = urgency;
+      document.querySelectorAll('#ctAddContainer .urgency-btn').forEach(btn => {
+        btn.classList.remove('active', 'normal', 'urgent');
+        if (btn.dataset.urgency === urgency) btn.classList.add('active', urgency);
+      });
+    }
+
+    function removeCtTag(i) {
+      ctTags.splice(i, 1);
+      renderTagsChips('ctTagsChips', ctTags, 'removeCtTag');
+    }
+
+    function addCtTagSuggestion(tag) {
+      addTagsToList(tag, ctTags);
+      const input = document.getElementById('ctTagInput');
+      if (input) { input.value = ''; input.focus(); }
+      renderTagsChips('ctTagsChips', ctTags, 'removeCtTag');
+      document.getElementById('ctTagSuggestions')?.classList.add('hidden');
+    }
+
+    // Crée une tâche pour le contact de la fiche en cours
+    function addCtTask() {
+      const title = document.getElementById('ctTitle').value.trim();
+      const description = document.getElementById('ctDescription').value.trim();
+      const isRecurring = document.getElementById('ctRecurring')?.checked;
+
+      let deadline = '';
+      if (!isRecurring) {
+        deadline = document.getElementById('ctDeadline').value;
+        if (!deadline) { document.getElementById('ctDeadline').focus(); return; }
+      }
+
+      let recurrence = null;
+      if (isRecurring) {
+        const startDate = document.getElementById('ctRecStart').value;
+        const endDate = document.getElementById('ctRecEnd').value;
+        const days = getCtSelectedDays();
+        if (!startDate) { document.getElementById('ctRecStart').focus(); return; }
+        if (!endDate) { document.getElementById('ctRecEnd').focus(); return; }
+        if (days.length === 0) { showToast('⚠ Sélectionnez au moins un jour'); return; }
+        recurrence = { startDate, endDate, days };
+        deadline = startDate; // la date de début sert d'échéance (comme le formulaire classique)
+      }
+
+      // Récupère le tag éventuellement encore tapé (non validé par Entrée)
+      const pendingTagInput = document.getElementById('ctTagInput');
+      if (pendingTagInput && pendingTagInput.value.trim()) {
+        addTagsToList(pendingTagInput.value, ctTags);
+      }
+      const task = {
+        id: generateId(),
+        title,
+        contact: projectContact === NO_CONTACT_KEY ? '' : projectContact,
+        deadline,
+        description: description || undefined,
+        urgency: ctUrgency,
+        category: ctCategory,
+        status: 'todo',
+        createdAt: new Date().toISOString(),
+        tags: [...ctTags],
+      };
+      if (recurrence) task.recurrence = recurrence;
+      tasks.unshift(task);
+      saveTasks();
+      ctFormExpanded = false;
+      ctTags = [];
+      ctUrgency = settings.defaultUrgency;
+      ctCategory = settings.defaultCategory;
+      render();
+      showToast('✓ Tâche ajoutée');
+    }
+
+    // ---- Fiche contact : vue gestion de projet ----
+    function renderContactProjectView() {
+      const container = document.getElementById('taskListContainer');
+      const isNoContact = projectContact === NO_CONTACT_KEY;
+      const contactName = isNoContact ? 'Sans contact' : (projectContact || '');
+      const norm = (projectContact || '').trim().toLowerCase();
+      const todayStr = getTodayStr();
+      const today = new Date().toISOString().split('T')[0];
+
+      // Tâches du contact (occurrences récurrentes dépliées comme en Mode Tâches)
+      const expanded = expandRecurringTasks([...tasks], null).filter(t => {
+        const c = (t.contact || '').trim().toLowerCase();
+        return isNoContact ? c === '' : c === norm;
+      });
+
+      let todo = expanded.filter(t => t.status !== 'done');
+      let done = expanded.filter(t => t.status === 'done');
+
+      // La recherche s'applique aussi dans la fiche contact
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matches = t => taskMatchesQuery(t, q);
+        todo = todo.filter(matches);
+        done = done.filter(matches);
+      }
+
+      todo.sort((a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999'));
+      done.sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
+
+      const overdueCount = todo.filter(t => t.deadline && t.deadline < todayStr).length;
+
+      const addArea = !ctFormExpanded ? `
+        <button class="add-task-btn" onclick="expandCtForm()">
+          <div class="icon-circle">${icons.plus}</div>
+          <span>Nouvelle tâche pour ${contactName}...</span>
+        </button>
+      ` : `
+        <div class="task-form">
+          <div class="form-header">
+            <div class="icon-circle">${icons.plus}</div>
+            <h3>Nouvelle tâche — ${contactName}</h3>
+          </div>
+          <div class="form-grid">
+            <div class="full-width">
+              <label>Titre de la tâche <span class="required">*</span></label>
+              <input type="text" id="ctTitle" placeholder="Ex: Préparer le devis client">
+            </div>
+            <div id="ctDeadlineField">
+              <label>Date limite <span class="required">*</span></label>
+              <input type="date" id="ctDeadline" min="${today}">
+            </div>
+            <div class="full-width">
+              <label>Description</label>
+              <textarea id="ctDescription" placeholder="Détails, contexte, instructions..." rows="2" style="resize:vertical;"></textarea>
+            </div>
+            <div class="full-width tag-field" id="ctTagField">
+              <label>${icons.tag} Tags (optionnel)</label>
+              <div class="tags-chips" id="ctTagsChips"></div>
+              <input type="text" id="ctTagInput" placeholder="Ajouter un tag et appuyer sur Entrée..." autocomplete="off">
+              <div class="suggestions hidden" id="ctTagSuggestions"></div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div>
+              <label>Catégorie</label>
+              <div class="category-buttons">
+                <button type="button" class="category-btn ${ctCategory === 'pro' ? 'active pro' : ''}" data-cat="pro" onclick="setCtCategory('pro')">${icons.briefcase} Pro</button>
+                <button type="button" class="category-btn ${ctCategory === 'perso' ? 'active perso' : ''}" data-cat="perso" onclick="setCtCategory('perso')">${icons.home} Perso</button>
+              </div>
+            </div>
+            <div>
+              <label>Niveau d'urgence</label>
+              <div class="urgency-buttons">
+                <button type="button" class="urgency-btn ${ctUrgency === 'normal' ? 'active normal' : ''}" data-urgency="normal" onclick="setCtUrgency('normal')">${icons.clock} Normal</button>
+                <button type="button" class="urgency-btn ${ctUrgency === 'urgent' ? 'active urgent' : ''}" data-urgency="urgent" onclick="setCtUrgency('urgent')">${icons.zap} Urgent</button>
+              </div>
+            </div>
+          </div>
+          <label class="recurrence-toggle">
+            <input type="checkbox" id="ctRecurring" onchange="toggleCtRecurrencePanel()">
+            ${icons.repeat} Tâche récurrente
+          </label>
+          <div class="recurrence-panel hidden" id="ctRecurrencePanel">
+            <div class="form-grid">
+              <div>
+                <label>Date de début <span class="required">*</span></label>
+                <input type="date" id="ctRecStart" min="${today}">
+              </div>
+              <div>
+                <label>Date de fin <span class="required">*</span></label>
+                <input type="date" id="ctRecEnd" min="${today}">
+              </div>
+            </div>
+            <label style="margin-top:0.5rem;">Jours de récurrence <span class="required">*</span></label>
+            <div class="days-grid" id="ctDaysGrid">
+              ${DAY_LABELS.map((d, i) => `<button type="button" class="day-btn" data-day="${i}" onclick="toggleDay(this)">${d}</button>`).join('')}
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="addCtTask()">${icons.plus} Ajouter</button>
+            <button class="btn btn-secondary" onclick="collapseCtForm()">Annuler</button>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = `
+        <button class="back-btn" onclick="backToProjects()">
+          ${icons.arrowLeft} Retour aux contacts
+        </button>
+
+        <div class="contact-project-header">
+          <div class="contact-project-name">${isNoContact ? icons.tag : icons.building} ${contactName}</div>
+          <div class="contact-project-stats">
+            <span class="cp-stat">${todo.length} en cours</span>
+            ${overdueCount > 0 ? `<span class="cp-stat danger">${overdueCount} en retard</span>` : ''}
+            <span class="cp-stat ok">${done.length} terminée${done.length > 1 ? 's' : ''}</span>
+          </div>
+        </div>
+
+        <div id="ctAddContainer">${addArea}</div>
+
+        <div class="cp-section-title">${icons.clock} Tâches en cours (${todo.length})</div>
+        ${todo.length > 0 ? `<div class="task-list">${todo.map(renderTaskCard).join('')}</div>` : `<div class="sheet-empty">Aucune tâche en cours pour ce contact.</div>`}
+
+        <div class="cp-section-title">${icons.checkCircle} Tâches terminées (${done.length})</div>
+        ${done.length > 0 ? `<div class="task-list">${done.map(renderTaskCard).join('')}</div>` : `<div class="sheet-empty">Aucune tâche terminée pour ce contact.</div>`}
+      `;
+
+      if (ctFormExpanded) {
+        setupTagInput({
+          inputId: 'ctTagInput',
+          suggestionsId: 'ctTagSuggestions',
+          chipsId: 'ctTagsChips',
+          fieldSelector: '#ctTagField',
+          list: ctTags,
+          removeFnName: 'removeCtTag',
+          addFnName: 'addCtTagSuggestion',
+        });
+        setTimeout(() => document.getElementById('ctTitle')?.focus(), 50);
+      }
+    }
+
+    // ---- Mode Projet : grille de cartes par entreprise/contact ----
+    function renderProjectView() {
+      const container = document.getElementById('taskListContainer');
+
+      if (tasks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">${icons.clipboard}</div>
+            <h3>Aucune tâche pour le moment</h3>
+            <p>Cliquez sur le bouton ci-dessus pour créer votre première tâche.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const todayStr = getTodayStr();
+
+      // Compte les tâches à faire par contact (occurrences récurrentes incluses,
+      // comme en Mode Tâches, pour rester cohérent avec les compteurs de filtres)
+      const expanded = expandRecurringTasks([...tasks], null);
+      const map = new Map();
+      const ensure = (key, displayName, isNoContact) => {
+        if (!map.has(key)) map.set(key, { key, name: displayName, noContact: !!isNoContact, todo: 0, overdue: 0, nextDeadline: null });
+        return map.get(key);
+      };
+      // Tous les contacts connus, même sans tâche en cours
+      tasks.forEach(t => {
+        const k = (t.contact || '').trim();
+        if (k) ensure(k, k, false);
+      });
+      // Tâches sans contact (données importées) regroupées sous une carte dédiée
+      if (tasks.some(t => !(t.contact || '').trim())) ensure(NO_CONTACT_KEY, 'Sans contact', true);
+      // Comptage des tâches à faire
+      expanded.forEach(t => {
+        if (t.status !== 'todo') return;
+        const k = (t.contact || '').trim() || NO_CONTACT_KEY;
+        const c = map.get(k);
+        if (!c) return;
+        c.todo++;
+        if (t.deadline) {
+          if (t.deadline < todayStr) c.overdue++;
+          if (!c.nextDeadline || t.deadline < c.nextDeadline) c.nextDeadline = t.deadline;
+        }
+      });
+
+      // Contacts actifs d'abord (échéance la plus proche en tête, les retards
+      // remontent naturellement), puis contacts sans tâche en cours (alphabétique)
+      const cards = Array.from(map.values());
+      const active = cards.filter(c => c.todo > 0).sort((a, b) => {
+        const da = a.nextDeadline || '9999-12-31';
+        const db = b.nextDeadline || '9999-12-31';
+        if (da !== db) return da < db ? -1 : 1;
+        return a.name.localeCompare(b.name, 'fr');
+      });
+      const inactive = cards.filter(c => c.todo === 0).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+      let list = [...active, ...inactive];
+
+      // La recherche filtre les cartes par nom d'entreprise/contact
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        list = list.filter(c => c.name.toLowerCase().includes(q));
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">${icons.search}</div>
+            <h3>Aucune entreprise/contact trouvé</h3>
+            <p>Essayez de modifier votre recherche pour voir plus de résultats.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="project-grid">
+          ${list.map(c => `
+            <button class="project-card ${c.todo > 0 ? '' : 'inactive'}" onclick="openContactTasks('${c.key.replace(/'/g, "\\'")}')" title="Voir les tâches de ${c.name.replace(/"/g, '&quot;')}">
+              <div class="project-card-name">${c.noContact ? icons.tag : icons.building}<span>${c.name}</span></div>
+              <div class="project-card-stats">
+                ${c.todo > 0 ? `
+                  <span class="project-stat">${c.todo} à faire</span>
+                  ${c.overdue > 0 ? `<span class="project-stat overdue">${c.overdue} en retard</span>` : ''}
+                ` : `<span class="project-stat ok">Aucune tâche en cours</span>`}
+              </div>
+            </button>
+          `).join('')}
+        </div>
+      `;
     }
 
     // ============ MODAL ============
@@ -5251,5 +5857,5 @@ function doPost(e) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a30abd47becbd4da',t:'MTc4NzY2MjQwMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
