@@ -1695,6 +1695,18 @@
       outline: none;
     }
     .settings-select:focus { border-color: #818cf8; }
+    .settings-input {
+      padding: 0.375rem 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #334155;
+      background: white;
+      outline: none;
+      width: 190px;
+      max-width: 100%;
+    }
+    .settings-input:focus { border-color: #818cf8; }
     .settings-toggle {
       width: 40px; height: 22px;
       background: #cbd5e1;
@@ -4608,6 +4620,16 @@
                 <button class="btn btn-secondary" onclick="forceLoadFromCloud()">Récupérer du cloud</button>
               </div>
               <div class="divider"><span>Modifier l'URL</span></div>
+              <details style="font-size:0.8rem;color:#64748b;margin-top:0.75rem;">
+                <summary style="cursor:pointer;font-weight:500;color:#475569;">Activer le récap e-mail automatique</summary>
+                <p style="margin-top:0.5rem;">
+                  Remplacez tout le code de votre Apps Script par la version ci-dessous (bouton Copier), enregistrez,
+                  puis redéployez : <strong>Déployer → Gérer les déploiements → ✏️ → Version « Nouvelle » → Déployer</strong>,
+                  en autorisant les nouvelles permissions (envoi d'e-mails, déclencheurs).
+                  Les réglages se font ensuite dans <strong>Paramètres → Récap e-mail automatique</strong>.
+                </p>
+                <div class="cloud-code"><button class="cloud-code-copy" onclick="copyScriptCode()">Copier</button>${APPS_SCRIPT_CODE.replace(/</g, '&lt;')}</div>
+              </details>
             ` : ''}
             
             ${!isConnected ? `
@@ -5561,6 +5583,76 @@
             <p id="notifStatusNote" style="font-size:0.75rem;color:#94a3b8;margin-top:0.25rem;">${getNotificationStatusNote()}</p>
           </div>
 
+          <!-- Récap e-mail automatique -->
+          <div class="settings-section">
+            <div class="settings-section-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Récap e-mail automatique
+            </div>
+            ${cloudUrl ? `
+            <div class="settings-row">
+              <div class="settings-row-label">
+                Envoi automatique
+                <small>Planifié par Google Apps Script, même application fermée</small>
+              </div>
+              <button class="settings-toggle ${emailRecap.enabled ? 'on' : ''}" id="emailRecapToggle" onclick="this.classList.toggle('on')" title="Activer/désactiver"></button>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">Destinataire</div>
+              <input type="email" class="settings-input" id="emailRecapAddr" value="${emailRecap.email}" placeholder="vous@exemple.fr">
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">Fréquence</div>
+              <select class="settings-select" id="emailRecapFreq" onchange="document.getElementById('emailRecapDayRow').style.display=this.value==='weekly'?'':'none'">
+                <option value="daily" ${emailRecap.frequency === 'daily' ? 'selected' : ''}>Chaque jour</option>
+                <option value="weekly" ${emailRecap.frequency !== 'daily' ? 'selected' : ''}>Chaque semaine</option>
+              </select>
+            </div>
+            <div class="settings-row" id="emailRecapDayRow" style="${emailRecap.frequency === 'weekly' ? '' : 'display:none;'}">
+              <div class="settings-row-label">Jour d'envoi</div>
+              <select class="settings-select" id="emailRecapDay">
+                ${['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((d, i) => `<option value="${i + 1}" ${emailRecap.day === i + 1 ? 'selected' : ''}>${d}</option>`).join('')}
+              </select>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">Heure d'envoi <small>Approximative (fenêtre d'une heure)</small></div>
+              <select class="settings-select" id="emailRecapHour">
+                ${Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${emailRecap.hour === h ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')}
+              </select>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">Contenu du récap</div>
+              <select class="settings-select" id="emailRecapContent">
+                <option value="all" ${emailRecap.content === 'all' ? 'selected' : ''}>Toutes les tâches à faire</option>
+                <option value="attention" ${emailRecap.content === 'attention' ? 'selected' : ''}>Retards et urgentes seulement</option>
+                <option value="week" ${emailRecap.content === 'week' ? 'selected' : ''}>Échéances des 7 prochains jours</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                Inclure les tâches terminées
+                <small>Depuis le dernier envoi (24 h ou 7 jours selon la fréquence)</small>
+              </div>
+              <button class="settings-toggle ${emailRecap.includeDone ? 'on' : ''}" id="emailRecapDoneToggle" onclick="this.classList.toggle('on')" title="Inclure/exclure"></button>
+            </div>
+            <div class="footer-actions" style="justify-content:flex-start;margin-top:0.75rem;">
+              <button class="footer-btn footer-btn-accent" onclick="saveEmailRecapConfig(false)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Enregistrer
+              </button>
+              <button class="footer-btn" onclick="saveEmailRecapConfig(true)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Tester l'envoi
+              </button>
+            </div>
+            <p class="modal-note" style="margin-top:0.5rem;">Le récap reflète la <strong>dernière synchronisation cloud</strong> de vos tâches.</p>
+            ` : `
+            <p style="font-size:0.8rem;color:#64748b;margin-bottom:0.75rem;">
+              Nécessite la synchronisation cloud (Google Sheets). <a href="#" onclick="openCloudSetup();return false;" style="color:#4f46e5;">Configurer →</a>
+            </p>
+            `}
+          </div>
+
           <!-- Export / Import -->
           <div class="settings-section">
             <div class="settings-section-title">
@@ -5645,41 +5737,414 @@
     const APPS_SCRIPT_CODE = `// ⚠️ CHANGEZ CE MOT DE PASSE par le vôtre
 var MOT_DE_PASSE = 'MonMotDePasse123';
 
+// ============================================================
+//  SYNCHRONISATION DES TÂCHES
+// ============================================================
 function checkPassword(e) {
   var pwd = (e && e.parameter && e.parameter.pwd) || '';
   return pwd === MOT_DE_PASSE;
 }
 
-function doGet(e) {
-  if (!checkPassword(e)) {
-    return ContentService.createTextOutput(
-      JSON.stringify({error: 'Mot de passe incorrect'})
-    ).setMimeType(ContentService.MimeType.JSON);
-  }
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getSheet() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Data');
   if (!sheet) {
     sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Data');
     sheet.getRange('A1').setValue('[]');
   }
-  var data = sheet.getRange('A1').getValue() || '[]';
-  return ContentService.createTextOutput(data)
+  return sheet;
+}
+
+function readTasks() {
+  try {
+    var tasks = JSON.parse(getSheet().getRange('A1').getValue() || '[]');
+    return Array.isArray(tasks) ? tasks : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function doGet(e) {
+  if (!checkPassword(e)) return jsonOut({ error: 'Mot de passe incorrect' });
+  // Lecture de la configuration du récap e-mail (action=emailconfig)
+  if (e && e.parameter && e.parameter.action === 'emailconfig') {
+    return jsonOut({ ok: true, version: 2, config: loadEmailConfig() });
+  }
+  return ContentService.createTextOutput(JSON.stringify(readTasks()))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
-  if (!checkPassword(e)) {
-    return ContentService.createTextOutput(
-      JSON.stringify({error: 'Mot de passe incorrect'})
-    ).setMimeType(ContentService.MimeType.JSON);
+  if (!checkPassword(e)) return jsonOut({ error: 'Mot de passe incorrect' });
+  var body = null;
+  try { body = JSON.parse(e.postData.contents); } catch (err) { body = null; }
+  // Un tableau = synchronisation des tâches (comportement d'origine)
+  if (Array.isArray(body)) {
+    getSheet().getRange('A1').setValue(e.postData.contents);
+    return jsonOut({ success: true });
   }
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Data');
-  if (!sheet) {
-    sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Data');
+  // Configuration du récap e-mail (+ envoi de test éventuel)
+  if (body && body.action === 'emailconfig') {
+    var config = body.config || {};
+    saveEmailConfig(config);
+    installEmailTrigger(config);
+    var result = { ok: true, sent: false };
+    if (body.test) {
+      try {
+        result.sent = sendRecapEmail(config, true);
+      } catch (err) {
+        result.error = String(err && err.message ? err.message : err);
+      }
+    }
+    return jsonOut(result);
   }
-  sheet.getRange('A1').setValue(e.postData.contents);
-  return ContentService.createTextOutput(
-    JSON.stringify({success: true})
-  ).setMimeType(ContentService.MimeType.JSON);
+  return jsonOut({ error: 'Action inconnue' });
+}
+
+// ============================================================
+//  RÉCAP E-MAIL AUTOMATIQUE
+//  Envoi planifié des tâches à faire (déclencheur horaire).
+// ============================================================
+var MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+var JOURS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+
+function loadEmailConfig() {
+  try {
+    var raw = PropertiesService.getScriptProperties().getProperty('EMAIL_RECAP_CONFIG');
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveEmailConfig(config) {
+  PropertiesService.getScriptProperties()
+    .setProperty('EMAIL_RECAP_CONFIG', JSON.stringify(config));
+}
+
+// Crée / met à jour le déclencheur horaire selon la configuration.
+// Appelé à chaque enregistrement depuis l'application.
+function installEmailTrigger(config) {
+  var i;
+  var triggers = ScriptApp.getProjectTriggers();
+  for (i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'emailRecapTrigger') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  if (!config || !config.enabled || !config.email) return;
+  var builder = ScriptApp.newTrigger('emailRecapTrigger').timeBased();
+  if (config.frequency === 'daily') {
+    builder.everyDays(1).atHour(config.hour || 8);
+  } else {
+    var days = [ScriptApp.WeekDay.MONDAY, ScriptApp.WeekDay.TUESDAY,
+      ScriptApp.WeekDay.WEDNESDAY, ScriptApp.WeekDay.THURSDAY,
+      ScriptApp.WeekDay.FRIDAY, ScriptApp.WeekDay.SATURDAY,
+      ScriptApp.WeekDay.SUNDAY];
+    var idx = (config.day || 1) - 1;
+    if (idx < 0 || idx > 6) idx = 0;
+    builder.onWeekDay(days[idx]).atHour(config.hour || 8);
+  }
+  builder.create();
+}
+
+// Fonction exécutée automatiquement par le déclencheur
+function emailRecapTrigger() {
+  var config = loadEmailConfig();
+  if (!config || !config.enabled || !config.email) return;
+  try {
+    sendRecapEmail(config, false);
+  } catch (e) {
+    // Échec silencieux : le prochain envoi retentera
+  }
+}
+
+// ---------- utilitaires dates ----------
+function todayStr() {
+  return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+}
+
+function plusDaysStr(n) {
+  var d = new Date();
+  d.setDate(d.getDate() + n);
+  return Utilities.formatDate(d, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr || dateStr.length < 10) return '';
+  var p = dateStr.split('-');
+  var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+  return JOURS_FR[d.getDay()] + ' ' + d.getDate() + ' ' + MOIS_FR[d.getMonth()];
+}
+
+function fmtDateTime(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  var hh = ('0' + d.getHours()).slice(-2);
+  var mm = ('0' + d.getMinutes()).slice(-2);
+  return d.getDate() + ' ' + MOIS_FR[d.getMonth()] + ' à ' + hh + ':' + mm;
+}
+
+function esc(s) {
+  return String(s === undefined || s === null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ---------- préparation des tâches ----------
+// Déplie les tâches récurrentes : 1 entrée « à faire » pour la prochaine
+// occurrence restante + 1 entrée « terminée » par occurrence complétée
+function expandForEmail(tasks) {
+  var out = [], i, j;
+  for (i = 0; i < tasks.length; i++) {
+    var t = tasks[i];
+    if (t.recurrence && t.recurrence.startDate && t.recurrence.endDate) {
+      var occ = occurrenceDates(t.recurrence);
+      var deleted = t.deletedDates || [];
+      var completed = t.completedDates || [];
+      var excluded = completed.concat(deleted);
+      var remaining = [];
+      for (j = 0; j < occ.length; j++) {
+        if (excluded.indexOf(occ[j]) === -1) remaining.push(occ[j]);
+      }
+      for (j = 0; j < completed.length; j++) {
+        if (deleted.indexOf(completed[j]) !== -1) continue;
+        var log = findLogEntry(t.completionLog || [], completed[j]);
+        out.push({
+          title: t.title, contact: t.contact, urgency: t.urgency,
+          category: t.category, deadline: completed[j], status: 'done',
+          completedAt: log && log.completedAt ? log.completedAt : completed[j] + 'T12:00:00',
+          completionComment: log ? (log.comment || '') : ''
+        });
+      }
+      if (remaining.length > 0) {
+        var today = todayStr();
+        var upcoming = [], overdue = [];
+        for (j = 0; j < remaining.length; j++) {
+          if (remaining[j] >= today) upcoming.push(remaining[j]);
+          else overdue.push(remaining[j]);
+        }
+        var next = upcoming.length > 0 ? upcoming[0] : overdue[overdue.length - 1];
+        out.push({
+          title: t.title, contact: t.contact, urgency: t.urgency,
+          category: t.category, deadline: next, status: 'todo'
+        });
+      }
+    } else {
+      out.push(t);
+    }
+  }
+  return out;
+}
+
+function occurrenceDates(r) {
+  var out = [];
+  var cur = new Date(r.startDate + 'T00:00:00');
+  var end = new Date(r.endDate + 'T00:00:00');
+  var days = r.days || [];
+  while (cur <= end) {
+    var dow = cur.getDay();
+    dow = dow === 0 ? 6 : dow - 1; // 0 = lundi ... 6 = dimanche
+    if (days.indexOf(dow) !== -1) {
+      out.push(Utilities.formatDate(cur, Session.getScriptTimeZone(), 'yyyy-MM-dd'));
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  return out;
+}
+
+function findLogEntry(log, date) {
+  for (var i = 0; i < log.length; i++) {
+    if (log[i].date === date) return log[i];
+  }
+  return null;
+}
+
+function countIf(arr, fn) {
+  var n = 0;
+  for (var i = 0; i < arr.length; i++) {
+    if (fn(arr[i])) n++;
+  }
+  return n;
+}
+
+// Sélectionne les tâches selon le contenu choisi et la période « terminées »
+function buildRecapData(config) {
+  var today = todayStr();
+  var in7 = plusDaysStr(7);
+  var all = expandForEmail(readTasks());
+  var todo = [], done = [], i;
+  for (i = 0; i < all.length; i++) {
+    var t = all[i];
+    if (t.status === 'done') { done.push(t); continue; }
+    var isLate = t.deadline && t.deadline < today;
+    var isUrgent = t.urgency === 'urgent';
+    if (config.content === 'attention') {
+      if (!isLate && !isUrgent) continue;
+    } else if (config.content === 'week') {
+      if (!t.deadline || t.deadline > in7) continue;
+    }
+    todo.push(t);
+  }
+  todo.sort(function (a, b) {
+    var da = a.deadline || '9999-12-31';
+    var db = b.deadline || '9999-12-31';
+    return da < db ? -1 : (da > db ? 1 : 0);
+  });
+  var doneFiltered = [];
+  if (config.includeDone) {
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - (config.frequency === 'daily' ? 1 : 7));
+    for (i = 0; i < done.length; i++) {
+      var ca = done[i].completedAt ? new Date(done[i].completedAt) : null;
+      if (ca && !isNaN(ca.getTime()) && ca >= cutoff) doneFiltered.push(done[i]);
+    }
+    doneFiltered.sort(function (a, b) {
+      return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
+    });
+  }
+  return {
+    today: today,
+    todo: todo,
+    done: doneFiltered,
+    lateCount: countIf(todo, function (t) { return t.deadline && t.deadline < today; }),
+    urgentCount: countIf(todo, function (t) { return t.urgency === 'urgent'; })
+  };
+}
+
+// ---------- construction de l'e-mail ----------
+function badgeHtml(kind, label) {
+  var bg = kind === 'urgent' ? '#fef3c7' : '#fee2e2';
+  var fg = kind === 'urgent' ? '#b45309' : '#dc2626';
+  return '<span style="display:inline-block;background:' + bg + ';color:' + fg +
+    ';border-radius:4px;padding:1px 6px;font-size:10px;font-weight:bold;vertical-align:middle;">' + label + '</span>';
+}
+
+function taskHtml(t, today, withContact) {
+  var html = '<div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:6px;font-size:13px;line-height:1.5;">';
+  html += '<b>' + esc(t.title) + '</b> ';
+  if (t.urgency === 'urgent') html += badgeHtml('urgent', '⚡ URGENT');
+  if (t.deadline && t.deadline < today) html += ' ' + badgeHtml('late', '⏰ RETARD');
+  html += '<br><span style="color:#64748b;">';
+  if (withContact && t.contact) html += esc(t.contact) + ' — ';
+  html += 'échéance ' + esc(fmtDate(t.deadline)) + '</span></div>';
+  return html;
+}
+
+function groupByContact(items) {
+  var groups = {}, keys = [], i;
+  for (i = 0; i < items.length; i++) {
+    var k = (items[i].contact || '').trim() || 'Sans contact';
+    if (!groups[k]) { groups[k] = []; keys.push(k); }
+    groups[k].push(items[i]);
+  }
+  keys.sort(function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); });
+  return { groups: groups, keys: keys };
+}
+
+function buildRecapHtml(data, isTest) {
+  var now = new Date();
+  var dateLabel = JOURS_FR[now.getDay()] + ' ' + now.getDate() + ' ' + MOIS_FR[now.getMonth()] + ' ' + now.getFullYear();
+  var html = '';
+  html += '<div style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;color:#1e293b;">';
+  html += '<div style="background:#4f46e5;color:#ffffff;padding:18px 22px;border-radius:10px 10px 0 0;">';
+  html += '<div style="font-size:18px;font-weight:bold;">📋 Récap de vos tâches' + (isTest ? ' — TEST' : '') + '</div>';
+  html += '<div style="font-size:12px;opacity:0.9;margin-top:4px;">' + dateLabel + '</div></div>';
+  html += '<div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 10px 10px;padding:18px 22px;background:#ffffff;">';
+  if (data.todo.length === 0 && data.done.length === 0) {
+    html += '<p style="font-size:14px;color:#059669;margin:0;">🎉 Rien à signaler : aucune tâche en attente.</p>';
+  } else {
+    html += '<p style="font-size:14px;margin:0 0 14px;"><b>' + data.todo.length + '</b> à faire';
+    if (data.urgentCount > 0) html += ' · <b style="color:#b45309;">' + data.urgentCount + '</b> urgent' + (data.urgentCount > 1 ? 'es' : '');
+    if (data.lateCount > 0) html += ' · <b style="color:#dc2626;">' + data.lateCount + '</b> en retard';
+    html += '</p>';
+    var late = [], upcoming = [], i;
+    for (i = 0; i < data.todo.length; i++) {
+      if (data.todo[i].deadline && data.todo[i].deadline < data.today) late.push(data.todo[i]);
+      else upcoming.push(data.todo[i]);
+    }
+    if (late.length > 0) {
+      html += '<h3 style="color:#dc2626;font-size:14px;margin:14px 0 8px;">⏰ En retard (' + late.length + ')</h3>';
+      for (i = 0; i < late.length; i++) html += taskHtml(late[i], data.today, true);
+    }
+    if (upcoming.length > 0) {
+      html += '<h3 style="color:#334155;font-size:14px;margin:14px 0 8px;">📍 À faire (' + upcoming.length + ')</h3>';
+      var g = groupByContact(upcoming);
+      for (i = 0; i < g.keys.length; i++) {
+        html += '<div style="font-size:12px;font-weight:bold;color:#4338ca;margin:10px 0 4px;">🏢 ' + esc(g.keys[i]) + ' (' + g.groups[g.keys[i]].length + ')</div>';
+        for (var j = 0; j < g.groups[g.keys[i]].length; j++) {
+          html += taskHtml(g.groups[g.keys[i]][j], data.today, false);
+        }
+      }
+    }
+    if (data.done.length > 0) {
+      html += '<h3 style="color:#059669;font-size:14px;margin:14px 0 8px;">✅ Terminées récemment (' + data.done.length + ')</h3>';
+      for (i = 0; i < data.done.length; i++) {
+        var t = data.done[i];
+        html += '<div style="padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;margin-bottom:6px;font-size:13px;line-height:1.5;">';
+        html += '<b>' + esc(t.title) + '</b>';
+        if (t.contact) html += ' — <span style="color:#64748b;">' + esc(t.contact) + '</span>';
+        html += '<br><span style="color:#059669;">terminée le ' + esc(fmtDateTime(t.completedAt)) + '</span>';
+        if (t.completionComment) html += '<br><i style="color:#64748b;">' + esc(t.completionComment) + '</i>';
+        html += '</div>';
+      }
+    }
+  }
+  html += '<p style="font-size:11px;color:#94a3b8;margin:16px 0 0;">Récap généré automatiquement — basé sur la dernière synchronisation de vos tâches.</p>';
+  html += '</div></div>';
+  return html;
+}
+
+function buildRecapText(data, isTest) {
+  var NL = String.fromCharCode(10);
+  var lines = [];
+  lines.push('Récap de vos tâches' + (isTest ? ' — TEST' : ''));
+  lines.push(data.todo.length + ' à faire' +
+    (data.lateCount ? ', ' + data.lateCount + ' en retard' : '') +
+    (data.urgentCount ? ', ' + data.urgentCount + ' urgentes' : ''));
+  lines.push('');
+  var i;
+  for (i = 0; i < data.todo.length; i++) {
+    var t = data.todo[i];
+    var line = '- ' + t.title;
+    if (t.contact) line += ' (' + t.contact + ')';
+    if (t.deadline) line += ' — échéance ' + t.deadline;
+    if (t.urgency === 'urgent') line += ' [URGENT]';
+    if (t.deadline && t.deadline < data.today) line += ' [RETARD]';
+    lines.push(line);
+  }
+  if (data.done.length > 0) {
+    lines.push('');
+    lines.push('Terminées récemment :');
+    for (i = 0; i < data.done.length; i++) {
+      var l = '- ' + data.done[i].title;
+      if (data.done[i].completionComment) l += ' : ' + data.done[i].completionComment;
+      lines.push(l);
+    }
+  }
+  if (data.todo.length === 0 && data.done.length === 0) {
+    lines.push('Rien à signaler : aucune tâche en attente.');
+  }
+  return lines.join(NL);
+}
+
+function sendRecapEmail(config, isTest) {
+  var data = buildRecapData(config);
+  var subject = (isTest ? '[TEST] ' : '') + '📋 Récap tâches — ' + data.todo.length + ' à faire';
+  if (data.lateCount > 0) subject += ', ' + data.lateCount + ' en retard';
+  if (data.urgentCount > 0) subject += ', ' + data.urgentCount + ' urgentes';
+  MailApp.sendEmail(config.email, subject, buildRecapText(data, isTest), {
+    htmlBody: buildRecapHtml(data, isTest),
+    name: 'Récap Tâches'
+  });
+  return true;
 }`;
 
     function updateSyncIndicator() {
@@ -5919,6 +6384,118 @@ function doPost(e) {
       });
     }
 
+    // ============ RÉCAP E-MAIL AUTOMATIQUE ============
+    // Envoi planifié des tâches à faire via Google Apps Script (déclencheur
+    // horaire + MailApp). Les réglages sont conservés en local ET côté script.
+    const defaultEmailRecap = { enabled: false, email: '', frequency: 'weekly', day: 1, hour: 8, content: 'all', includeDone: false };
+    let emailRecap = { ...defaultEmailRecap, ...safeParseJSON(localStorage.getItem('taskflow-email-recap')) };
+
+    function safeParseJSON(str) {
+      try { return str ? JSON.parse(str) : {}; } catch (e) { return {}; }
+    }
+
+    function saveEmailRecapLocal() {
+      localStorage.setItem('taskflow-email-recap', JSON.stringify(emailRecap));
+    }
+
+    // Lit le formulaire de réglages affiché dans les Paramètres
+    function readEmailRecapForm() {
+      return {
+        enabled: document.getElementById('emailRecapToggle')?.classList.contains('on') || false,
+        email: (document.getElementById('emailRecapAddr')?.value || '').trim(),
+        frequency: document.getElementById('emailRecapFreq')?.value || 'weekly',
+        day: parseInt(document.getElementById('emailRecapDay')?.value || '1', 10),
+        hour: parseInt(document.getElementById('emailRecapHour')?.value || '8', 10),
+        content: document.getElementById('emailRecapContent')?.value || 'all',
+        includeDone: document.getElementById('emailRecapDoneToggle')?.classList.contains('on') || false,
+      };
+    }
+
+    function saveEmailRecapConfig(test) {
+      if (!cloudUrl) {
+        showToast('⚠ Configurez d\'abord la synchronisation cloud');
+        return;
+      }
+      const config = readEmailRecapForm();
+      if (config.enabled && !config.email) {
+        showToast('⚠ Renseignez l\'adresse e-mail du destinataire');
+        document.getElementById('emailRecapAddr')?.focus();
+        return;
+      }
+      if (config.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(config.email)) {
+        showToast('⚠ Adresse e-mail invalide');
+        document.getElementById('emailRecapAddr')?.focus();
+        return;
+      }
+      showToast(test ? '⏳ Envoi de l\'e-mail de test...' : '⏳ Enregistrement...');
+      // Vérifie que le script déployé prend en charge le récap e-mail (version 2+)
+      checkScriptEmailSupport().then(supported => {
+        if (!supported) {
+          showToast('⚠ Script cloud obsolète — mettez-le à jour (Configuration cloud → « Activer le récap e-mail ») et redéployez');
+          return;
+        }
+        pushEmailRecapConfig(config, test);
+      });
+    }
+
+    async function checkScriptEmailSupport() {
+      try {
+        const url = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword) + '&action=emailconfig';
+        const response = await fetch(url, { redirect: 'follow' });
+        const data = await response.json();
+        return !!(data && data.ok && data.version >= 2);
+      } catch (err) {
+        console.error('Email support check error:', err);
+        return false;
+      }
+    }
+
+    async function pushEmailRecapConfig(config, test) {
+      try {
+        const url = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword);
+        const response = await fetch(url, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'emailconfig', config: config, test: !!test }),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          redirect: 'follow'
+        });
+        const data = await response.json();
+        if (data && data.ok) {
+          emailRecap = { ...config };
+          saveEmailRecapLocal();
+          if (test) {
+            showToast(data.sent ? '✓ E-mail de test envoyé à ' + config.email : '⚠ E-mail non envoyé' + (data.error ? ' : ' + data.error : ''));
+          } else if (config.enabled) {
+            showToast('✓ Récap enregistré — envoi ' + (config.frequency === 'daily' ? 'chaque jour' : 'chaque semaine') + ' vers ' + config.hour + ' h');
+          } else {
+            showToast('✓ Récap e-mail désactivé');
+          }
+        } else {
+          showToast('⚠ ' + ((data && data.error) || 'Réponse inattendue du script'));
+        }
+      } catch (err) {
+        console.error('Email config error:', err);
+        showToast('⚠ Impossible de joindre le script cloud');
+      }
+    }
+
+    // Au démarrage : récupère la configuration du récap depuis le script
+    // (le cloud reste la référence, comme pour les tâches)
+    async function fetchEmailRecapConfig() {
+      if (!cloudUrl) return;
+      try {
+        const url = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword) + '&action=emailconfig';
+        const response = await fetch(url, { redirect: 'follow' });
+        const data = await response.json();
+        if (data && data.ok && data.version >= 2 && data.config) {
+          emailRecap = { ...defaultEmailRecap, ...data.config };
+          saveEmailRecapLocal();
+        }
+      } catch (err) {
+        // silencieux : l'application garde sa copie locale
+      }
+    }
+
     // ============ SCROLL TO TOP ============
     function scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -5934,6 +6511,7 @@ function doPost(e) {
     if (cloudUrl) {
       // Auto-load from cloud on startup
       loadFromCloud();
+      fetchEmailRecapConfig();
     }
     checkAndNotify();
     document.addEventListener('visibilitychange', () => {
@@ -5949,5 +6527,5 @@ function doPost(e) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3430ce31a691624',t:'MTc4ODI1Mjg2Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3437ad39ba849f0',t:'MTc4ODI1NzM3MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
