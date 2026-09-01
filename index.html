@@ -4625,7 +4625,9 @@
                 <p style="margin-top:0.5rem;">
                   Remplacez tout le code de votre Apps Script par la version ci-dessous (bouton Copier), enregistrez,
                   puis redéployez : <strong>Déployer → Gérer les déploiements → ✏️ → Version « Nouvelle » → Déployer</strong>,
-                  en autorisant les nouvelles permissions (envoi d'e-mails, déclencheurs).
+                  en revalidant l'autorisation (envoi d'e-mails, déclencheurs).
+                  Vérifiez aussi que le déploiement est bien réglé sur
+                  <strong>« Exécuter en tant que : Moi »</strong> et <strong>« Accès : Tout le monde »</strong>.
                   Les réglages se font ensuite dans <strong>Paramètres → Récap e-mail automatique</strong>.
                 </p>
                 <div class="cloud-code"><button class="cloud-code-copy" onclick="copyScriptCode()">Copier</button>${APPS_SCRIPT_CODE.replace(/</g, '&lt;')}</div>
@@ -4645,6 +4647,7 @@
                 <li><strong>⚠️ Changez le mot de passe</strong> dans le code (ligne 2) par celui de votre choix</li>
                 <li>Cliquez <strong>Déployer → Nouveau déploiement</strong></li>
                 <li>Type : <strong>Application Web</strong><br>
+                    Exécuter en tant que : <strong>Moi</strong> (votre compte)<br>
                     Accès : <strong>Tout le monde</strong><br>
                     Cliquez <strong>Déployer</strong></li>
                 <li><strong>Autorisez</strong> l'accès quand demandé</li>
@@ -5750,6 +5753,10 @@ function jsonOut(obj) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+function errMsg(err) {
+  return String(err && err.message ? err.message : err);
+}
+
 function getSheet() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Data');
   if (!sheet) {
@@ -5772,7 +5779,11 @@ function doGet(e) {
   if (!checkPassword(e)) return jsonOut({ error: 'Mot de passe incorrect' });
   // Lecture de la configuration du récap e-mail (action=emailconfig)
   if (e && e.parameter && e.parameter.action === 'emailconfig') {
-    return jsonOut({ ok: true, version: 2, config: loadEmailConfig() });
+    try {
+      return jsonOut({ ok: true, version: 2, config: loadEmailConfig() });
+    } catch (err) {
+      return jsonOut({ ok: false, error: 'Lecture impossible : ' + errMsg(err) });
+    }
   }
   return ContentService.createTextOutput(JSON.stringify(readTasks()))
     .setMimeType(ContentService.MimeType.JSON);
@@ -5787,17 +5798,30 @@ function doPost(e) {
     getSheet().getRange('A1').setValue(e.postData.contents);
     return jsonOut({ success: true });
   }
-  // Configuration du récap e-mail (+ envoi de test éventuel)
+  // Configuration du récap e-mail (+ envoi de test éventuel).
+  // Chaque étape est protégée : une erreur est renvoyée en JSON à
+  // l'application plutôt que de faire planter le script (page HTML).
   if (body && body.action === 'emailconfig') {
     var config = body.config || {};
-    saveEmailConfig(config);
-    installEmailTrigger(config);
     var result = { ok: true, sent: false };
+    try {
+      saveEmailConfig(config);
+    } catch (err) {
+      return jsonOut({ ok: false, error: 'Enregistrement impossible : ' + errMsg(err) });
+    }
+    // La création du déclencheur peut échouer si le script n'a pas été
+    // (re)autorisé avec la permission « déclencheurs » : on le signale
+    // sans bloquer le reste.
+    try {
+      installEmailTrigger(config);
+    } catch (err) {
+      result.triggerError = errMsg(err);
+    }
     if (body.test) {
       try {
         result.sent = sendRecapEmail(config, true);
       } catch (err) {
-        result.error = String(err && err.message ? err.message : err);
+        result.error = errMsg(err);
       }
     }
     return jsonOut(result);
@@ -6429,24 +6453,39 @@ function sendRecapEmail(config, isTest) {
       }
       showToast(test ? '⏳ Envoi de l\'e-mail de test...' : '⏳ Enregistrement...');
       // Vérifie que le script déployé prend en charge le récap e-mail (version 2+)
-      checkScriptEmailSupport().then(supported => {
-        if (!supported) {
-          showToast('⚠ Script cloud obsolète — mettez-le à jour (Configuration cloud → « Activer le récap e-mail ») et redéployez');
+      checkScriptEmailSupport().then(status => {
+        if (status === 'network') {
+          showToast('⚠ Impossible de joindre le script cloud — vérifiez votre connexion et l\'URL de déploiement');
+          return;
+        }
+        if (status === 'unreachable') {
+          showToast('⚠ Le script cloud est inaccessible — vérifiez l\'URL et que l\'accès du déploiement est bien « Tout le monde »');
+          return;
+        }
+        if (status === 'old') {
+          showToast('⚠ Script cloud obsolète — mettez-le à jour (Configuration cloud → « Activer le récap e-mail ») et redéployez une nouvelle version');
           return;
         }
         pushEmailRecapConfig(config, test);
       });
     }
 
+    // Vérifie que le script déployé prend en charge le récap e-mail (version 2+).
+    // Retourne 'ok' | 'old' (script obsolète) | 'unreachable' (réponse non JSON :
+    // page de connexion Google, erreur du script…) | 'network' (requête impossible)
     async function checkScriptEmailSupport() {
       try {
         const url = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword) + '&action=emailconfig';
         const response = await fetch(url, { redirect: 'follow' });
-        const data = await response.json();
-        return !!(data && data.ok && data.version >= 2);
+        const text = await response.text();
+        let data = null;
+        try { data = JSON.parse(text); } catch (e) { data = null; }
+        if (data && data.ok && data.version >= 2) return 'ok';
+        if (data) return 'old';
+        return 'unreachable';
       } catch (err) {
         console.error('Email support check error:', err);
-        return false;
+        return 'network';
       }
     }
 
@@ -6459,23 +6498,36 @@ function sendRecapEmail(config, isTest) {
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           redirect: 'follow'
         });
-        const data = await response.json();
+        const text = await response.text();
+        let data = null;
+        try { data = JSON.parse(text); } catch (e) { data = null; }
+        if (!data) {
+          // Réponse non JSON (page d'erreur Google) : le script a probablement
+          // planté — déploiement non mis à jour ou autorisation manquante
+          console.error('Réponse inattendue du script cloud :', text.substring(0, 400));
+          showToast('⚠ Le script cloud a renvoyé une erreur — vérifiez que la dernière version du code est bien déployée (nouvelle version) et autorisée');
+          return;
+        }
         if (data && data.ok) {
           emailRecap = { ...config };
           saveEmailRecapLocal();
-          if (test) {
-            showToast(data.sent ? '✓ E-mail de test envoyé à ' + config.email : '⚠ E-mail non envoyé' + (data.error ? ' : ' + data.error : ''));
+          let msg;
+          if (data.triggerError) {
+            msg = '⚠ Récap enregistré mais déclencheur NON créé (' + data.triggerError + ') — redéployez une nouvelle version en revalidant l\'autorisation';
+          } else if (test) {
+            msg = data.sent ? '✓ E-mail de test envoyé à ' + config.email : '⚠ E-mail non envoyé' + (data.error ? ' : ' + data.error : '');
           } else if (config.enabled) {
-            showToast('✓ Récap enregistré — envoi ' + (config.frequency === 'daily' ? 'chaque jour' : 'chaque semaine') + ' vers ' + config.hour + ' h');
+            msg = '✓ Récap enregistré — envoi ' + (config.frequency === 'daily' ? 'chaque jour' : 'chaque semaine') + ' vers ' + config.hour + ' h';
           } else {
-            showToast('✓ Récap e-mail désactivé');
+            msg = '✓ Récap e-mail désactivé';
           }
+          showToast(msg);
         } else {
           showToast('⚠ ' + ((data && data.error) || 'Réponse inattendue du script'));
         }
       } catch (err) {
         console.error('Email config error:', err);
-        showToast('⚠ Impossible de joindre le script cloud');
+        showToast('⚠ Impossible de joindre le script cloud — vérifiez votre connexion et l\'URL de déploiement');
       }
     }
 
@@ -6527,5 +6579,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3437ad39ba849f0',t:'MTc4ODI1NzM3MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a343ab34892c2438',t:'MTc4ODI1OTM1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
