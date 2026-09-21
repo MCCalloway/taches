@@ -5790,15 +5790,66 @@ function getSheet() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Data');
   if (!sheet) {
     sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Data');
-    sheet.getRange('A1').setValue('[]');
   }
   return sheet;
 }
 
+// ==== Stockage : UNE LIGNE PAR TÂCHE ====
+// Colonne A = JSON complet de la tâche (source de vérité), colonnes B à H
+// = informations lisibles (titre, contact, échéance, statut...).
+// Lève définitivement la limite des 50 000 caractères d'une cellule.
+var TASK_HEADERS = ['JSON (ne pas modifier)', 'Titre', 'Entreprise / Contact', 'Échéance', 'Statut', 'Urgence', 'Catégorie', 'Terminée le'];
+
+function writeTasks(tasks) {
+  var sheet = getSheet();
+  var values = [TASK_HEADERS];
+  for (var i = 0; i < tasks.length; i++) {
+    var t = tasks[i];
+    values.push([
+      JSON.stringify(t),
+      t && t.title ? t.title : '',
+      t && t.contact ? t.contact : '',
+      t && t.deadline ? t.deadline : '',
+      t && t.status === 'done' ? 'Terminée' : 'À faire',
+      t && t.urgency ? t.urgency : '',
+      t && t.category ? t.category : '',
+      t && t.completedAt ? fmtDateTime(t.completedAt) : ''
+    ]);
+  }
+  sheet.clearContents();
+  sheet.getRange(1, 1, values.length, TASK_HEADERS.length).setValues(values);
+  sheet.getRange(1, 1, 1, TASK_HEADERS.length).setFontWeight('bold');
+  sheet.setFrozenRows(1);
+}
+
+// Lecture : une ligne par tâche. L'ancien format (tout le tableau dans la
+// cellule A1) reste accepté pour la migration automatique : dès le premier
+// enregistrement, les données sont réécrites au nouveau format.
 function readTasks() {
   try {
-    var tasks = JSON.parse(getSheet().getRange('A1').getValue() || '[]');
-    return Array.isArray(tasks) ? tasks : [];
+    var sheet = getSheet();
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 1) return [];
+    var firstCell = sheet.getRange(1, 1).getValue();
+    // Ancien format : la cellule A1 contient le tableau complet
+    if (typeof firstCell === 'string' && firstCell.charAt(0) === '[') {
+      var old = JSON.parse(firstCell);
+      return Array.isArray(old) ? old : [];
+    }
+    if (lastRow < 2) return [];
+    var col = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    var tasks = [];
+    for (var i = 0; i < col.length; i++) {
+      var raw = col[i][0];
+      if (!raw) continue;
+      try {
+        var t = JSON.parse(raw);
+        if (t && t.id) tasks.push(t);
+      } catch (e) {
+        // ligne illisible : ignorée
+      }
+    }
+    return tasks;
   } catch (e) {
     return [];
   }
@@ -5818,7 +5869,7 @@ function doGet(e) {
       }
     }
     try {
-      return jsonOut({ ok: true, version: 4, config: loadEmailConfig() });
+      return jsonOut({ ok: true, version: 5, config: loadEmailConfig() });
     } catch (err) {
       return jsonOut({ ok: false, error: 'Lecture impossible : ' + errMsg(err) });
     }
@@ -5832,7 +5883,7 @@ function doGet(e) {
 // (une page d erreur HTML serait bloquée par le navigateur et semblerait
 // être un problème réseau).
 function handleEmailConfigSet(p) {
-  var result = { ok: true, version: 4, sent: false };
+  var result = { ok: true, version: 5, sent: false };
   var config = null;
   try {
     config = JSON.parse(p.set);
@@ -5863,9 +5914,9 @@ function doPost(e) {
   if (!checkPassword(e)) return jsonOut({ error: 'Mot de passe incorrect' });
   var body = null;
   try { body = JSON.parse(e.postData.contents); } catch (err) { body = null; }
-  // Un tableau = synchronisation des tâches (comportement d'origine)
+  // Un tableau = synchronisation des tâches (une ligne par tâche)
   if (Array.isArray(body)) {
-    getSheet().getRange('A1').setValue(e.postData.contents);
+    writeTasks(body);
     return jsonOut({ success: true });
   }
   // Configuration du récap e-mail via POST (compatibilité) :
@@ -6270,6 +6321,7 @@ function sendRecapEmail(config, isTest) {
       } catch (err) {
         syncStatus = 'error';
         console.error('Cloud sync error:', err);
+        showToast('⚠ Synchronisation cloud échouée — données conservées en local');
       }
       updateSyncIndicator();
     }
@@ -6551,7 +6603,7 @@ function sendRecapEmail(config, isTest) {
         const text = await response.text();
         let data = null;
         try { data = JSON.parse(text); } catch (e) { data = null; }
-        if (data && data.ok && data.version >= 4) return 'ok';
+        if (data && data.ok && data.version >= 5) return 'ok';
         if (data) return 'old';
         return 'unreachable';
       } catch (err) {
@@ -6579,7 +6631,7 @@ function sendRecapEmail(config, isTest) {
         }
         // Un script version < 3 répond « ok » mais IGNORE la commande
         // d'enregistrement : il faut recopier le dernier code et redéployer
-        if (data.ok && !(data.version >= 4)) {
+        if (data.ok && !(data.version >= 5)) {
           showToast('⚠ Le script déployé est trop ancien (version ' + (data.version || '?') + ') — recopiez le DERNIER code et redéployez en choisissant « Version : Nouvelle »', 6000);
           const diag = document.getElementById('emailDiagResult');
           if (diag) {
@@ -6659,7 +6711,7 @@ function sendRecapEmail(config, isTest) {
         lines.push('Statut HTTP : ' + response.status);
         let parsed = null;
         try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
-        if (parsed && parsed.ok && parsed.version >= 4) {
+        if (parsed && parsed.ok && parsed.version >= 5) {
           lines.push('Script : version ' + parsed.version + ' ✓ (à jour, récap e-mail pris en charge)');
           lines.push('Récap configuré : ' + (parsed.config && parsed.config.enabled ? 'activé — ' + (parsed.config.email || '(sans adresse)') : 'désactivé'));
         } else if (parsed && parsed.ok) {
@@ -6708,5 +6760,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a34432d68e084f23',t:'MTc4ODI2NDkwNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3e744d24e97fa41',t:'MTc4OTk3NDgyMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
