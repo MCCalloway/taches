@@ -49,6 +49,13 @@
       justify-content: center;
       min-width: 0;
     }
+    /* Navigation entre les pages (intégrée au header, toujours visible) */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      flex-shrink: 0;
+    }
     .logo {
       display: flex;
       align-items: center;
@@ -66,8 +73,6 @@
       flex-shrink: 0;
     }
     .logo-icon svg { color: white; }
-    .logo-text h1 { font-size: 1.5rem; font-weight: 800; color: #1e293b; letter-spacing: -0.02em; }
-    .logo-text p { font-size: 0.75rem; color: #94a3b8; margin-top: -2px; }
     
     .search-box {
       position: relative;
@@ -325,6 +330,16 @@
       transform: translateY(-2px);
     }
     .add-task-square.log:hover .icon-circle { background: #4f46e5; color: white; }
+    .add-task-square.rapport { border-color: #bfdbfe; box-shadow: 0 2px 10px rgba(37,99,235,0.14); }
+    .add-task-square.rapport .icon-circle { background: #dbeafe; color: #2563eb; }
+    .add-task-square.rapport:hover {
+      border-color: #2563eb;
+      color: #1d4ed8;
+      background: #eff6ff;
+      box-shadow: 0 5px 16px rgba(37,99,235,0.24);
+      transform: translateY(-2px);
+    }
+    .add-task-square.rapport:hover .icon-circle { background: #2563eb; color: white; }
     @media (max-width: 640px) {
       .add-task-square { width: 130px; font-size: 0.8rem; }
     }
@@ -962,6 +977,8 @@
     .modal-icon.blue { background: #dbeafe; color: #2563eb; }
     .modal-icon.indigo { background: #e0e7ff; color: #4338ca; }
     .modal-title { font-size: 1.125rem; font-weight: 600; color: #1e293b; }
+    .modal-subtitle.clickable { cursor: pointer; transition: color 0.15s; }
+    .modal-subtitle.clickable:hover { color: #4f46e5; }
     .modal-subtitle {
       font-size: 0.875rem;
       color: #94a3b8;
@@ -2250,6 +2267,13 @@
     /* Vue Mois : 6 tâches visibles par jour maximum, défilement au-delà
        (les vues Semaine / Semaine de travail ne sont pas limitées) */
     .cal-month-grid .cal-tasks { max-height: 8.7rem; }
+    /* Glisser-déposer : tâches déplaçables (non récurrentes) et zones de dépôt */
+    .cal-task[draggable="true"] { cursor: grab; }
+    .cal-cell.drag-over, .cal-week-col.drag-over {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      box-shadow: inset 0 0 0 1px #4f46e5;
+    }
     /* Petit logo discret des tâches récurrentes (toutes vues du calendrier) */
     .cal-task .cal-rec-logo { display: flex; align-items: center; color: #94a3b8; flex-shrink: 0; }
     .cal-task .cal-rec-logo svg { width: 11px; height: 11px; }
@@ -2282,15 +2306,38 @@
     .cal-year-title:hover { color: #4f46e5; }
     .mini-cal-day.has-done { background: #f1f5f9; color: #94a3b8; font-weight: 600; }
 
+    /* Page Accueil : légende du graphique de la semaine */
+    .home-week-legend { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem; }
+    .home-legend-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: #475569; }
+    .home-legend-item b { color: #1e293b; }
+    .home-legend-item .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    @media (max-width: 768px) {
+      .charts { grid-template-columns: 1fr; }
+    }
+
     /* Utilities */
     .hidden { display: none !important; }
     
     /* Responsive */
+    /* La navigation passe sur sa propre ligne quand la largeur manque */
+    @media (max-width: 1200px) {
+      .header-inner { flex-wrap: wrap; gap: 0.6rem 1rem; }
+      .header-nav { order: 4; flex-basis: 100%; }
+    }
     @media (max-width: 768px) {
+      .header { padding: 0.75rem; }
       .header-inner { flex-wrap: wrap; gap: 0.5rem; }
+      .header-nav { order: 2; }
+      .header-nav .view-switcher {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .header-nav .view-switcher::-webkit-scrollbar { display: none; }
+      .header-nav .view-btn { flex: 1 1 auto; min-width: fit-content; padding: 0.45rem 0.5rem; font-size: 0.8rem; gap: 0.25rem; }
       .header-center { order: 3; flex-basis: 100%; justify-content: stretch; }
       .search-box { max-width: none; }
-      .logo-text h1 { font-size: 1rem; }
     }
     @media (max-width: 640px) {
       .stats { grid-template-columns: 1fr; }
@@ -2315,10 +2362,8 @@
         <div class="logo-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h9"/><path d="M10 12h9"/><path d="M10 18h9"/><path d="m4 6 1 1 2-2"/><path d="m4 12 1 1 2-2"/><path d="m4 18 1 1 2-2"/></svg>
         </div>
-        <div class="logo-text">
-          <h1>Tâches</h1>
-        </div>
       </div>
+      <nav class="header-nav" id="viewSwitcherContainer" aria-label="Navigation entre les pages"></nav>
       <div class="header-center">
         <div class="search-box">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -2344,9 +2389,6 @@
   <main>
     <div class="layout-grid">
       <div class="layout-top">
-        <!-- Sélecteur de mode (Mode Projet / Mode Tâches) -->
-        <div id="viewSwitcherContainer"></div>
-
         <!-- Charts + Calendar -->
         <div class="stats-row" id="statsRow" style="display:none;">
           <div class="charts" id="chartsContainer"></div>
@@ -2418,7 +2460,7 @@
       defaultSortAsc: true,
       defaultCategory: 'pro',
       defaultUrgency: 'normal',
-      defaultView: 'tasks',
+      defaultView: 'home',
       defaultProjectSort: 'deadline',
       defaultCalendarMode: 'month',
       notificationsEnabled: false,
@@ -2462,7 +2504,10 @@
     let filterLate = false;
     let isFormExpanded = false;
     let isLogFormExpanded = false; // formulaire « Consigner tâche » (créée directement terminée)
-    let prefillDeadline = null; // date pré-remplie dans le formulaire (clic « + » du calendrier)
+    let quickAddDate = null; // date du « + » du calendrier (formulaire popup)
+    let quickCategory = 'pro';
+    let quickUrgency = 'normal';
+    let quickTags = [];
     let completingTask = null;
     let modalMode = 'choose';
     let cloudUrl = localStorage.getItem('taskflow-cloud-url') || '';
@@ -2587,6 +2632,7 @@
     }
 
     let viewingContact = null;
+    let detailTask = null; // tâche consultée en popup (depuis le calendrier)
     function openContactSheet(contactName) {
       viewingContact = contactName;
       modalMode = 'contactSheet';
@@ -2977,35 +3023,65 @@
       }
     }
 
+    // Statuts de la semaine en cours (lundi à dimanche), occurrences
+    // récurrentes incluses. Catégories exclusives : une tâche urgente à
+    // faire compte uniquement comme « urgente », pas aussi comme « à faire ».
+    function getWeekStats() {
+      const now = new Date();
+      const dow = now.getDay();
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (dow === 0 ? -6 : 1 - dow));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const fromStr = monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0');
+      const toStr = sunday.getFullYear() + '-' + String(sunday.getMonth() + 1).padStart(2, '0') + '-' + String(sunday.getDate()).padStart(2, '0');
+      const counts = { todo: 0, urgent: 0, done: 0 };
+      const count = (t, isDone) => {
+        if (isDone) counts.done++;
+        else if (t.urgency === 'urgent') counts.urgent++;
+        else counts.todo++;
+      };
+      tasks.forEach(t => {
+        if (t.recurrence && t.recurrence.startDate && t.recurrence.endDate) {
+          const completed = t.completedDates || [];
+          const deleted = t.deletedDates || [];
+          getRecurrenceOccurrences(t).forEach(d => {
+            if (d < fromStr || d > toStr) return;
+            if (deleted.includes(d)) return;
+            count(t, completed.includes(d));
+          });
+        } else if (t.deadline && t.deadline >= fromStr && t.deadline <= toStr) {
+          count(t, t.status === 'done');
+        }
+      });
+      return { counts, fromStr, toStr, total: counts.todo + counts.urgent + counts.done };
+    }
+
     function renderStats() {
       const row = document.getElementById('statsRow');
       const container = document.getElementById('chartsContainer');
-      // Mini-listes et calendrier : uniquement en Mode Tâches
-      if (tasks.length === 0 || taskView !== 'tasks') {
+      const cal = document.getElementById('miniCalendar');
+      // La nouvelle page Accueil : graphique de la semaine + tâches du jour
+      if (tasks.length === 0 || taskView !== 'home') {
         row.style.display = 'none';
+        if (cal) cal.style.display = 'none';
         return;
       }
       row.style.display = '';
-      
-      const now = new Date();
-      const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-      const todoTasks = tasks.filter(t => t.status === 'todo');
-      const totalTodo = todoTasks.length;
-      const normalCount = todoTasks.filter(t => t.urgency === 'normal' && !(t.deadline && t.deadline < todayStr)).length;
-      const urgentCount = todoTasks.filter(t => t.urgency === 'urgent' && !(t.deadline && t.deadline < todayStr)).length;
-      const overdueCount = todoTasks.filter(t => t.deadline && t.deadline < todayStr).length;
-      const proCount = todoTasks.filter(t => (t.category || 'pro') === 'pro').length;
-      const persoCount = todoTasks.filter(t => (t.category || 'pro') === 'perso').length;
-      
+      row.style.gridTemplateColumns = '1fr';
+      if (cal) { cal.style.display = 'none'; cal.innerHTML = ''; }
+
+      const week = getWeekStats();
+      const slices = [];
+      if (week.counts.todo > 0) slices.push({ label: 'À faire', value: week.counts.todo, color: '#10b981' });
+      if (week.counts.urgent > 0) slices.push({ label: 'Urgentes', value: week.counts.urgent, color: '#f59e0b' });
+      if (week.counts.done > 0) slices.push({ label: 'Terminées', value: week.counts.done, color: '#94a3b8' });
+      const donut = makePieChart(slices, week.total);
+
       const todayItems = getTodoTasksForNotif().today
         .sort((a, b) => (a.urgency === 'urgent' ? 0 : 1) - (b.urgency === 'urgent' ? 0 : 1))
         .slice(0, 30);
 
-      const recentItems = [...tasks]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 30);
-
-      const dotColor = (t) => t.status === 'done' ? '#94a3b8' : (t.urgency === 'urgent' ? '#f59e0b' : '#10b981');
+      const dotColor = (t) => t.urgency === 'urgent' ? '#f59e0b' : '#10b981';
 
       const renderMiniItem = (t, whenLabel) => `
         <button class="mini-task-item" onclick="focusTask('${t.id}')" title="${(t.title || '').replace(/"/g, '&quot;')}">
@@ -3016,6 +3092,15 @@
       `;
 
       container.innerHTML = `
+        <div class="chart-box">
+          <div class="chart-title">Cette semaine (du ${formatDate(week.fromStr + 'T00:00:00')} au ${formatDate(week.toStr + 'T00:00:00')})</div>
+          <div class="chart-svg-wrap">${donut}<div class="chart-center-label">${week.total}</div></div>
+          <div class="home-week-legend">
+            <span class="home-legend-item"><i class="dot" style="background:#10b981"></i> À faire <b>${week.counts.todo}</b></span>
+            <span class="home-legend-item"><i class="dot" style="background:#f59e0b"></i> Urgentes <b>${week.counts.urgent}</b></span>
+            <span class="home-legend-item"><i class="dot" style="background:#94a3b8"></i> Terminées <b>${week.counts.done}</b></span>
+          </div>
+        </div>
         <div class="chart-box list-box">
           <div class="chart-title">Tâches du jour (${todayItems.length})</div>
           <div class="mini-task-list">
@@ -3024,17 +3109,7 @@
               : '<div class="mini-task-empty">Aucune tâche aujourd’hui</div>'}
           </div>
         </div>
-        <div class="chart-box list-box">
-          <div class="chart-title">Dernières tâches créées</div>
-          <div class="mini-task-list">
-            ${recentItems.length
-              ? recentItems.map(t => renderMiniItem(t, formatDate(t.createdAt))).join('')
-              : '<div class="mini-task-empty">Aucune tâche</div>'}
-          </div>
-        </div>
       `;
-      
-      renderCalendar();
     }
 
     function focusTask(id) {
@@ -3174,6 +3249,7 @@
         if (!t.deadline) return false;
         if (filterPeriod.mode === 'before') return t.deadline <= filterPeriod.from;
         if (filterPeriod.mode === 'after') return t.deadline >= filterPeriod.from;
+        if (filterPeriod.mode === 'on') return t.deadline === filterPeriod.from;
         if (filterPeriod.mode === 'between') return t.deadline >= filterPeriod.from && t.deadline <= filterPeriod.to;
         return true;
       });
@@ -3183,8 +3259,9 @@
       const d = ds => formatDate(ds + 'T00:00:00');
       if (fp.mode === 'before') return `Avant le ${d(fp.from)}`;
       if (fp.mode === 'after') return `Après le ${d(fp.from)}`;
+      if (fp.mode === 'on') return `Le ${d(fp.from)}`;
       if (fp.mode === 'between') return `Du ${d(fp.from)} au ${d(fp.to)}`;
-      return 'Période';
+      return 'Date';
     }
 
     function openPeriodFilterModal() {
@@ -3258,9 +3335,10 @@
     function renderAddTask() {
       const container = document.getElementById('addTaskContainer');
 
-      // Bouton d'ajout global : uniquement en Mode Tâches
-      // (le Mode Projet propose la création directement dans la fiche contact)
-      if (taskView !== 'tasks') {
+      // Boutons d'ajout : page Accueil (2 carrés) et page Recherche
+      // (3 carrés avec le Rapport ; le mode Projet propose la création
+      // directement dans la fiche contact)
+      if (taskView !== 'home' && taskView !== 'tasks') {
         container.classList.add('hidden');
         return;
       }
@@ -3277,6 +3355,11 @@
               <div class="icon-circle">${icons.check}</div>
               <span>Consigner tâche</span>
             </button>
+            ${taskView === 'tasks' ? `
+            <button class="add-task-square rapport" onclick="openSummary()" title="Rapport des tâches terminées">
+              <div class="icon-circle rapport">${icons.fileText}</div>
+              <span>Rapport</span>
+            </button>` : ''}
           </div>
         `;
         return;
@@ -3305,7 +3388,7 @@
             </div>
             <div id="deadlineField">
               <label>${isLog ? 'Date <span style="color:#94a3b8;font-weight:400;">(facultative)</span>' : 'Date limite <span class="required">*</span>'}</label>
-              <input type="date" id="taskDeadline" ${isLog ? `value="${getTodayStr()}"` : (prefillDeadline ? `value="${prefillDeadline}"` : `min="${today}"`)} required>
+              <input type="date" id="taskDeadline" ${isLog ? `value="${getTodayStr()}"` : `min="${today}" required`}>
             </div>
             <div class="full-width">
               <label>Description</label>
@@ -3429,23 +3512,17 @@
     function renderFilters() {
       const container = document.getElementById('filtersContainer');
 
-      // Barre au-dessus des tâches : filtre « Période » (Mode Tâches uniquement)
-      // + bouton « Résumé » (toujours accessible)
-      const showPeriodBtn = taskView === 'tasks';
-      document.getElementById('periodFilters').innerHTML = showPeriodBtn ? `
+      // Barre au-dessus des tâches (page Recherche) : filtre « Date »
+      // (le bouton Rapport est désormais un carré à côté de Nouvelle tâche)
+      const showDateBtn = taskView === 'tasks';
+      document.getElementById('periodFilters').innerHTML = showDateBtn ? `
         <button class="filter-btn ${filterPeriod ? 'active' : ''}" onclick="openPeriodFilterModal()">
-          ${icons.calendar} <span>${filterPeriod ? getPeriodFilterLabel(filterPeriod) : 'Période'}</span>
+          ${icons.calendar} <span>${filterPeriod ? getPeriodFilterLabel(filterPeriod) : 'Date'}</span>
         </button>
       ` : '';
-      document.getElementById('periodFilters').classList.toggle('hidden', !showPeriodBtn);
-      // Bouton « Rapport » : Accueil uniquement
-      const showRapportBtn = taskView === 'tasks';
-      document.getElementById('summaryFilters').innerHTML = showRapportBtn ? `
-        <button class="filter-btn" onclick="openSummary()" title="Rapport des tâches terminées">
-          ${icons.fileText.replace(/20"/g, '15"')} <span>Rapport</span>
-        </button>
-      ` : '';
-      document.getElementById('summaryFilters').classList.toggle('hidden', !showRapportBtn);
+      document.getElementById('periodFilters').classList.toggle('hidden', !showDateBtn);
+      document.getElementById('summaryFilters').innerHTML = '';
+      document.getElementById('summaryFilters').classList.add('hidden');
       // Tri des comptes (mode Comptes uniquement) : échéance la plus proche ou nom
       const sortSel = document.getElementById('projectSortSelect');
       if (sortSel) {
@@ -3455,8 +3532,9 @@
         `;
         sortSel.classList.toggle('hidden', taskView !== 'project');
       }
-      // Hors Mode Tâches (grille projet ou fiche contact), le tri ne s'applique pas
+      // Hors Recherche/Comptes, la barre d'outils est masquée
       document.getElementById('taskSortBar')?.classList.toggle('project-mode', taskView !== 'tasks');
+      document.getElementById('taskSortBar')?.classList.toggle('hidden', taskView !== 'tasks' && taskView !== 'project');
 
       // Hors Mode Tâches, les filtres de la colonne latérale ne s'appliquent pas
       if (tasks.length === 0 || taskView !== 'tasks') {
@@ -3565,6 +3643,13 @@
 
     function renderTaskList() {
       const container = document.getElementById('taskListContainer');
+
+      // Page Accueil : le contenu (graphique, tâches du jour, boutons) est
+      // rendu par renderStats/renderAddTask dans la zone du haut
+      if (taskView === 'home') {
+        container.innerHTML = '';
+        return;
+      }
 
       // Mode Projet : grille par entreprise/contact à la place de la liste
       if (taskView === 'project') {
@@ -3964,16 +4049,146 @@
     }
 
     // Clic sur le « + » d un jour (vues Semaine du calendrier) : ouvre le
-    // formulaire « Nouvelle tâche » sur l Accueil, date du jour pré-remplie
-    function openTaskFormForDate(dateStr) {
-      prefillDeadline = dateStr;
-      isFormExpanded = true;
-      isLogFormExpanded = false;
-      currentTags = [];
-      taskView = 'tasks';
+    // formulaire « Nouvelle tâche » en fenêtre popup, date du jour pré-remplie
+    function openQuickAddModal(dateStr) {
+      quickAddDate = dateStr || getTodayStr();
+      quickCategory = settings.defaultCategory;
+      quickUrgency = settings.defaultUrgency;
+      quickTags = [];
+      completingTask = null;
+      modalMode = 'quickAdd';
+      renderModal();
+      document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function setQuickCategory(cat) {
+      quickCategory = cat;
+      document.querySelectorAll('.modal .category-btn').forEach(btn => {
+        btn.classList.remove('active', 'pro', 'perso');
+        if (btn.dataset.cat === cat) btn.classList.add('active', cat);
+      });
+    }
+
+    function setQuickUrgency(urgency) {
+      quickUrgency = urgency;
+      document.querySelectorAll('.modal .urgency-btn').forEach(btn => {
+        btn.classList.remove('active', 'normal', 'urgent');
+        if (btn.dataset.urgency === urgency) btn.classList.add('active', urgency);
+      });
+    }
+
+    function toggleQuickRecurrencePanel() {
+      const panel = document.getElementById('quickRecurrencePanel');
+      const deadlineField = document.getElementById('quickDeadlineField');
+      const cb = document.getElementById('quickRecurring');
+      if (cb.checked) {
+        panel.classList.remove('hidden');
+        if (deadlineField) deadlineField.classList.add('hidden');
+      } else {
+        panel.classList.add('hidden');
+        if (deadlineField) deadlineField.classList.remove('hidden');
+      }
+    }
+
+    function removeQuickTag(i) {
+      quickTags.splice(i, 1);
+      renderTagsChips('quickTagsChips', quickTags, 'removeQuickTag');
+    }
+
+    function addQuickTagSuggestion(tag) {
+      addTagsToList(tag, quickTags);
+      const input = document.getElementById('quickTagInput');
+      if (input) { input.value = ''; input.focus(); }
+      renderTagsChips('quickTagsChips', quickTags, 'removeQuickTag');
+      document.getElementById('quickTagSuggestions')?.classList.add('hidden');
+    }
+
+    function selectQuickContact(name) {
+      const input = document.getElementById('quickContact');
+      if (input) input.value = name;
+      document.getElementById('quickContactSuggestions')?.classList.add('hidden');
+    }
+
+    function saveQuickAddTask() {
+      const title = document.getElementById('quickTitle').value.trim();
+      const contact = document.getElementById('quickContact').value.trim();
+      const description = document.getElementById('quickDescription').value.trim();
+      const isRecurring = document.getElementById('quickRecurring')?.checked;
+
+      if (!title) { document.getElementById('quickTitle').focus(); return; }
+      if (!contact) { document.getElementById('quickContact').focus(); return; }
+
+      let deadline = '';
+      let recurrence = null;
+      if (isRecurring) {
+        const startDate = document.getElementById('quickRecStart').value || quickAddDate;
+        const endDate = document.getElementById('quickRecEnd').value;
+        const days = getSelectedDays();
+        if (!endDate) { document.getElementById('quickRecEnd').focus(); return; }
+        if (days.length === 0) { showToast('⚠ Sélectionnez au moins un jour'); return; }
+        recurrence = { startDate, endDate, days };
+        deadline = startDate;
+      } else {
+        deadline = document.getElementById('quickDeadline').value || quickAddDate;
+      }
+
+      // Récupère le tag éventuellement encore tapé (non validé par Entrée)
+      const pendingTagInput = document.getElementById('quickTagInput');
+      if (pendingTagInput && pendingTagInput.value.trim()) {
+        addTagsToList(pendingTagInput.value, quickTags);
+      }
+
+      const task = {
+        id: generateId(),
+        title,
+        contact,
+        deadline,
+        description: description || undefined,
+        urgency: quickUrgency,
+        category: quickCategory,
+        status: 'todo',
+        createdAt: new Date().toISOString(),
+        tags: [...quickTags],
+      };
+      if (recurrence) task.recurrence = recurrence;
+
+      tasks.unshift(task);
+      saveTasks();
+      quickTags = [];
+      closeModal();
       render();
-      prefillDeadline = null;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast('✓ Tâche ajoutée');
+    }
+
+    // ---- Glisser-déposer : déplacer une tâche sur un autre jour ----
+    // (tâches non récurrentes uniquement ; modification de l'échéance)
+    function calDragTask(event, id) {
+      event.dataTransfer.setData('text/plain', id);
+      event.dataTransfer.effectAllowed = 'move';
+    }
+
+    function calAllowDrop(event, el) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      el.classList.add('drag-over');
+    }
+
+    function calDragLeave(event, el) {
+      el.classList.remove('drag-over');
+    }
+
+    function calDropTask(event, dateStr) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('drag-over');
+      const id = event.dataTransfer.getData('text/plain');
+      if (!id || !dateStr) return;
+      const task = tasks.find(t => t.id === id);
+      if (!task || task.recurrence) return;
+      if (task.deadline === dateStr) return;
+      task.deadline = dateStr;
+      saveTasks();
+      render();
+      showToast('✓ Tâche déplacée au ' + formatDate(dateStr + 'T00:00:00'));
     }
 
     function expandLogForm() {
@@ -4366,7 +4581,7 @@
       if (!el) return;
       el.innerHTML = `
         <div class="view-switcher">
-          <button class="view-btn ${taskView === 'tasks' ? 'active' : ''}" onclick="setTaskView('tasks')">
+          <button class="view-btn ${taskView === 'home' ? 'active' : ''}" onclick="setTaskView('home')">
             ${icons.layoutList} Accueil
           </button>
           <button class="view-btn ${(taskView === 'project' || taskView === 'contact') ? 'active' : ''}" onclick="setTaskView('project')">
@@ -4374,6 +4589,9 @@
           </button>
           <button class="view-btn ${taskView === 'calendar' ? 'active' : ''}" onclick="setTaskView('calendar')">
             ${icons.calendar} Calendrier
+          </button>
+          <button class="view-btn ${taskView === 'tasks' ? 'active' : ''}" onclick="setTaskView('tasks')">
+            ${icons.search.replace(/28"/g, '15"')} Recherche
           </button>
         </div>
       `;
@@ -4771,7 +4989,7 @@
 
       container.innerHTML = `
         <button class="back-btn" onclick="backToProjects()">
-          ${icons.arrowLeft} Retour aux comptes
+          ${icons.arrowLeft} Retour
         </button>
 
         <div class="contact-project-header">
@@ -4866,10 +5084,9 @@
       const isOverdue = t.status !== 'done' && t.date && t.date < todayStr;
       const dot = t.status === 'done' ? '#94a3b8' : (isOverdue ? '#dc2626' : (t.urgency === 'urgent' ? '#f59e0b' : '#10b981'));
       const when = t.status === 'done' ? '✓' : (isOverdue ? 'Retard' : (t.urgency === 'urgent' ? 'Urgent' : ''));
-      const contactAttr = t.contact
-        ? ` onclick="event.stopPropagation();openContactTasks('${t.contact.replace(/'/g, "\\\'")}', '${t.id || ''}')" title="Voir la fiche de ${t.contact.replace(/"/g, '&quot;')}"`
-        : '';
-      return `<button class="mini-task-item cal-task"${contactAttr}>
+      const clickAttr = ` onclick="event.stopPropagation();openTaskDetail('${t.id}', '${t.date}')" title="Consulter la tâche"`;
+      const dragAttr = !t.recurring ? ` draggable="true" ondragstart="calDragTask(event, '${t.id}')"` : '';
+      return `<button class="mini-task-item cal-task"${clickAttr}${dragAttr}>
         <span class="dot" style="background:${dot}"></span>
         <span class="txt">${t.title}</span>
         ${t.recurring ? `<span class="cal-rec-logo" title="Tâche récurrente">${icons.repeat}</span>` : ''}
@@ -4975,7 +5192,7 @@
         const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
         const items = map[dateStr] || [];
         html += `
-          <div class="cal-cell ${dateStr === todayStr ? 'today' : ''}" onclick="calJumpToWeek('${dateStr}')" title="Voir cette semaine">
+          <div class="cal-cell ${dateStr === todayStr ? 'today' : ''}" onclick="calJumpToWeek('${dateStr}')" title="Voir cette semaine" ondragover="calAllowDrop(event, this)" ondragleave="calDragLeave(event, this)" ondrop="calDropTask(event, '${dateStr}')">
             <div class="cal-day-num">${day}</div>
             <div class="cal-tasks">${items.map(renderCalTask).join('')}</div>
           </div>`;
@@ -4998,10 +5215,10 @@
         const dateStr = isoDate(d);
         const items = map[dateStr] || [];
         cols += `
-          <div class="cal-week-col">
+          <div class="cal-week-col" ondragover="calAllowDrop(event, this)" ondragleave="calDragLeave(event, this)" ondrop="calDropTask(event, '${dateStr}')">
             <div class="cal-week-head ${dateStr === todayStr ? 'today' : ''}">
               <span class="cal-week-day-label">${d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
-              <button class="cal-add-day-btn" onclick="openTaskFormForDate('${dateStr}')" title="Nouvelle tâche le ${dateStr}">+</button>
+              <button class="cal-add-day-btn" onclick="openQuickAddModal('${dateStr}')" title="Nouvelle tâche le ${dateStr}">+</button>
             </div>
             <div class="cal-tasks">${items.length ? items.map(renderCalTask).join('') : '<div class="cal-empty-day">Aucune tâche</div>'}</div>
           </div>`;
@@ -5171,6 +5388,21 @@
       completingTask = null;
       periodDraft = null;
       viewingContact = null;
+      detailTask = null;
+    }
+
+    // Consultation d une tâche du calendrier en popup ; le nom de
+    // l entreprise y est cliquable et ouvre la fiche du compte
+    function openTaskDetail(id, dateStr) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      detailTask = JSON.parse(JSON.stringify(task));
+      detailTask._date = dateStr || task.deadline;
+      completingTask = null;
+      viewingContact = null;
+      modalMode = 'taskDetail';
+      renderModal();
+      document.getElementById('modalOverlay').classList.remove('hidden');
     }
 
     function renderModal() {
@@ -5221,7 +5453,7 @@
               <div class="modal-icon indigo">${icons.building}</div>
               <div>
                 <div class="modal-title">Fiche entreprise/contact</div>
-                <div class="modal-subtitle">${contact}</div>
+                <div class="modal-subtitle clickable" onclick="closeModal();openContactTasks('${contact.replace(/'/g, "\\'")}')" title="Voir la fiche du compte">${contact}</div>
               </div>
             </div>
             <button class="modal-close" onclick="closeModal()">${icons.x}</button>
@@ -5270,6 +5502,7 @@
             <div class="period-mode-btns">
               <button type="button" class="period-mode-btn ${pd.mode === 'before' ? 'active' : ''}" onclick="setPeriodDraftMode('before')">Avant le</button>
               <button type="button" class="period-mode-btn ${pd.mode === 'after' ? 'active' : ''}" onclick="setPeriodDraftMode('after')">Après le</button>
+              <button type="button" class="period-mode-btn ${pd.mode === 'on' ? 'active' : ''}" onclick="setPeriodDraftMode('on')">Le</button>
               <button type="button" class="period-mode-btn ${pd.mode === 'between' ? 'active' : ''}" onclick="setPeriodDraftMode('between')">Entre le ... et le ...</button>
             </div>
 
@@ -5285,7 +5518,7 @@
                 </div>
               </div>
             ` : `
-              <label style="margin-top:0.75rem;">${icons.calendar} ${pd.mode === 'before' ? 'Avant le' : 'Après le'}</label>
+              <label style="margin-top:0.75rem;">${icons.calendar} ${pd.mode === 'before' ? 'Avant le' : (pd.mode === 'on' ? 'Le' : 'Après le')}</label>
               <input type="date" id="periodFrom" value="${pd.from || ''}" oninput="periodDraft.from=this.value">
             `}
 
@@ -5380,6 +5613,185 @@
             </div>
           </div>
         `;
+        return;
+      }
+
+      if (modalMode === 'taskDetail') {
+        const t = detailTask;
+        if (!t) { closeModal(); return; }
+        const isDone = t.recurrence
+          ? ((t.completedDates || []).includes(t._date) && !(t.deletedDates || []).includes(t._date))
+          : t.status === 'done';
+        const logEntry = t.recurrence ? (t.completionLog || []).find(e => e.date === t._date) : null;
+        const completedAt = t.recurrence ? (logEntry && logEntry.completedAt) : t.completedAt;
+        const completionComment = t.recurrence ? (logEntry ? (logEntry.comment || '') : '') : (t.completionComment || '');
+        const comments = (t.comments || [])
+          .filter(c => !t.recurrence || !c.occurrenceDate || c.occurrenceDate === t._date);
+        const deadline = t._date || t.deadline;
+        const contactName = (t.contact || '').trim();
+        const contactAttr = contactName
+          ? ` onclick="closeModal();openContactTasks('${contactName.replace(/'/g, "\\'")}', '${t.id}')" title="Voir la fiche du compte"`
+          : '';
+
+        modal.innerHTML = `
+          <div class="modal-header">
+            <div class="modal-header-left">
+              <div class="modal-icon ${isDone ? 'green' : 'indigo'}">${isDone ? icons.checkCircle : icons.listTodo}</div>
+              <div style="min-width:0;">
+                <div class="modal-title" style="white-space:normal;">${t.title}</div>
+                ${contactName ? `<div class="modal-subtitle clickable"${contactAttr}>${contactName}</div>` : ''}
+              </div>
+            </div>
+            <button class="modal-close" onclick="closeModal()">${icons.x}</button>
+          </div>
+          <div class="modal-body">
+            <div class="summary-task-meta" style="margin-top:0;">
+              <span class="category-badge ${t.category || 'pro'}">${(t.category || 'pro') === 'pro' ? icons.briefcase + ' Pro' : icons.home + ' Perso'}</span>
+              ${!isDone ? `<span class="urgency-badge ${t.urgency}">${t.urgency === 'urgent' ? icons.zap + ' Urgent' : icons.clock + ' Normal'}</span>` : ''}
+              ${t.recurrence ? `<span class="recurrence-badge">${icons.repeat} ${getRecurrenceLabel(t)}</span>` : ''}
+            </div>
+            <div class="task-meta" style="margin-top:0.625rem;">
+              ${deadline ? `<span class="task-meta-item">${icons.calendar} Échéance ${formatDate(deadline)}</span>` : ''}
+              ${isDone && completedAt ? `<span class="task-meta-item" style="color:#059669;font-weight:500;">${icons.calendarCheck} Terminée le ${formatDate(completedAt, true)}</span>` : ''}
+            </div>
+            ${(t.tags || []).length ? `
+            <div class="task-meta" style="margin-top:0.375rem;">
+              ${(t.tags || []).map(tag => `<span class="tag-badge">${icons.tag} ${tag}</span>`).join('')}
+            </div>` : ''}
+            ${t.description ? `<div style="margin-top:0.75rem;font-size:0.85rem;color:#475569;line-height:1.5;">${t.description}</div>` : ''}
+            ${completionComment ? `
+              <div class="task-comment" style="margin-top:0.75rem;">
+                ${icons.message}
+                <p>${completionComment}</p>
+              </div>` : ''}
+            ${comments.length ? `
+              <div class="sheet-section-title" style="margin-top:1rem;">${icons.message} Commentaires (${comments.length})</div>
+              ${comments.map(c => `
+                <div class="sheet-task-comment">
+                  ${icons.message}
+                  <div>
+                    <div>${c.text}</div>
+                    <div class="sheet-task-comment-date">${c.date ? formatDate(c.date, true) : ''}</div>
+                  </div>
+                </div>
+              `).join('')}` : ''}
+            <div class="modal-actions">
+              <button class="btn btn-primary" onclick="closeModal()">Fermer</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (modalMode === 'quickAdd') {
+        const dateLabel = quickAddDate ? formatDate(quickAddDate + 'T00:00:00') : '';
+        modal.innerHTML = `
+          <div class="modal-header">
+            <div class="modal-header-left">
+              <div class="icon-circle" style="background:#4f46e5;color:white;">${icons.plus}</div>
+              <div>
+                <div class="modal-title">Nouvelle tâche</div>
+                <div class="modal-subtitle">${dateLabel}</div>
+              </div>
+            </div>
+            <button class="modal-close" onclick="closeModal()">${icons.x}</button>
+          </div>
+          <div class="modal-body edit-form">
+            <label>Titre <span class="required">*</span></label>
+            <input type="text" id="quickTitle" placeholder="Ex: Préparer le devis client">
+
+            <label>Entreprise / Contact <span class="required">*</span></label>
+            <div class="contact-field">
+              ${icons.building}
+              <input type="text" id="quickContact" placeholder="Ex: Acme Corp" autocomplete="off">
+              <div class="suggestions hidden" id="quickContactSuggestions"></div>
+            </div>
+
+            <div id="quickDeadlineField">
+              <label>Date limite <span class="required">*</span></label>
+              <input type="date" id="quickDeadline" value="${quickAddDate || ''}">
+            </div>
+
+            <label>Description</label>
+            <textarea id="quickDescription" rows="2" style="resize:vertical;" placeholder="Détails, contexte, instructions..."></textarea>
+
+            <label>${icons.tag} Tags (optionnel)</label>
+            <div class="tag-field" id="quickTagField">
+              <div class="tags-chips" id="quickTagsChips"></div>
+              <input type="text" id="quickTagInput" placeholder="Ajouter un tag et appuyer sur Entrée..." autocomplete="off">
+              <div class="suggestions hidden" id="quickTagSuggestions"></div>
+            </div>
+
+            <label>Catégorie</label>
+            <div class="category-buttons" style="margin-top:0;">
+              <button type="button" class="category-btn ${quickCategory === 'pro' ? 'active pro' : ''}" data-cat="pro" onclick="setQuickCategory('pro')">${icons.briefcase} Pro</button>
+              <button type="button" class="category-btn ${quickCategory === 'perso' ? 'active perso' : ''}" data-cat="perso" onclick="setQuickCategory('perso')">${icons.home} Perso</button>
+            </div>
+
+            <label>Urgence</label>
+            <div class="urgency-buttons" style="margin-top:0;">
+              <button type="button" class="urgency-btn ${quickUrgency === 'normal' ? 'active normal' : ''}" data-urgency="normal" onclick="setQuickUrgency('normal')">${icons.clock} Normal</button>
+              <button type="button" class="urgency-btn ${quickUrgency === 'urgent' ? 'active urgent' : ''}" data-urgency="urgent" onclick="setQuickUrgency('urgent')">${icons.zap} Urgent</button>
+            </div>
+
+            <label class="recurrence-toggle" style="margin-top:0.75rem;">
+              <input type="checkbox" id="quickRecurring" onchange="toggleQuickRecurrencePanel()">
+              ${icons.repeat} Tâche récurrente
+            </label>
+            <div class="recurrence-panel hidden" id="quickRecurrencePanel">
+              <div class="form-row">
+                <div>
+                  <label>Date de début <span class="required">*</span></label>
+                  <input type="date" id="quickRecStart" value="${quickAddDate || ''}">
+                </div>
+                <div>
+                  <label>Date de fin <span class="required">*</span></label>
+                  <input type="date" id="quickRecEnd">
+                </div>
+              </div>
+              <label style="margin-top:0.5rem;">Jours de récurrence <span class="required">*</span></label>
+              <div class="days-grid">
+                ${DAY_LABELS.map((d, i) => `<button type="button" class="day-btn" data-day="${i}" onclick="toggleDay(this)">${d}</button>`).join('')}
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button class="btn btn-primary" onclick="saveQuickAddTask()">${icons.checkCircle} Ajouter</button>
+              <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+            </div>
+          </div>
+        `;
+        // Autocomplétion contact
+        const contactInput = document.getElementById('quickContact');
+        const suggestionsDiv = document.getElementById('quickContactSuggestions');
+        const contacts = getAllContacts();
+        contactInput.addEventListener('input', () => {
+          const val = contactInput.value.toLowerCase();
+          const filtered = val ? contacts.filter(c => c.toLowerCase().includes(val)) : contacts;
+          if (filtered.length > 0) {
+            suggestionsDiv.innerHTML = filtered.map(c => `
+              <div class="suggestion-item" onclick="selectQuickContact('${c.replace(/'/g, "\\'")}')">
+                <span>${icons.building} ${c}</span>
+              </div>
+            `).join('');
+            suggestionsDiv.classList.remove('hidden');
+          } else {
+            suggestionsDiv.classList.add('hidden');
+          }
+        });
+        contactInput.addEventListener('focus', () => {
+          if (contacts.length > 0) contactInput.dispatchEvent(new Event('input'));
+        });
+        setupTagInput({
+          inputId: 'quickTagInput',
+          suggestionsId: 'quickTagSuggestions',
+          chipsId: 'quickTagsChips',
+          fieldSelector: '#quickTagField',
+          list: quickTags,
+          removeFnName: 'removeQuickTag',
+          addFnName: 'addQuickTagSuggestion',
+        });
+        setTimeout(() => document.getElementById('quickTitle')?.focus(), 100);
         return;
       }
 
@@ -7476,5 +7888,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ea366dfdeec1fb',t:'MTc5MDAwNTY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3f8cfbf4be9d2ad',t:'MTc5MDE1ODc3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
