@@ -1850,7 +1850,7 @@
     }
     .summary-stats {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 0.5rem;
       margin-bottom: 0.75rem;
     }
@@ -1862,10 +1862,8 @@
       text-align: center;
     }
     .summary-stat .num { display: block; font-size: 1.15rem; font-weight: 800; color: #4338ca; }
+    .summary-stat.created .num { color: #047857; }
     .summary-stat span:last-child { font-size: 0.62rem; color: #94a3b8; display: block; margin-top: 0.1rem; }
-    @media (max-width: 480px) {
-      .summary-stats { grid-template-columns: repeat(2, 1fr); }
-    }
     .summary-group { margin-bottom: 1rem; }
     .summary-group:last-of-type { margin-bottom: 0; }
     .summary-group-title {
@@ -1880,8 +1878,8 @@
       border-bottom: 2px solid #eef2ff;
     }
     .summary-group-title svg { color: #6366f1; flex-shrink: 0; }
+    .summary-group-title .counts { margin-left: auto; display: flex; gap: 0.25rem; flex-shrink: 0; }
     .summary-group-title .count {
-      margin-left: auto;
       background: #e0e7ff;
       color: #4338ca;
       border-radius: 6px;
@@ -1889,14 +1887,35 @@
       font-size: 0.7rem;
       font-weight: 600;
     }
+    .summary-group-title .count.created { background: #d1fae5; color: #047857; }
+    .summary-group-title .count.done { background: #e2e8f0; color: #475569; }
+    /* Entrée du rapport : « créée » en vert, « terminée » en gris (lisible) */
     .summary-task {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
+      display: flex;
+      gap: 0.55rem;
+      align-items: flex-start;
       border-radius: 10px;
       padding: 0.6rem 0.75rem;
       margin-bottom: 0.4rem;
+      border: 1px solid;
     }
     .summary-task:last-child { margin-bottom: 0; }
+    .summary-task.created { background: #f0fdf4; border-color: #bbf7d0; }
+    .summary-task.done { background: #f8fafc; border-color: #e2e8f0; }
+    .summary-task-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .summary-task-icon svg { width: 13px; height: 13px; }
+    .summary-task.created .summary-task-icon { background: #d1fae5; color: #047857; }
+    .summary-task.done .summary-task-icon { background: #e2e8f0; color: #475569; }
+    .summary-task-body { flex: 1; min-width: 0; }
     .summary-task-head {
       display: flex;
       justify-content: space-between;
@@ -1913,6 +1932,7 @@
       align-items: center;
       gap: 0.2rem;
     }
+    .summary-task.done .summary-task-when { color: #64748b; }
     .summary-task-meta {
       display: flex;
       flex-wrap: wrap;
@@ -1998,6 +2018,9 @@
       padding: 0.25rem;
       width: fit-content;
       max-width: 100%;
+      /* Même hauteur que le carré du logo (44px) : les deux éléments
+         alignés côte à côte dans le header apparaissent égaux */
+      height: 44px;
     }
     .view-btn {
       flex: 0 1 auto;
@@ -2395,14 +2418,20 @@
     /* La navigation passe sur sa propre ligne quand la largeur manque */
     @media (max-width: 1200px) {
       .header-inner { flex-wrap: wrap; gap: 0.6rem 1rem; }
+      /* Tablette : l'icône du header n'est pas affichée non plus */
+      .logo { display: none; }
       .header-nav { order: 4; flex-basis: 100%; }
     }
     @media (max-width: 768px) {
       .header { padding: 0.75rem; }
       .header-inner { flex-wrap: wrap; gap: 0.5rem; }
+      /* Version mobile : l'icône du header n'est pas affichée */
+      .logo { display: none; }
+      .header-right { margin-left: auto; }
       .header-nav { order: 2; }
       .header-nav .view-switcher {
         width: 100%;
+        height: auto;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
@@ -3313,9 +3342,9 @@
       if (w.type === 'chart') {
         const s = getHomeChartStats(w.data);
         const slices = [];
-        if (s.counts.todo > 0) slices.push({ label: 'À faire', value: s.counts.todo, color: '#10b981' });
-        if (s.counts.urgent > 0) slices.push({ label: 'Urgentes', value: s.counts.urgent, color: '#f59e0b' });
-        if (s.counts.done > 0) slices.push({ label: 'Terminées', value: s.counts.done, color: '#94a3b8' });
+        if (s.counts.todo > 0) slices.push({ label: 'À faire', value: s.counts.todo, color: '#10b981', onclick: `homeChartDrillDown('${w.data}', 'todo')` });
+        if (s.counts.urgent > 0) slices.push({ label: 'Urgentes', value: s.counts.urgent, color: '#f59e0b', onclick: `homeChartDrillDown('${w.data}', 'urgent')` });
+        if (s.counts.done > 0) slices.push({ label: 'Terminées', value: s.counts.done, color: '#94a3b8', onclick: `homeChartDrillDown('${w.data}', 'done')` });
         const donut = makePieChart(slices, s.total);
         return `
           <div class="chart-box">
@@ -3379,6 +3408,47 @@
         el.classList.add('flash-highlight');
         setTimeout(() => el.classList.remove('flash-highlight'), 1500);
       });
+    }
+
+    // Clic sur une part d'un graphique de l'Accueil (jour / semaine / mois) :
+    // bascule vers la page Recherche avec la plage de dates du graphique et
+    // les filtres correspondant à la part cliquée (à faire / urgentes / terminées)
+    function homeChartDrillDown(data, kind) {
+      const now = new Date();
+      let fromStr, toStr;
+      if (data === 'today') {
+        fromStr = isoDate(now);
+        toStr = '';
+      } else if (data === 'month') {
+        fromStr = isoDate(new Date(now.getFullYear(), now.getMonth(), 1));
+        toStr = isoDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+      } else { // 'week'
+        const dow = now.getDay();
+        const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (dow === 0 ? -6 : 1 - dow));
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        fromStr = isoDate(monday);
+        toStr = isoDate(sunday);
+      }
+      filterStatus = kind === 'done' ? 'done' : 'todo';
+      filterUrgency = kind === 'urgent' ? 'urgent' : (kind === 'todo' ? 'normal' : 'all');
+      filterCategory = 'all';
+      filterLate = false;
+      filterDate = null;
+      filterPeriod = data === 'today'
+        ? { mode: 'on', from: fromStr, to: '' }
+        : { mode: 'between', from: fromStr, to: toStr };
+      // La recherche est remise à zéro pour montrer exactement les tâches de la part
+      searchQuery = '';
+      const input = document.getElementById('searchInput');
+      if (input) input.value = '';
+      if (taskView !== 'tasks') {
+        taskView = 'tasks';
+        settings.defaultView = 'tasks';
+        saveSettings();
+      }
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function renderCalendar() {
@@ -3608,7 +3678,7 @@
               <span>Consigner tâche</span>
             </button>
             ${taskView === 'tasks' ? `
-            <button class="add-task-square rapport" onclick="openSummary()" title="Rapport des tâches terminées">
+            <button class="add-task-square rapport" onclick="openSummary()" title="Rapport des tâches (créées et terminées)">
               <div class="icon-circle rapport">${icons.fileText}</div>
               <span>Rapport</span>
             </button>` : ''}
@@ -6812,6 +6882,38 @@
     // tombe dans la période [fromDate ; toDate] (inclus).
     // Pour les tâches récurrentes, chaque occurrence terminée compte
     // comme une entrée distincte (via completionLog).
+    // Tâches créées dans la période (date de création comprise dans [from ; to])
+    function getCreatedInPeriod(fromDate, toDate) {
+      if (!fromDate || !toDate) return [];
+      const fromMs = new Date(fromDate + 'T00:00:00').getTime();
+      const toMs = new Date(toDate + 'T23:59:59').getTime();
+      const results = [];
+      tasks.forEach(t => {
+        if (!t.createdAt) return;
+        const ms = new Date(t.createdAt).getTime();
+        if (ms < fromMs || ms > toMs) return;
+        const comments = (t.comments || []).map(c => ({ text: c.text, date: c.date }));
+        results.push({
+          kind: 'created',
+          title: t.title,
+          contact: t.contact || '',
+          category: t.category || 'pro',
+          createdAt: t.createdAt,
+          at: t.createdAt,
+          deadline: t.deadline || '',
+          completionComment: '',
+          comments,
+        });
+      });
+      results.sort((a, b) => new Date(b.at) - new Date(a.at));
+      return results;
+    }
+
+    // Entrées du Rapport : tâches créées + tâches terminées sur la période
+    function getReportEntries(fromDate, toDate) {
+      return getCreatedInPeriod(fromDate, toDate).concat(getCompletedInPeriod(fromDate, toDate));
+    }
+
     function getCompletedInPeriod(fromDate, toDate) {
       if (!fromDate || !toDate) return [];
       const fromMs = new Date(fromDate + 'T00:00:00').getTime();
@@ -6832,10 +6934,12 @@
               .filter(c => !c.occurrenceDate || c.occurrenceDate === date)
               .map(c => ({ text: c.text, date: c.date }));
             results.push({
+              kind: 'done',
               title: t.title,
               contact: t.contact || '',
               category: t.category || 'pro',
               completedAt,
+              at: completedAt,
               deadline: date,
               completionComment: logEntry ? (logEntry.comment || '') : '',
               comments: occComments,
@@ -6846,17 +6950,20 @@
           if (ms < fromMs || ms > toMs) return;
           const comments = (t.comments || []).map(c => ({ text: c.text, date: c.date }));
           results.push({
+            kind: 'done',
             title: t.title,
             contact: t.contact || '',
             category: t.category || 'pro',
             completedAt: t.completedAt,
+            at: t.completedAt,
             deadline: t.deadline || '',
             completionComment: t.completionComment || '',
             comments,
           });
         }
       });
-      results.sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));
+      // Les plus récentes en premier
+      results.sort((a, b) => new Date(b.at) - new Date(a.at));
       return results;
     }
 
@@ -6866,6 +6973,10 @@
       results.forEach(r => {
         const key = r.contact.trim() ? r.contact.trim() : NO_CONTACT_KEY;
         (groups[key] = groups[key] || []).push(r);
+      });
+      // Dans chaque groupe : l'événement le plus récent en haut
+      Object.keys(groups).forEach(k => {
+        groups[k].sort((a, b) => new Date(b.at || '') - new Date(a.at || ''));
       });
       const groupKeys = Object.keys(groups).sort((a, b) => {
         if (a === NO_CONTACT_KEY) return 1;
@@ -6878,51 +6989,69 @@
     function renderSummaryModal() {
       const modal = document.getElementById('modal');
       if (!summaryFrom || !summaryTo) setSummaryQuick('lastWeek');
-      const results = getCompletedInPeriod(summaryFrom, summaryTo);
-      const { groups, groupKeys, NO_CONTACT_KEY } = buildSummaryGroups(results);
-      const proCount = results.filter(r => r.category === 'pro').length;
-      const persoCount = results.filter(r => r.category === 'perso').length;
+      const entries = getReportEntries(summaryFrom, summaryTo);
+      const { groups, groupKeys, NO_CONTACT_KEY } = buildSummaryGroups(entries);
+      const createdCount = entries.filter(r => r.kind === 'created').length;
+      const doneCount = entries.filter(r => r.kind === 'done').length;
 
-      const renderTask = (r) => `
-        <div class="summary-task">
-          <div class="summary-task-head">
-            <span class="summary-task-title">${r.title}</span>
-            <span class="summary-task-when">${icons.checkCircle} ${formatDate(r.completedAt, true)}</span>
-          </div>
-          <div class="summary-task-meta">
-            <span class="category-badge ${r.category}">${r.category === 'pro' ? icons.briefcase + ' Pro' : icons.home + ' Perso'}</span>
-            ${r.deadline ? `<span class="task-meta-item">${icons.calendar} Échéance ${formatDate(r.deadline)}</span>` : ''}
-          </div>
-          ${r.completionComment ? `
-            <div class="summary-comment completion">
-              ${icons.message}
-              <div style="min-width:0;">
-                <div class="summary-comment-label">Commentaire de clôture</div>
-                <p>${r.completionComment}</p>
-              </div>
-            </div>` : ''}
-          ${r.comments.length ? `
-            <div class="summary-comment-list">
-              ${r.comments.map(c => `
-                <div class="summary-comment other">
-                  ${icons.message}
-                  <div style="min-width:0;">
-                    <p>${c.text}</p>
-                    ${c.date ? `<span>${formatDate(c.date, true)}</span>` : ''}
-                  </div>
+      // Une entrée du rapport : « créée » (vert) ou « terminée » (gris),
+      // avec pastille d'état à gauche pour une lecture rapide
+      const renderTask = (r) => {
+        const isCreated = r.kind === 'created';
+        return `
+        <div class="summary-task ${isCreated ? 'created' : 'done'}">
+          <div class="summary-task-icon">${isCreated ? icons.plus : icons.checkCircle}</div>
+          <div class="summary-task-body">
+            <div class="summary-task-head">
+              <span class="summary-task-title">${r.title}</span>
+              <span class="summary-task-when">${isCreated ? 'Créée le ' + formatDate(r.at, true) : 'Terminée le ' + formatDate(r.at, true)}</span>
+            </div>
+            <div class="summary-task-meta">
+              <span class="category-badge ${r.category}">${r.category === 'pro' ? icons.briefcase + ' Pro' : icons.home + ' Perso'}</span>
+              ${r.deadline ? `<span class="task-meta-item">${icons.calendar} Échéance ${formatDate(r.deadline)}</span>` : ''}
+            </div>
+            ${!isCreated && r.completionComment ? `
+              <div class="summary-comment completion">
+                ${icons.message}
+                <div style="min-width:0;">
+                  <div class="summary-comment-label">Commentaire de clôture</div>
+                  <p>${r.completionComment}</p>
                 </div>
-              `).join('')}
-            </div>` : ''}
+              </div>` : ''}
+            ${r.comments.length ? `
+              <div class="summary-comment-list">
+                ${r.comments.map(c => `
+                  <div class="summary-comment other">
+                    ${icons.message}
+                    <div style="min-width:0;">
+                      <p>${c.text}</p>
+                      ${c.date ? `<span>${formatDate(c.date, true)}</span>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>` : ''}
+          </div>
         </div>
       `;
+      };
+
+      // Compteurs par type sous le nom du contact
+      const renderGroupCounts = (list) => {
+        const c = list.filter(r => r.kind === 'created').length;
+        const d = list.filter(r => r.kind === 'done').length;
+        return `
+          ${c > 0 ? `<span class="count created">${c} créée${c > 1 ? 's' : ''}</span>` : ''}
+          ${d > 0 ? `<span class="count done">${d} terminée${d > 1 ? 's' : ''}</span>` : ''}
+        `;
+      };
 
       modal.innerHTML = `
         <div class="modal-header">
           <div class="modal-header-left">
             <div class="modal-icon indigo">${icons.fileText}</div>
             <div>
-              <div class="modal-title">Résumé des tâches terminées</div>
-              <div class="modal-subtitle">Récapitulatif sur une période</div>
+              <div class="modal-title">Rapport</div>
+              <div class="modal-subtitle">Tâches créées et terminées sur une période</div>
             </div>
           </div>
           <button class="modal-close" onclick="closeModal()">${icons.x}</button>
@@ -6950,16 +7079,15 @@
           <div class="summary-period-label">Du ${formatDate(summaryFrom + 'T00:00:00')} au ${formatDate(summaryTo + 'T00:00:00')}</div>
 
           <div class="summary-stats">
-            <div class="summary-stat"><span class="num">${results.length}</span><span>Terminées</span></div>
+            <div class="summary-stat created"><span class="num">${createdCount}</span><span>Créées</span></div>
+            <div class="summary-stat"><span class="num">${doneCount}</span><span>Terminées</span></div>
             <div class="summary-stat"><span class="num">${groupKeys.length}</span><span>Contact(s)</span></div>
-            <div class="summary-stat"><span class="num">${proCount}</span><span>Pro</span></div>
-            <div class="summary-stat"><span class="num">${persoCount}</span><span>Perso</span></div>
           </div>
 
-          ${results.length === 0 ? `
+          ${entries.length === 0 ? `
             <div class="summary-empty">
               <div class="emoji">🗂️</div>
-              <p>Aucune tâche terminée sur cette période.</p>
+              <p>Aucune tâche créée ou terminée sur cette période.</p>
             </div>
           ` : groupKeys.map(key => {
             const isNoContact = key === NO_CONTACT_KEY;
@@ -6967,14 +7095,14 @@
             const iconHtml = isNoContact ? icons.tag : icons.building;
             return `
               <div class="summary-group">
-                <div class="summary-group-title">${iconHtml} <span>${label}</span> <span class="count">${groups[key].length}</span></div>
+                <div class="summary-group-title">${iconHtml} <span>${label}</span> <span class="counts">${renderGroupCounts(groups[key])}</span></div>
                 ${groups[key].map(renderTask).join('')}
               </div>
             `;
           }).join('')}
 
           <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="copySummary()" ${results.length === 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>${icons.copy} Copier le résumé</button>
+            <button class="btn btn-secondary" onclick="copySummary()" ${entries.length === 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>${icons.copy} Copier le rapport</button>
             <button class="btn btn-primary" onclick="closeModal()">Fermer</button>
           </div>
         </div>
@@ -6982,24 +7110,25 @@
     }
 
     function copySummary() {
-      const results = getCompletedInPeriod(summaryFrom, summaryTo);
-      const { groups, groupKeys, NO_CONTACT_KEY } = buildSummaryGroups(results);
+      const entries = getReportEntries(summaryFrom, summaryTo);
+      const { groups, groupKeys, NO_CONTACT_KEY } = buildSummaryGroups(entries);
+      const createdCount = entries.filter(e => e.kind === 'created').length;
+      const doneCount = entries.filter(e => e.kind === 'done').length;
       const lines = [];
-      lines.push(`Résumé des tâches terminées — du ${formatDate(summaryFrom + 'T00:00:00')} au ${formatDate(summaryTo + 'T00:00:00')}`);
-      lines.push(`${results.length} tâche${results.length > 1 ? 's' : ''} terminée${results.length > 1 ? 's' : ''}`);
+      lines.push(`Rapport — du ${formatDate(summaryFrom + 'T00:00:00')} au ${formatDate(summaryTo + 'T00:00:00')}`);
+      lines.push(`${createdCount} tâche${createdCount > 1 ? 's' : ''} créée${createdCount > 1 ? 's' : ''}, ${doneCount} terminée${doneCount > 1 ? 's' : ''}`);
       groupKeys.forEach(key => {
         lines.push('');
         lines.push(key === NO_CONTACT_KEY ? 'Sans contact' : key);
         groups[key].forEach(r => {
-          let line = `• ${r.title}`;
-          if (r.completedAt) line += ` (terminée le ${formatDate(r.completedAt, true)})`;
-          lines.push(line);
-          if (r.completionComment) lines.push(`   → ${r.completionComment}`);
+          const verb = r.kind === 'created' ? 'créée le' : 'terminée le';
+          lines.push(`• ${r.title} (${verb} ${formatDate(r.at, true)})`);
+          if (r.kind === 'done' && r.completionComment) lines.push(`   → ${r.completionComment}`);
           r.comments.forEach(c => lines.push(`   · ${c.text}`));
         });
       });
       const text = lines.join('\n');
-      const ok = () => showToast('✓ Résumé copié dans le presse-papier');
+      const ok = () => showToast('✓ Rapport copié dans le presse-papier');
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopyText(text));
       } else {
@@ -7014,7 +7143,7 @@
       ta.style.opacity = '0';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); showToast('✓ Résumé copié'); }
+      try { document.execCommand('copy'); showToast('✓ Rapport copié'); }
       catch (e) { showToast('⚠ Copie impossible'); }
       document.body.removeChild(ta);
     }

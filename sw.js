@@ -1,4 +1,4 @@
-const CACHE_NAME = 'taches-cache-v39';
+const CACHE_NAME = 'taches-cache-v51';
 const APP_SHELL = [
   './index.html',
   './manifest.json',
