@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tâches</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='0' y='0' width='24' height='24' rx='6' fill='%234f46e5'/%3E%3Cpath d='M10 6h9'/%3E%3Cpath d='M10 12h9'/%3E%3Cpath d='M10 18h9'/%3E%3Cpath d='m4 6 1 1 2-2'/%3E%3Cpath d='m4 12 1 1 2-2'/%3E%3Cpath d='m4 18 1 1 2-2'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="icon-192.png">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
@@ -18,7 +18,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, #f9fafb 0%, #eff2f5 100%);
+      background: linear-gradient(135deg, #f7f9fe 0%, #edf1fb 100%);
       min-height: 100vh;
       color: #1e293b;
     }
@@ -64,15 +64,9 @@
     .logo-icon {
       width: 44px;
       height: 44px;
-      background: #2d44e5;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+      object-fit: contain;
       flex-shrink: 0;
     }
-    .logo-icon svg { color: white; }
     
     .search-box {
       position: relative;
@@ -110,7 +104,7 @@
     #searchInput {
       padding: 0.5rem 2rem 0.5rem 2.5rem;
       width: 100%;
-      background: #e2e8f0;
+      background: #EEF1FE;
       border: 1px solid transparent;
       border-radius: 12px;
       font-size: 0.875rem;
@@ -121,7 +115,8 @@
     /* Main */
     main {
       margin: 0 auto;
-      padding: 1.5rem 1rem;
+      /* Même écart sous le header que sous le bouton Retour de la fiche (0,75rem) */
+      padding: 0.75rem 1rem 1.5rem;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
@@ -144,7 +139,7 @@
         grid-template-areas: "top top" "filters list";
         align-items: start;
       }
-      /* Aligné sur la première tâche : décalé de la hauteur de la barre
+      /* Aligné sur la première action : décalé de la hauteur de la barre
          Période/Résumé/tri qui surmonte la liste */
       #filtersContainer { position: sticky; top: 92px; z-index: 10; margin-top: 3.05rem; }
       #filtersContainer .filter-row { flex-direction: column; align-items: stretch; }
@@ -172,7 +167,7 @@
     .chart-box {
       background: rgba(255,255,255,0.9);
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 0.75rem;
       display: flex;
       flex-direction: column;
@@ -229,7 +224,7 @@
       text-align: left;
       transition: background 0.15s;
     }
-    .mini-task-item:hover { background: #eef2ff; }
+    .mini-task-item:hover { background: #EEF1FE; }
     .mini-task-item .dot {
       width: 8px; height: 8px;
       border-radius: 50%;
@@ -254,7 +249,7 @@
     }
     @keyframes flashHighlight {
       0%, 100% { box-shadow: none; }
-      30% { box-shadow: 0 0 0 3px #818cf8; }
+      30% { box-shadow: 0 0 0 3px #8B9CF8; }
     }
     .task-card.flash-highlight { animation: flashHighlight 1.5s ease; }
     .chart-tooltip {
@@ -320,16 +315,16 @@
     }
     .add-task-square .icon-circle svg { width: 22px; height: 22px; }
     .add-task-square:hover .icon-circle { background: #059669; color: white; }
-    .add-task-square.log { border-color: #c7d2fe; box-shadow: 0 2px 10px rgba(79,70,229,0.14); }
-    .add-task-square.log .icon-circle { background: #e0e7ff; color: #4f46e5; }
+    .add-task-square.log { border-color: #D4DCFA; box-shadow: 0 2px 10px rgba(91,114,245,0.14); }
+    .add-task-square.log .icon-circle { background: #E9EDFD; color: #5B72F5; }
     .add-task-square.log:hover {
-      border-color: #4f46e5;
-      color: #4338ca;
-      background: #eef2ff;
-      box-shadow: 0 5px 16px rgba(79,70,229,0.24);
+      border-color: #5B72F5;
+      color: #4D5FD8;
+      background: #EEF1FE;
+      box-shadow: 0 5px 16px rgba(91,114,245,0.24);
       transform: translateY(-2px);
     }
-    .add-task-square.log:hover .icon-circle { background: #4f46e5; color: white; }
+    .add-task-square.log:hover .icon-circle { background: #5B72F5; color: white; }
     .add-task-square.rapport { border-color: #bfdbfe; box-shadow: 0 2px 10px rgba(37,99,235,0.14); }
     .add-task-square.rapport .icon-circle { background: #dbeafe; color: #2563eb; }
     .add-task-square.rapport:hover {
@@ -360,15 +355,15 @@
       color: #64748b;
     }
     .add-task-btn:hover {
-      border-color: #818cf8;
-      color: #4f46e5;
+      border-color: #8B9CF8;
+      color: #5B72F5;
       background: rgba(238,242,255,0.5);
     }
     .add-task-btn .icon-circle {
       width: 36px;
       height: 36px;
-      background: #e0e7ff;
-      color: #4f46e5;
+      background: #E9EDFD;
+      color: #5B72F5;
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -376,7 +371,7 @@
       transition: all 0.2s;
     }
     .add-task-btn:hover .icon-circle {
-      background: #4f46e5;
+      background: #5B72F5;
       color: white;
     }
     
@@ -402,7 +397,7 @@
     .form-header .icon-circle {
       width: 36px;
       height: 36px;
-      background: #4f46e5;
+      background: #5B72F5;
       color: white;
       border-radius: 12px;
       display: flex;
@@ -437,8 +432,8 @@
       transition: all 0.2s;
     }
     input:focus, textarea:focus {
-      border-color: #818cf8;
-      box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+      border-color: #8B9CF8;
+      box-shadow: 0 0 0 3px rgba(91,114,245,0.1);
     }
     input::placeholder, textarea::placeholder { color: #94a3b8; }
     
@@ -468,7 +463,7 @@
       font-size: 0.875rem;
       transition: background 0.15s;
     }
-    .suggestion-item:hover, .suggestion-item.selected { background: #eef2ff; }
+    .suggestion-item:hover, .suggestion-item.selected { background: #EEF1FE; }
     .suggestion-item svg { color: #94a3b8; margin-right: 0.5rem; }
     .urgency-buttons {
       display: flex;
@@ -573,11 +568,11 @@
       border-radius: 8px;
       font-size: 0.75rem;
       font-weight: 500;
-      background: #eef2ff;
-      color: #4338ca;
-      border: 1px solid #c7d2fe;
+      background: #EEF1FE;
+      color: #4D5FD8;
+      border: 1px solid #D4DCFA;
     }
-    .tag-chip svg { color: #818cf8; }
+    .tag-chip svg { color: #8B9CF8; }
     .tag-chip button {
       display: flex;
       align-items: center;
@@ -585,9 +580,9 @@
       border: none;
       padding: 0;
       cursor: pointer;
-      color: #818cf8;
+      color: #8B9CF8;
     }
-    .tag-chip button:hover { color: #4338ca; }
+    .tag-chip button:hover { color: #4D5FD8; }
     .tag-badge {
       display: inline-flex;
       align-items: center;
@@ -596,9 +591,9 @@
       border-radius: 8px;
       font-size: 0.75rem;
       font-weight: 500;
-      background: #eef2ff;
-      color: #4338ca;
-      border: 1px solid #c7d2fe;
+      background: #EEF1FE;
+      color: #4D5FD8;
+      border: 1px solid #D4DCFA;
     }
     
     .form-actions {
@@ -620,25 +615,37 @@
       border: none;
     }
     .btn-primary {
-      background: #4f46e5;
+      background: linear-gradient(135deg, #3B8DF7 0%, #7B5CF3 100%);
       color: white;
+      box-shadow: 0 4px 12px rgba(91,114,245,0.28);
     }
-    .btn-primary:hover { background: #4338ca; }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2F7DEE 0%, #6B4BE8 100%);
+      box-shadow: 0 6px 16px rgba(91,114,245,0.36);
+    }
     .btn-secondary {
       background: transparent;
       color: #64748b;
     }
     .btn-secondary:hover { background: #f1f5f9; color: #334155; }
     .btn-success {
-      background: #059669;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
+      box-shadow: 0 4px 12px rgba(5,150,105,0.25);
     }
-    .btn-success:hover { background: #047857; }
+    .btn-success:hover {
+      background: linear-gradient(135deg, #0da271 0%, #047857 100%);
+      box-shadow: 0 6px 16px rgba(5,150,105,0.33);
+    }
     .btn-blue {
-      background: #2563eb;
+      background: linear-gradient(135deg, #3B8DF7 0%, #2563eb 100%);
       color: white;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.25);
     }
-    .btn-blue:hover { background: #1d4ed8; }
+    .btn-blue:hover {
+      background: linear-gradient(135deg, #2F7DEE 0%, #1d4ed8 100%);
+      box-shadow: 0 6px 16px rgba(37,99,235,0.33);
+    }
     
     /* Filters */
     .filters {
@@ -655,7 +662,7 @@
     .filter-row svg { color: #94a3b8; }
     .filter-group {
       display: flex;
-      background: #e2e8f0;
+      background: #E9EDFD;
       border-radius: 12px;
       padding: 0.25rem;
       gap: 0.25rem;
@@ -667,7 +674,7 @@
       padding: 0.375rem 0.75rem;
       border: none;
       background: transparent;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 0.875rem;
       font-weight: 500;
       color: #475569;
@@ -681,7 +688,7 @@
     }
     .filter-btn .count {
       padding: 0.125rem 0.375rem;
-      background: #cbd5e1;
+      background: #D4DCFA;
       border-radius: 6px;
       font-size: 0.75rem;
       color: #475569;
@@ -705,7 +712,7 @@
       cursor: pointer;
       outline: none;
     }
-    .sort-select select:focus { border-color: #818cf8; }
+    .sort-select select:focus { border-color: #8B9CF8; }
     .sort-dir-btn {
       display: flex;
       align-items: center;
@@ -736,8 +743,8 @@
       transition: all 0.3s;
     }
     .task-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      border-color: #cbd5e1;
+      box-shadow: 0 4px 14px rgba(91,114,245,0.13);
+      border-color: #C9D2F2;
     }
     .task-card.done { opacity: 0.7; }
     .task-card.deleting {
@@ -753,6 +760,131 @@
     .task-stripe.urgent { background: #f59e0b; }
     .task-stripe.done { background: #34d399; }
     .task-stripe.overdue { background: #dc2626; }
+    .task-stripe.rdv { background: #2563eb; }
+    /* Fiche compte : cartes d'actions compactes, description et
+       commentaires déroulés au clic sur la carte */
+    .fiche-card .task-content { cursor: pointer; }
+    .fiche-type-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .fiche-type-logo.rdv { background: #dbeafe; color: #2563eb; }
+    .fiche-type-logo svg { width: 17px; height: 17px; }
+    .fiche-chevron {
+      display: inline-flex;
+      vertical-align: middle;
+      margin-left: 0.35rem;
+      color: #94a3b8;
+    }
+    .fiche-task-details {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed #e2e8f0;
+      cursor: default;
+    }
+    .fiche-desc { font-size: 0.825rem; color: #64748b; line-height: 1.4; margin-bottom: 0.4rem; }
+    /* Historique des commentaires de clôture (chaîne de suivis), plus récent en haut */
+    .fiche-history { margin-top: 0.5rem; }
+    .fiche-history-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .fiche-history-item {
+      display: flex;
+      gap: 0.4rem;
+      align-items: flex-start;
+      padding: 0.35rem 0.5rem;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      font-size: 0.78rem;
+      margin-bottom: 0.3rem;
+    }
+    .fiche-history-item:last-child { margin-bottom: 0; }
+    .fiche-history-item svg { color: #94a3b8; flex-shrink: 0; margin-top: 2px; }
+    .fiche-history-item p { color: #475569; line-height: 1.35; }
+    /* Sections pliables de la fiche */
+    .cp-section-toggle { cursor: pointer; user-select: none; }
+    .cp-section-toggle:hover { color: #5B72F5; }
+    .cp-section-toggle:hover svg { color: #5B72F5; }
+    .cp-section-chev { margin-left: auto; color: #94a3b8; display: flex; flex-shrink: 0; }
+    /* Stats de synthèse du compte (sous le nom et les compteurs) */
+    .fiche-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.5rem;
+      width: 100%;
+    }
+    .fiche-info-item {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.45rem 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+    .fiche-info-label {
+      font-size: 0.66rem;
+      font-weight: 600;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fiche-info-value { font-size: 0.88rem; font-weight: 700; color: #1e293b; }
+    /* Badge Rendez-vous (à la place du badge d'urgence) */
+    .rdv-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: #dbeafe;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+    }
+    /* Sélecteur de type d'action (Tâche / Rendez-vous) dans le formulaire */
+    .type-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .type-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      background: white;
+      color: #64748b;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .type-btn:hover { border-color: #D4DCFA; }
+    .type-btn.active.task { background: #f1f5f9; border-color: #94a3b8; color: #334155; }
+    .type-btn.active.rdv { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
     .task-card.overdue { border-color: #fecaca; background: #fff5f5; }
     .task-card.overdue:hover { border-color: #fca5a5; }
     
@@ -914,14 +1046,14 @@
     .empty-icon {
       width: 80px;
       height: 80px;
-      background: linear-gradient(135deg, #e0e7ff, #f3e8ff);
+      background: linear-gradient(135deg, #E9EDFD, #f3e8ff);
       border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1.25rem;
     }
-    .empty-icon svg { color: #6366f1; }
+    .empty-icon svg { color: #7B8CF6; }
     .empty-state h3 { font-size: 1.25rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem; }
     .empty-state p { font-size: 0.875rem; color: #94a3b8; max-width: 280px; }
     
@@ -945,7 +1077,7 @@
     .modal {
       background: white;
       border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      box-shadow: 0 24px 48px rgba(61,74,150,0.18);
       width: 100%;
       max-width: 480px;
       max-height: 90vh;
@@ -975,10 +1107,10 @@
     }
     .modal-icon.green { background: #d1fae5; color: #059669; }
     .modal-icon.blue { background: #dbeafe; color: #2563eb; }
-    .modal-icon.indigo { background: #e0e7ff; color: #4338ca; }
+    .modal-icon.indigo { background: linear-gradient(135deg, #3B8DF7 0%, #7B5CF3 100%); color: white; }
     .modal-title { font-size: 1.125rem; font-weight: 600; color: #1e293b; }
     .modal-subtitle.clickable { cursor: pointer; transition: color 0.15s; }
-    .modal-subtitle.clickable:hover { color: #4f46e5; }
+    .modal-subtitle.clickable:hover { color: #5B72F5; }
     .modal-subtitle {
       font-size: 0.875rem;
       color: #94a3b8;
@@ -1145,11 +1277,11 @@
     }
     .footer-btn:hover { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
     .footer-btn-accent {
-      background: #eef2ff;
-      border-color: #c7d2fe;
-      color: #4338ca;
+      background: #EEF1FE;
+      border-color: #D4DCFA;
+      color: #4D5FD8;
     }
-    .footer-btn-accent:hover { background: #e0e7ff; border-color: #a5b4fc; color: #3730a3; }
+    .footer-btn-accent:hover { background: #E9EDFD; border-color: #AEB9FA; color: #3730a3; }
     .footer-divider {
       width: 120px;
       height: 1px;
@@ -1167,7 +1299,7 @@
       bottom: 1.5rem;
       left: 50%;
       transform: translateX(-50%);
-      background: #1e293b;
+      background: linear-gradient(135deg, #3B8DF7, #7B5CF3);
       color: white;
       padding: 0.625rem 1.25rem;
       border-radius: 10px;
@@ -1208,10 +1340,10 @@
       border: none;
       font-size: 0.75rem;
       font-weight: 500;
-      color: #6366f1;
+      color: #7B8CF6;
       cursor: pointer;
     }
-    .comments-toggle:hover { color: #4338ca; }
+    .comments-toggle:hover { color: #4D5FD8; }
 
     .comments-section {
       margin-top: 0.5rem;
@@ -1263,15 +1395,15 @@
       outline: none;
     }
     .add-comment-row input:focus {
-      border-color: #818cf8;
-      box-shadow: 0 0 0 2px rgba(99,102,241,0.1);
+      border-color: #8B9CF8;
+      box-shadow: 0 0 0 2px rgba(91,114,245,0.1);
     }
     .add-comment-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0.375rem 0.75rem;
-      background: #4f46e5;
+      background: #5B72F5;
       color: white;
       border: none;
       border-radius: 8px;
@@ -1281,7 +1413,7 @@
       gap: 0.25rem;
       transition: background 0.2s;
     }
-    .add-comment-btn:hover { background: #4338ca; }
+    .add-comment-btn:hover { background: #4D5FD8; }
 
     /* Mini Calendar */
     .mini-calendar {
@@ -1351,7 +1483,7 @@
     }
     .mini-cal-day.empty { visibility: hidden; }
     .mini-cal-day.today {
-      background: #4f46e5;
+      background: #5B72F5;
       color: white;
       font-weight: 700;
     }
@@ -1363,10 +1495,10 @@
     .mini-cal-day.has-urgent { background: #fef3c7; color: #b45309; }
     .mini-cal-day.has-normal.has-urgent { background: linear-gradient(135deg, #d1fae5 50%, #fef3c7 50%); color: #334155; }
     .mini-cal-day.today.has-task {
-      box-shadow: inset 0 0 0 2px #4f46e5;
+      box-shadow: inset 0 0 0 2px #5B72F5;
     }
-    .mini-cal-day.today.has-normal { background: #d1fae5; color: #047857; box-shadow: inset 0 0 0 2px #4f46e5; }
-    .mini-cal-day.today.has-urgent { background: #fef3c7; color: #b45309; box-shadow: inset 0 0 0 2px #4f46e5; }
+    .mini-cal-day.today.has-normal { background: #d1fae5; color: #047857; box-shadow: inset 0 0 0 2px #5B72F5; }
+    .mini-cal-day.today.has-urgent { background: #fef3c7; color: #b45309; box-shadow: inset 0 0 0 2px #5B72F5; }
     .mini-cal-day.overdue-day { background: #fee2e2; color: #dc2626; font-weight: 700; }
     .mini-cal-legend {
       display: flex;
@@ -1389,7 +1521,7 @@
     .mini-cal-legend-dot.green { background: #d1fae5; border: 1px solid #6ee7b7; }
     .mini-cal-legend-dot.amber { background: #fef3c7; border: 1px solid #fcd34d; }
     .mini-cal-legend-dot.red { background: #fee2e2; border: 1px solid #fca5a5; }
-    .mini-cal-legend-dot.indigo { background: #4f46e5; }
+    .mini-cal-legend-dot.indigo { background: #5B72F5; }
 
     .mini-cal-tooltip {
       position: absolute;
@@ -1408,7 +1540,7 @@
     }
 
     .mini-cal-day.selected {
-      outline: 2px solid #4f46e5;
+      outline: 2px solid #5B72F5;
       outline-offset: -2px;
     }
 
@@ -1417,11 +1549,11 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 0.75rem;
-      background: #eef2ff;
-      border: 1px solid #c7d2fe;
+      background: #EEF1FE;
+      border: 1px solid #D4DCFA;
       border-radius: 10px;
       font-size: 0.8rem;
-      color: #4338ca;
+      color: #4D5FD8;
       font-weight: 500;
     }
     .date-filter-banner svg { flex-shrink: 0; }
@@ -1429,14 +1561,14 @@
       margin-left: auto;
       padding: 0.2rem 0.5rem;
       background: white;
-      border: 1px solid #c7d2fe;
+      border: 1px solid #D4DCFA;
       border-radius: 6px;
       font-size: 0.75rem;
-      color: #4338ca;
+      color: #4D5FD8;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .date-filter-clear:hover { background: #4338ca; color: white; }
+    .date-filter-clear:hover { background: #4D5FD8; color: white; }
 
     /* Cloud sync indicator */
     .sync-indicator {
@@ -1503,7 +1635,7 @@
       top: 0.4rem;
       width: 1.25rem;
       height: 1.25rem;
-      background: #4f46e5;
+      background: #5B72F5;
       color: white;
       border-radius: 50%;
       font-size: 0.65rem;
@@ -1579,7 +1711,7 @@
       font-weight: 500;
     }
     .recurrence-toggle input[type="checkbox"] {
-      width: 16px; height: 16px; cursor: pointer; accent-color: #4f46e5;
+      width: 16px; height: 16px; cursor: pointer; accent-color: #5B72F5;
     }
     .recurrence-panel {
       margin-top: 0.5rem;
@@ -1608,11 +1740,11 @@
       cursor: pointer;
       transition: all 0.15s;
     }
-    .day-btn:hover { border-color: #818cf8; color: #4338ca; }
+    .day-btn:hover { border-color: #8B9CF8; color: #4D5FD8; }
     .day-btn.active {
-      background: #4f46e5;
+      background: #5B72F5;
       color: white;
-      border-color: #4f46e5;
+      border-color: #5B72F5;
     }
     .recurrence-badge {
       display: inline-flex;
@@ -1679,7 +1811,7 @@
       font-size: 0.85rem;
       color: #334155;
     }
-    .rec-choice-btn:hover { border-color: #818cf8; background: #f8fafc; }
+    .rec-choice-btn:hover { border-color: #8B9CF8; background: #f8fafc; }
     .rec-choice-btn svg { flex-shrink: 0; color: #64748b; }
     .rec-choice-btn strong { display: block; font-size: 0.85rem; }
     .rec-choice-btn span { font-size: 0.75rem; color: #94a3b8; }
@@ -1704,11 +1836,11 @@
       transition: all 0.15s;
       text-align: center;
     }
-    .period-mode-btn:hover { border-color: #818cf8; background: #f8fafc; }
+    .period-mode-btn:hover { border-color: #8B9CF8; background: #f8fafc; }
     .period-mode-btn.active {
-      border-color: #4f46e5;
-      background: #eef2ff;
-      color: #4338ca;
+      border-color: #5B72F5;
+      background: #EEF1FE;
+      color: #4D5FD8;
       font-weight: 600;
     }
 
@@ -1742,6 +1874,10 @@
       gap: 0.375rem;
     }
     .settings-section-title svg { color: #94a3b8; }
+    /* Sections pliables : titre cliquable + chevron */
+    .settings-section-toggle { cursor: pointer; user-select: none; }
+    .settings-section-toggle:hover { color: #5B72F5; }
+    .settings-section-chev { margin-left: auto; color: #94a3b8; display: flex; flex-shrink: 0; }
     .settings-row {
       display: flex;
       align-items: center;
@@ -1770,7 +1906,7 @@
       cursor: pointer;
       outline: none;
     }
-    .settings-select:focus { border-color: #818cf8; }
+    .settings-select:focus { border-color: #8B9CF8; }
     .settings-input {
       padding: 0.375rem 0.5rem;
       border: 1px solid #e2e8f0;
@@ -1782,7 +1918,7 @@
       width: 190px;
       max-width: 100%;
     }
-    .settings-input:focus { border-color: #818cf8; }
+    .settings-input:focus { border-color: #8B9CF8; }
     .settings-toggle {
       width: 40px; height: 22px;
       background: #cbd5e1;
@@ -1792,7 +1928,7 @@
       position: relative;
       transition: background 0.2s;
     }
-    .settings-toggle.on { background: #4f46e5; }
+    .settings-toggle.on { background: #5B72F5; }
     .settings-toggle::after {
       content: '';
       position: absolute;
@@ -1830,11 +1966,11 @@
       cursor: pointer;
       transition: all 0.15s;
     }
-    .summary-quick-btn:hover { border-color: #818cf8; background: #f8fafc; }
+    .summary-quick-btn:hover { border-color: #8B9CF8; background: #f8fafc; }
     .summary-quick-btn.active {
-      border-color: #4f46e5;
-      background: #eef2ff;
-      color: #4338ca;
+      border-color: #5B72F5;
+      background: #EEF1FE;
+      color: #4D5FD8;
       font-weight: 600;
     }
     .summary-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
@@ -1861,7 +1997,7 @@
       padding: 0.5rem 0.25rem;
       text-align: center;
     }
-    .summary-stat .num { display: block; font-size: 1.15rem; font-weight: 800; color: #4338ca; }
+    .summary-stat .num { display: block; font-size: 1.15rem; font-weight: 800; color: #4D5FD8; }
     .summary-stat.created .num { color: #047857; }
     .summary-stat span:last-child { font-size: 0.62rem; color: #94a3b8; display: block; margin-top: 0.1rem; }
     .summary-group { margin-bottom: 1rem; }
@@ -1875,13 +2011,13 @@
       gap: 0.375rem;
       margin-bottom: 0.5rem;
       padding-bottom: 0.375rem;
-      border-bottom: 2px solid #eef2ff;
+      border-bottom: 2px solid #EEF1FE;
     }
-    .summary-group-title svg { color: #6366f1; flex-shrink: 0; }
+    .summary-group-title svg { color: #7B8CF6; flex-shrink: 0; }
     .summary-group-title .counts { margin-left: auto; display: flex; gap: 0.25rem; flex-shrink: 0; }
     .summary-group-title .count {
-      background: #e0e7ff;
-      color: #4338ca;
+      background: #E9EDFD;
+      color: #4D5FD8;
       border-radius: 6px;
       padding: 0.1rem 0.4rem;
       font-size: 0.7rem;
@@ -1985,13 +2121,13 @@
       height: 44px;
       border-radius: 50%;
       border: none;
-      background: #4f46e5;
+      background: #5B72F5;
       color: white;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 14px rgba(79,70,229,0.45);
+      box-shadow: 0 4px 14px rgba(91,114,245,0.45);
       opacity: 0;
       visibility: hidden;
       transform: translateY(12px);
@@ -2003,17 +2139,17 @@
       visibility: visible;
       transform: translateY(0);
     }
-    .scroll-top-btn:hover { background: #4338ca; }
+    .scroll-top-btn:hover { background: #4D5FD8; }
     .scroll-top-btn:active { transform: translateY(1px); }
     @media (max-width: 640px) {
       .scroll-top-btn { bottom: 1rem; right: 1rem; width: 40px; height: 40px; }
     }
 
-    /* Sélecteur de mode (Mode Projet / Mode Tâches) */
+    /* Sélecteur de mode (Mode Projet / Mode Actions) */
     .view-switcher {
       display: flex;
       gap: 0.25rem;
-      background: #e2e8f0;
+      background: #E9EDFD;
       border-radius: 12px;
       padding: 0.25rem;
       width: fit-content;
@@ -2039,6 +2175,7 @@
       transition: all 0.2s;
       min-width: 0;
       white-space: nowrap;
+      border-radius: 10px;
     }
     .view-btn:hover { background: rgba(255,255,255,0.5); color: #1e293b; }
     .view-btn.active {
@@ -2068,7 +2205,7 @@
     }
     .project-card:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      border-color: #c7d2fe;
+      border-color: #D4DCFA;
     }
     .project-card-name {
       display: flex;
@@ -2079,7 +2216,7 @@
       color: #1e293b;
       min-width: 0;
     }
-    .project-card-name svg { color: #6366f1; flex-shrink: 0; }
+    .project-card-name svg { color: #7B8CF6; flex-shrink: 0; }
     .project-card-name-txt {
       flex: 1;
       min-width: 0;
@@ -2095,7 +2232,7 @@
       flex-shrink: 0;
       transition: all 0.2s;
     }
-    .project-card:hover .project-card-go { color: #4f46e5; transform: translateX(3px); }
+    .project-card:hover .project-card-go { color: #5B72F5; transform: translateX(3px); }
     .project-card-next {
       background: #f8fafc;
       border: 1px solid #eef2f7;
@@ -2135,8 +2272,8 @@
       border-radius: 6px;
       font-size: 0.72rem;
       font-weight: 600;
-      background: #e0e7ff;
-      color: #4338ca;
+      background: #E9EDFD;
+      color: #4D5FD8;
       white-space: nowrap;
     }
     .project-stat.urgent { background: #fef3c7; color: #b45309; }
@@ -2147,11 +2284,15 @@
     .project-card.inactive .project-card-name svg { color: #94a3b8; }
 
     /* Mode Projet : colonne de filtres masquée, liste en pleine largeur,
-       contrôles de tri masqués (ils ne s'appliquent qu'à la liste de tâches) */
+       contrôles de tri masqués (ils ne s'appliquent qu'à la liste d'actions) */
     .layout-grid.project-view {
       grid-template-columns: 1fr;
       grid-template-areas: "top" "list";
     }
+    /* Vues sans contenu dans la zone haute (Comptes, Calendrier, fiche compte) :
+       la piste vide « top » est retirée pour ne pas ajouter d'écart inutile
+       entre le header et le premier contenu de la page */
+    .layout-grid.no-top { grid-template-columns: 1fr; grid-template-areas: "list"; }
     .task-sort-bar.project-mode #sortSelect,
     .task-sort-bar.project-mode #sortDirBtn { display: none; }
 
@@ -2170,12 +2311,17 @@
       cursor: pointer;
       transition: all 0.15s;
       margin-bottom: 0.75rem;
+      /* Bouton collant : reste visible sous le header pendant le scroll de la fiche */
+      position: sticky;
+      top: calc(var(--header-h, 80px) + 0.75rem);
+      z-index: 20;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .back-btn:hover { background: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
     .contact-project-header {
       background: rgba(255,255,255,0.9);
       border: 1px solid #e2e8f0;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 1.1rem 1.25rem;
       margin-bottom: 1rem;
       display: flex;
@@ -2191,14 +2337,14 @@
     .cp-icon {
       width: 46px;
       height: 46px;
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      background: linear-gradient(135deg, #3B8DF7, #7B5CF3);
       color: white;
       border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(79,70,229,0.25);
+      box-shadow: 0 4px 12px rgba(91,114,245,0.25);
     }
     .cp-icon svg { width: 24px; height: 24px; }
     .cp-name {
@@ -2218,8 +2364,8 @@
       border-radius: 999px;
       font-size: 0.78rem;
       font-weight: 600;
-      background: #e0e7ff;
-      color: #4338ca;
+      background: #E9EDFD;
+      color: #4D5FD8;
       white-space: nowrap;
     }
     .cp-stat.warning { background: #fef3c7; color: #b45309; }
@@ -2238,7 +2384,7 @@
       transition: all 0.15s;
       flex-shrink: 0;
     }
-    .cp-edit-btn:hover { background: #eef2ff; border-color: #c7d2fe; color: #4f46e5; }
+    .cp-edit-btn:hover { background: #EEF1FE; border-color: #D4DCFA; color: #5B72F5; }
     .cp-edit-btn.danger:hover { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
     .contact-rename-row {
       display: flex;
@@ -2248,7 +2394,7 @@
       flex: 1;
       min-width: 240px;
     }
-    .contact-rename-row > svg { color: #6366f1; flex-shrink: 0; }
+    .contact-rename-row > svg { color: #7B8CF6; flex-shrink: 0; }
     .contact-rename-row input { flex: 1; min-width: 160px; }
     .cp-stat.ok { background: #ecfdf5; color: #059669; }
     .cp-section-title {
@@ -2297,35 +2443,35 @@
       gap: 0.2rem; min-width: 0; overflow: hidden;
     }
     .cal-cell.cal-muted { background: #fafafa; border-color: #f1f5f9; }
-    .cal-cell.today { border-color: #4f46e5; background: #f5f6ff; box-shadow: inset 0 0 0 1px #4f46e5; }
+    .cal-cell.today { border-color: #5B72F5; background: #F0F3FE; box-shadow: inset 0 0 0 1px #5B72F5; }
     .cal-day-num { font-size: 0.75rem; font-weight: 700; color: #475569; text-align: right; }
-    .cal-cell.today .cal-day-num { color: #4f46e5; }
+    .cal-cell.today .cal-day-num { color: #5B72F5; }
     .cal-month-grid .cal-cell { cursor: pointer; }
-    .cal-month-grid .cal-cell:hover { border-color: #a5b4fc; }
+    .cal-month-grid .cal-cell:hover { border-color: #AEB9FA; }
     /* Jours des mois adjacents : atténués mais présents et cliquables */
     .cal-cell.cal-muted .cal-day-num { color: #94a3b8; font-weight: 600; }
     .cal-cell.cal-muted .cal-tasks { opacity: 0.75; }
     .cal-tasks { display: flex; flex-direction: column; gap: 0.2rem; overflow-y: auto; flex: 1; min-height: 0; }
     .cal-month-grid .mini-task-item { padding: 0.2rem 0.35rem; font-size: 0.7rem; }
     .cal-month-grid .mini-task-item .when { display: none; }
-    /* Vue Mois : 6 tâches visibles par jour maximum, défilement au-delà
+    /* Vue Mois : 6 actions visibles par jour maximum, défilement au-delà
        (les vues Semaine / Semaine de travail ne sont pas limitées) */
     .cal-month-grid .cal-tasks { max-height: 8.7rem; }
-    /* Glisser-déposer : tâches déplaçables (non récurrentes) et zones de dépôt */
+    /* Glisser-déposer : actions déplaçables (non récurrentes) et zones de dépôt */
     .cal-task[draggable="true"] { cursor: grab; }
     .cal-cell.drag-over, .cal-week-col.drag-over {
-      border-color: #4f46e5;
-      background: #eef2ff;
-      box-shadow: inset 0 0 0 1px #4f46e5;
+      border-color: #5B72F5;
+      background: #EEF1FE;
+      box-shadow: inset 0 0 0 1px #5B72F5;
     }
-    /* Petit logo discret des tâches récurrentes (toutes vues du calendrier) */
+    /* Petit logo discret des actions récurrentes (toutes vues du calendrier) */
     .cal-task .cal-rec-logo { display: flex; align-items: center; color: #94a3b8; flex-shrink: 0; }
     .cal-task .cal-rec-logo svg { width: 11px; height: 11px; }
     .cal-week-grid { display: grid; gap: 0.5rem; }
     .cal-week-col { background: white; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; flex-direction: column; min-width: 0; }
     .cal-week-head {
       padding: 0.5rem 0.6rem; font-size: 0.8rem; font-weight: 700; color: #334155;
-      border-bottom: 2px solid #eef2ff; text-transform: capitalize;
+      border-bottom: 2px solid #EEF1FE; text-transform: capitalize;
       display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
     }
     .cal-week-day-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2337,8 +2483,8 @@
       font-size: 0.95rem; font-weight: 600; line-height: 1;
       cursor: pointer; transition: all 0.15s;
     }
-    .cal-add-day-btn:hover { background: #4f46e5; border-color: #4f46e5; color: white; }
-    .cal-week-head.today { color: #4f46e5; background: #f5f6ff; border-radius: 10px 10px 0 0; }
+    .cal-add-day-btn:hover { background: #5B72F5; border-color: #5B72F5; color: white; }
+    .cal-week-head.today { color: #5B72F5; background: #F0F3FE; border-radius: 10px 10px 0 0; }
     .cal-week-col .cal-tasks { padding: 0.4rem; max-height: 62vh; }
     .cal-empty-day { font-size: 0.75rem; color: #cbd5e1; text-align: center; padding: 0.75rem 0; }
     .cal-year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(225px, 1fr)); gap: 0.75rem; }
@@ -2347,7 +2493,7 @@
       font-size: 0.8rem; font-weight: 700; color: #334155; text-transform: capitalize;
       margin-bottom: 0.35rem; cursor: pointer; transition: color 0.15s;
     }
-    .cal-year-title:hover { color: #4f46e5; }
+    .cal-year-title:hover { color: #5B72F5; }
     .mini-cal-day.has-done { background: #f1f5f9; color: #94a3b8; font-weight: 600; }
 
     /* Page Accueil : légende du graphique de la semaine */
@@ -2367,7 +2513,7 @@
       color: #94a3b8; cursor: pointer; transition: all 0.15s; flex-shrink: 0;
     }
     .widget-btn svg { width: 12px; height: 12px; }
-    .widget-btn:hover { background: #eef2ff; border-color: #c7d2fe; color: #4f46e5; }
+    .widget-btn:hover { background: #EEF1FE; border-color: #D4DCFA; color: #5B72F5; }
     .widget-btn.danger:hover { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
     .widget-empty {
       border: 1.5px dashed #cbd5e1;
@@ -2377,16 +2523,16 @@
       gap: 0.5rem;
       transition: all 0.15s;
     }
-    .widget-empty:hover { border-color: #818cf8; background: #eef2ff; }
+    .widget-empty:hover { border-color: #8B9CF8; background: #EEF1FE; }
     .widget-add-circle {
       width: 44px; height: 44px; border-radius: 50%;
       background: white; border: 1.5px dashed #94a3b8; color: #64748b;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.15s;
     }
-    .widget-empty:hover .widget-add-circle { border-color: #4f46e5; color: #4f46e5; }
+    .widget-empty:hover .widget-add-circle { border-color: #5B72F5; color: #5B72F5; }
     .widget-add-label { font-size: 0.78rem; color: #94a3b8; font-weight: 500; }
-    .widget-empty:hover .widget-add-label { color: #4f46e5; }
+    .widget-empty:hover .widget-add-label { color: #5B72F5; }
 
     /* Fenêtre de choix d'un widget */
     .widget-options { display: flex; flex-direction: column; gap: 0.4rem; }
@@ -2397,16 +2543,16 @@
       cursor: pointer; font-size: 0.85rem; color: #334155; text-align: left;
       transition: all 0.15s;
     }
-    .widget-option:hover { border-color: #a5b4fc; background: #f5f6ff; }
-    .widget-option.current { border-color: #4f46e5; background: #eef2ff; }
+    .widget-option:hover { border-color: #AEB9FA; background: #F0F3FE; }
+    .widget-option.current { border-color: #5B72F5; background: #EEF1FE; }
     .widget-option-icon {
       width: 30px; height: 30px; border-radius: 8px;
-      background: #eef2ff; color: #4f46e5;
+      background: #EEF1FE; color: #5B72F5;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .widget-option.current .widget-option-icon { background: #4f46e5; color: white; }
+    .widget-option.current .widget-option-icon { background: #5B72F5; color: white; }
     .widget-option-label { flex: 1; font-weight: 500; }
-    .widget-option-check { color: #4f46e5; display: flex; flex-shrink: 0; }
+    .widget-option-check { color: #5B72F5; display: flex; flex-shrink: 0; }
     @media (max-width: 768px) {
       .charts { grid-template-columns: 1fr; }
     }
@@ -2463,9 +2609,7 @@
   <header class="header">
     <div class="header-inner">
       <div class="logo">
-        <div class="logo-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h9"/><path d="M10 12h9"/><path d="M10 18h9"/><path d="m4 6 1 1 2-2"/><path d="m4 12 1 1 2-2"/><path d="m4 18 1 1 2-2"/></svg>
-        </div>
+        <img class="logo-icon" src="app-logo.png" alt="Logo">
       </div>
       <nav class="header-nav" id="viewSwitcherContainer" aria-label="Navigation entre les pages"></nav>
       <div class="header-center">
@@ -2509,10 +2653,13 @@
           <div class="filter-group" id="statusFilters"></div>
         </div>
         <div class="filter-row">
-          <div class="filter-group" id="categoryFilters"></div>
+          <div class="filter-group" id="typeFilters"></div>
         </div>
         <div class="filter-row">
           <div class="filter-group" id="urgencyFilters"></div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-group" id="categoryFilters"></div>
         </div>
       </div>
 
@@ -2540,7 +2687,7 @@
   </main>
 
   <footer>
-    <a href="#" onclick="openSettings();return false" style="color:#6366f1;text-decoration:none;">Paramètres</a>
+    <a href="#" onclick="openSettings();return false" style="color:#7B8CF6;text-decoration:none;">Paramètres</a>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </footer>
 
@@ -2570,8 +2717,8 @@
       notificationsEnabled: false,
       // Widgets de la page Accueil (4 emplacements ; null = emplacement vide)
       homeWidgets: [
-        { type: 'chart', data: 'week' },
-        { type: 'list', data: 'today' },
+        { type: 'chart', data: 'week', filter: 'task' },
+        { type: 'list', data: 'today', filter: 'task' },
         null,
         null,
       ],
@@ -2585,6 +2732,7 @@
     let tasks = JSON.parse(localStorage.getItem('taskflow-tasks') || '[]');
     let filterStatus = settings.defaultFilterStatus;
     let filterUrgency = settings.defaultFilterUrgency;
+    let filterType = 'all'; // filtre par type d'action : 'all' | 'task' | 'rdv'
     let sortBy = settings.defaultSortBy;
     let sortAsc = settings.defaultSortAsc;
     let searchQuery = '';
@@ -2614,7 +2762,7 @@
     let filterCategory = settings.defaultFilterCategory;
     let filterLate = false;
     let isFormExpanded = false;
-    let isLogFormExpanded = false; // formulaire « Consigner tâche » (créée directement terminée)
+    let isLogFormExpanded = false; // formulaire « Consigner action » (créée directement terminée)
     let quickAddDate = null; // date du « + » du calendrier (formulaire popup)
     let quickCategory = 'pro';
     let quickUrgency = 'normal';
@@ -2672,16 +2820,24 @@
     // Catalogue des données proposées, par famille (Liste / Graphique)
     const HOME_WIDGET_CATALOG = {
       list: [
-        { id: 'today', label: 'Tâches du jour', icon: 'calendarCheck', empty: 'Aucune tâche aujourd’hui' },
-        { id: 'created', label: 'Dernières tâches créées', icon: 'plus', empty: 'Aucune tâche créée' },
-        { id: 'completed', label: 'Dernières tâches terminées', icon: 'checkCircle', empty: 'Aucune tâche terminée' },
-        { id: 'week', label: 'Tâches de la semaine', icon: 'calendar', empty: 'Aucune tâche cette semaine' },
-        { id: 'next3', label: 'Tâches des 3 prochains jours', icon: 'clock', empty: 'Aucune tâche les 3 prochains jours' },
+        { id: 'today', filter: 'task', label: 'Tâches du jour', icon: 'calendarCheck', empty: 'Aucune tâche aujourd’hui' },
+        { id: 'created', filter: 'task', label: 'Dernières tâches créées', icon: 'plus', empty: 'Aucune tâche créée' },
+        { id: 'completed', filter: 'task', label: 'Dernières tâches terminées', icon: 'checkCircle', empty: 'Aucune tâche terminée' },
+        { id: 'week', filter: 'task', label: 'Tâches de la semaine', icon: 'calendar', empty: 'Aucune tâche cette semaine' },
+        { id: 'next3', filter: 'task', label: 'Tâches des 3 prochains jours', icon: 'clock', empty: 'Aucune tâche les 3 prochains jours' },
+        { id: 'today', filter: 'rdv', label: 'RDV du jour', icon: 'calendarCheck', empty: 'Aucun RDV aujourd’hui' },
+        { id: 'created', filter: 'rdv', label: 'Derniers RDV créés', icon: 'plus', empty: 'Aucun RDV créé' },
+        { id: 'completed', filter: 'rdv', label: 'Derniers RDV terminés', icon: 'checkCircle', empty: 'Aucun RDV terminé' },
+        { id: 'week', filter: 'rdv', label: 'RDV de la semaine', icon: 'calendar', empty: 'Aucun RDV cette semaine' },
+        { id: 'next3', filter: 'rdv', label: 'RDV des 3 prochains jours', icon: 'clock', empty: 'Aucun RDV les 3 prochains jours' },
       ],
       chart: [
-        { id: 'today', label: 'Tâches du jour', icon: 'pieChart' },
-        { id: 'week', label: 'Tâches de la semaine', icon: 'pieChart' },
-        { id: 'month', label: 'Tâches du mois', icon: 'pieChart' },
+        { id: 'today', filter: 'task', label: 'Tâches du jour', icon: 'pieChart' },
+        { id: 'week', filter: 'task', label: 'Tâches de la semaine', icon: 'pieChart' },
+        { id: 'month', filter: 'task', label: 'Tâches du mois', icon: 'pieChart' },
+        { id: 'today', filter: 'rdv', label: 'RDV du jour', icon: 'calendarCheck' },
+        { id: 'week', filter: 'rdv', label: 'RDV de la semaine', icon: 'calendarCheck' },
+        { id: 'month', filter: 'rdv', label: 'RDV du mois', icon: 'calendarCheck' },
       ],
     };
     const HOME_WIDGET_SLOTS = 4;
@@ -2692,31 +2848,37 @@
       const out = [];
       for (let i = 0; i < HOME_WIDGET_SLOTS; i++) {
         const w = raw[i];
-        const valid = w && HOME_WIDGET_CATALOG[w.type] && HOME_WIDGET_CATALOG[w.type].some(o => o.id === w.data);
-        out.push(valid ? { type: w.type, data: w.data } : null);
+        // Les anciennes configurations (sans filtre de type) sont migrées vers « Tâche »
+        const f = (w && (w.filter === 'rdv')) ? 'rdv' : 'task';
+        const valid = w && HOME_WIDGET_CATALOG[w.type] && HOME_WIDGET_CATALOG[w.type].some(o => o.id === w.data && o.filter === f);
+        out.push(valid ? { type: w.type, data: w.data, filter: f } : null);
       }
       return out;
     }
 
     function getHomeWidgetDef(w) {
       if (!w) return null;
-      return (HOME_WIDGET_CATALOG[w.type] || []).find(o => o.id === w.data) || null;
+      const f = w.filter === 'rdv' ? 'rdv' : 'task';
+      return (HOME_WIDGET_CATALOG[w.type] || []).find(o => o.id === w.data && o.filter === f) || null;
     }
 
-    // Éléments affichés par un widget de type Liste (max 10, triés selon le type)
-    function getWidgetListItems(data) {
+    // Éléments affichés par un widget de type Liste (max 10, triés selon le type),
+    // pour un type d'action donné ('task' ou 'rdv')
+    function getWidgetListItems(data, filter) {
       const now = new Date();
       const plusDays = (n) => { const x = new Date(now); x.setDate(x.getDate() + n); return isoDate(x); };
+      const pool = tasks.filter(t => filter === 'rdv' ? t.type === 'rdv' : t.type !== 'rdv');
 
       if (data === 'today') {
         return getTodoTasksForNotif().today
+          .filter(t => filter === 'rdv' ? t.type === 'rdv' : t.type !== 'rdv')
           .sort((a, b) => (a.urgency === 'urgent' ? 0 : 1) - (b.urgency === 'urgent' ? 0 : 1))
           .slice(0, 10)
           .map(t => Object.assign({}, t, { _when: t.urgency === 'urgent' ? 'Urgent' : '' }));
       }
 
       if (data === 'created') {
-        return tasks.slice()
+        return pool.slice()
           .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
           .slice(0, 10)
           .map(t => Object.assign({}, t, {
@@ -2727,7 +2889,7 @@
 
       if (data === 'completed') {
         const entries = [];
-        tasks.forEach(t => {
+        pool.forEach(t => {
           if (t.recurrence) {
             (t.completionLog || []).forEach(e => entries.push({ t: t, at: e.completedAt || '' }));
           } else if (t.status === 'done') {
@@ -2754,7 +2916,7 @@
           toStr = plusDays(3);
         }
         const items = [];
-        tasks.forEach(t => {
+        pool.forEach(t => {
           if (t.recurrence && t.recurrence.startDate && t.recurrence.endDate) {
             const excluded = (t.completedDates || []).concat(t.deletedDates || []);
             getRecurrenceOccurrences(t).forEach(date => {
@@ -2813,9 +2975,9 @@
       return { text: formatDate(deadline), class: '' };
     }
 
-    // Construit la fiche d'un contact/entreprise à partir de l'ensemble des tâches
+    // Construit la fiche d'un contact/entreprise à partir de l'ensemble des actions
     // (en cours et terminées) qui lui sont associées. La fiche est entièrement
-    // dérivée des tâches existantes : aucune donnée séparée à créer ni à saisir.
+    // dérivée des actions existantes : aucune donnée séparée à créer ni à saisir.
     function getContactSheet(contactName) {
       if (!contactName || !contactName.trim()) return { todo: [], done: [] };
       const normalized = contactName.trim().toLowerCase();
@@ -2850,7 +3012,7 @@
     }
 
     let viewingContact = null;
-    let detailTask = null; // tâche consultée en popup (depuis le calendrier)
+    let detailTask = null; // action consultée en popup (depuis le calendrier)
     let widgetPickSlot = null; // emplacement de widget en cours de configuration (page Accueil)
     function openContactSheet(contactName) {
       viewingContact = contactName;
@@ -2990,7 +3152,7 @@
       return (task.completedDates || []).filter(d => !deleted.includes(d));
     }
 
-    // Construit un élément "virtuel" représentant une occurrence terminée d'une tâche
+    // Construit un élément "virtuel" représentant une occurrence terminée d'une action
     // récurrente, à une date précise (pour consultation/recherche dans "Terminées")
     function buildOccurrenceDoneItem(t, date) {
       const logEntry = (t.completionLog || []).find(e => e.date === date);
@@ -3006,7 +3168,7 @@
     }
 
     // For task list: expand recurring tasks into virtual occurrences.
-    // Chaque tâche récurrente produit : une entrée "à faire" pour la prochaine occurrence
+    // Chaque action récurrente produit : une entrée "à faire" pour la prochaine occurrence
     // restante (s'il en reste), et une entrée "terminée" par occurrence déjà complétée —
     // ce qui permet de les consulter/rechercher dans l'onglet "Terminées" sans qu'elles
     // ne comptent jamais dans "À faire".
@@ -3065,7 +3227,7 @@
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     }
-    // Tâches "todo" effectives du jour (occurrences récurrentes incluses, en excluant
+    // Actions "todo" effectives du jour (occurrences récurrentes incluses, en excluant
     // explicitement les occurrences déjà marquées terminées/supprimées pour ce jour précis)
     function getTodoTasksForNotif() {
       const todayStr = getTodayStr();
@@ -3146,21 +3308,28 @@
 
       if (today.length > 0 && (force || state.lastTodayDate !== todayStr)) {
         const body = today.length === 1
-          ? `1 tâche à traiter : ${today[0].title}`
-          : `${today.length} tâches à traiter aujourd'hui`;
-        sendAppNotification('📋 Tâches du jour', body, 'taches-today');
+          ? `1 action à traiter : ${today[0].title}`
+          : `${today.length} actions à traiter aujourd'hui`;
+        sendAppNotification('📋 Actions du jour', body, 'taches-today');
         state.lastTodayDate = todayStr;
       }
       if (overdue.length > 0 && (force || state.lastLateDate !== todayStr)) {
         const body = overdue.length === 1
-          ? `1 tâche en retard non terminée`
-          : `${overdue.length} tâches en retard non terminées`;
-        sendAppNotification('⏰ Rappel : tâches en retard', body, 'taches-late');
+          ? `1 action en retard non terminée`
+          : `${overdue.length} actions en retard non terminées`;
+        sendAppNotification('⏰ Rappel : actions en retard', body, 'taches-late');
         state.lastLateDate = todayStr;
       }
       saveNotifState(state);
     }
-    // Badge sur l'icône de l'app (nombre de tâches du jour à traiter)
+    // Badge sur l'icône de l'app (nombre d'actions du jour à traiter)
+    // Hauteur du header publiée en variable CSS (bouton Retour collant de la fiche)
+    function updateHeaderHeightVar() {
+      const h = document.querySelector('.header');
+      if (h) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+    }
+    window.addEventListener('resize', updateHeaderHeightVar);
+
     function updateAppBadge() {
       if (!('setAppBadge' in navigator)) return;
       const { today } = getTodoTasksForNotif();
@@ -3175,9 +3344,15 @@
       renderStats();
       renderAddTask();
       renderViewSwitcher();
-      // Hors Mode Tâches (grille projet ou fiche contact) : une seule colonne,
+      updateHeaderHeightVar();
+      // Hors Mode Actions (grille projet ou fiche contact) : une seule colonne,
       // sans la colonne de filtres (le contenu occupe toute la largeur dans tous les modes)
       document.querySelector('.layout-grid')?.classList.toggle('project-view', taskView !== 'tasks');
+      // Vues sans zone haute : la piste « top » (vide) est retirée de la grille
+      // pour que l'écart header -> premier contenu reste le même partout
+      const topEmpty = taskView === 'project' || taskView === 'contact' || taskView === 'calendar';
+      document.querySelector('.layout-top')?.classList.toggle('hidden', topEmpty);
+      document.querySelector('.layout-grid')?.classList.toggle('no-top', topEmpty);
       renderFilters();
       renderTaskList();
       updateAppBadge();
@@ -3243,18 +3418,20 @@
     }
 
     // Statuts de la semaine en cours (lundi à dimanche), occurrences
-    // récurrentes incluses. Catégories exclusives : une tâche urgente à
+    // récurrentes incluses. Catégories exclusives : une action urgente à
     // faire compte uniquement comme « urgente », pas aussi comme « à faire ».
-    // Compte les tâches (à faire / urgentes / terminées) dont l'échéance
+    // Compte les actions (à faire / urgentes / terminées) dont l'échéance
     // tombe dans la période [fromStr ; toStr] (occurrences récurrentes incluses)
-    function getRangeStats(fromStr, toStr) {
+    function getRangeStats(fromStr, toStr, typeFilter) {
       const counts = { todo: 0, urgent: 0, done: 0 };
       const count = (t, isDone) => {
         if (isDone) counts.done++;
         else if (t.urgency === 'urgent') counts.urgent++;
         else counts.todo++;
       };
+      const matchType = (t) => !typeFilter || (typeFilter === 'rdv' ? t.type === 'rdv' : t.type !== 'rdv');
       tasks.forEach(t => {
+        if (!matchType(t)) return;
         if (t.recurrence && t.recurrence.startDate && t.recurrence.endDate) {
           const completed = t.completedDates || [];
           const deleted = t.deletedDates || [];
@@ -3270,21 +3447,23 @@
       return { counts, fromStr, toStr, total: counts.todo + counts.urgent + counts.done };
     }
 
-    // Stats + titre pour les graphiques de la page Accueil (jour / semaine / mois)
-    function getHomeChartStats(data) {
+    // Stats + période pour les graphiques de la page Accueil (jour / semaine / mois),
+    // pour un type d'action donné ('task' ou 'rdv')
+    function getHomeChartStats(data, filter) {
+      const f = filter === 'rdv' ? 'rdv' : 'task';
       const now = new Date();
       if (data === 'today') {
         const todayStr = isoDate(now);
-        const s = getRangeStats(todayStr, todayStr);
-        s.title = "Aujourd'hui (" + formatDate(todayStr + 'T00:00:00') + ")";
+        const s = getRangeStats(todayStr, todayStr, f);
+        s.periodLabel = formatDate(todayStr + 'T00:00:00');
         return s;
       }
       if (data === 'month') {
         const first = new Date(now.getFullYear(), now.getMonth(), 1);
         const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const s = getRangeStats(isoDate(first), isoDate(last));
+        const s = getRangeStats(isoDate(first), isoDate(last), f);
         const label = first.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-        s.title = 'Ce mois (' + label.charAt(0).toUpperCase() + label.slice(1) + ')';
+        s.periodLabel = label.charAt(0).toUpperCase() + label.slice(1);
         return s;
       }
       // 'week' (par défaut)
@@ -3292,8 +3471,8 @@
       const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (dow === 0 ? -6 : 1 - dow));
       const sunday = new Date(monday);
       sunday.setDate(monday.getDate() + 6);
-      const s = getRangeStats(isoDate(monday), isoDate(sunday));
-      s.title = 'Cette semaine (du ' + formatDate(s.fromStr + 'T00:00:00') + ' au ' + formatDate(s.toStr + 'T00:00:00') + ')';
+      const s = getRangeStats(isoDate(monday), isoDate(sunday), f);
+      s.periodLabel = 'du ' + formatDate(s.fromStr + 'T00:00:00') + ' au ' + formatDate(s.toStr + 'T00:00:00');
       return s;
     }
 
@@ -3340,16 +3519,22 @@
         </div>`;
 
       if (w.type === 'chart') {
-        const s = getHomeChartStats(w.data);
+        const s = getHomeChartStats(w.data, w.filter);
+        // Pour les RDV : « Programmés » au lieu de « À faire », pas de notion
+        // d'urgence, et « Terminé » au singulier
+        const isRdvChart = w.filter === 'rdv';
+        const todoLabel = isRdvChart ? 'Programmés' : 'À faire';
+        const todoColor = isRdvChart ? '#2563eb' : '#10b981';
+        const doneLabel = isRdvChart ? 'Terminés' : 'Terminées';
         const slices = [];
-        if (s.counts.todo > 0) slices.push({ label: 'À faire', value: s.counts.todo, color: '#10b981', onclick: `homeChartDrillDown('${w.data}', 'todo')` });
-        if (s.counts.urgent > 0) slices.push({ label: 'Urgentes', value: s.counts.urgent, color: '#f59e0b', onclick: `homeChartDrillDown('${w.data}', 'urgent')` });
-        if (s.counts.done > 0) slices.push({ label: 'Terminées', value: s.counts.done, color: '#94a3b8', onclick: `homeChartDrillDown('${w.data}', 'done')` });
+        if (s.counts.todo > 0) slices.push({ label: todoLabel, value: s.counts.todo, color: todoColor, onclick: `homeChartDrillDown('${w.data}', 'todo', '${w.filter}')` });
+        if (s.counts.urgent > 0 && !isRdvChart) slices.push({ label: 'Urgentes', value: s.counts.urgent, color: '#f59e0b', onclick: `homeChartDrillDown('${w.data}', 'urgent', '${w.filter}')` });
+        if (s.counts.done > 0) slices.push({ label: doneLabel, value: s.counts.done, color: '#94a3b8', onclick: `homeChartDrillDown('${w.data}', 'done', '${w.filter}')` });
         const donut = makePieChart(slices, s.total);
         return `
           <div class="chart-box">
             <div class="widget-head">
-              <div class="chart-title">${s.title}</div>
+              <div class="chart-title">${def.label} (${s.periodLabel})</div>
               <div class="widget-actions">
                 <button class="widget-btn" onclick="openWidgetPicker(${slot})" title="Modifier ce widget">${icons.pencil}</button>
                 <button class="widget-btn danger" onclick="removeHomeWidget(${slot})" title="Retirer ce widget">${icons.trash}</button>
@@ -3357,16 +3542,17 @@
             </div>
             <div class="chart-svg-wrap">${donut}<div class="chart-center-label">${s.total}</div></div>
             <div class="home-week-legend">
-              <span class="home-legend-item"><i class="dot" style="background:#10b981"></i> À faire <b>${s.counts.todo}</b></span>
-              <span class="home-legend-item"><i class="dot" style="background:#f59e0b"></i> Urgentes <b>${s.counts.urgent}</b></span>
-              <span class="home-legend-item"><i class="dot" style="background:#94a3b8"></i> Terminées <b>${s.counts.done}</b></span>
+              <span class="home-legend-item"><i class="dot" style="background:${todoColor}"></i> ${todoLabel} <b>${s.counts.todo}</b></span>
+              ${!isRdvChart ? `<span class="home-legend-item"><i class="dot" style="background:#f59e0b"></i> Urgentes <b>${s.counts.urgent}</b></span>` : ''}
+              <span class="home-legend-item"><i class="dot" style="background:#94a3b8"></i> ${doneLabel} <b>${s.counts.done}</b></span>
             </div>
           </div>`;
       }
 
       // Widget Liste
-      const items = getWidgetListItems(w.data);
-      const dotColor = (t) => t._dot || (t.urgency === 'urgent' ? '#f59e0b' : '#10b981');
+      const items = getWidgetListItems(w.data, w.filter);
+      // Les RDV gardent leur point bleu, comme dans le calendrier
+      const dotColor = (t) => t.type === 'rdv' ? '#2563eb' : (t._dot || (t.urgency === 'urgent' ? '#f59e0b' : '#10b981'));
       const renderMiniItem = (t) => `
         <button class="mini-task-item" onclick="focusTask('${t.id}')" title="${(t.title || '').replace(/"/g, '&quot;')}">
           <span class="dot" style="background:${dotColor(t)}"></span>
@@ -3379,7 +3565,7 @@
           <div class="mini-task-list">
             ${items.length
               ? items.map(renderMiniItem).join('')
-              : `<div class="mini-task-empty">${def.empty || 'Aucune tâche'}</div>`}
+              : `<div class="mini-task-empty">${def.empty || 'Aucune action'}</div>`}
           </div>
         </div>`;
     }
@@ -3394,7 +3580,7 @@
     }
 
     function focusTask(id) {
-      filterStatus = 'all'; filterUrgency = 'all'; filterCategory = 'all'; filterLate = false; filterDate = null; filterPeriod = null;
+      filterStatus = 'all'; filterUrgency = 'all'; filterCategory = 'all'; filterType = 'all'; filterLate = false; filterDate = null; filterPeriod = null;
       if (taskView !== 'tasks') {
         taskView = 'tasks';
         settings.defaultView = 'tasks';
@@ -3413,7 +3599,7 @@
     // Clic sur une part d'un graphique de l'Accueil (jour / semaine / mois) :
     // bascule vers la page Recherche avec la plage de dates du graphique et
     // les filtres correspondant à la part cliquée (à faire / urgentes / terminées)
-    function homeChartDrillDown(data, kind) {
+    function homeChartDrillDown(data, kind, filter) {
       const now = new Date();
       let fromStr, toStr;
       if (data === 'today') {
@@ -3433,12 +3619,13 @@
       filterStatus = kind === 'done' ? 'done' : 'todo';
       filterUrgency = kind === 'urgent' ? 'urgent' : (kind === 'todo' ? 'normal' : 'all');
       filterCategory = 'all';
+      filterType = filter === 'rdv' ? 'rdv' : 'task';
       filterLate = false;
       filterDate = null;
       filterPeriod = data === 'today'
         ? { mode: 'on', from: fromStr, to: '' }
         : { mode: 'between', from: fromStr, to: toStr };
-      // La recherche est remise à zéro pour montrer exactement les tâches de la part
+      // La recherche est remise à zéro pour montrer exactement les actions de la part
       searchQuery = '';
       const input = document.getElementById('searchInput');
       if (input) input.value = '';
@@ -3671,14 +3858,14 @@
           <div class="add-task-grid">
             <button class="add-task-square" onclick="expandForm()">
               <div class="icon-circle">${icons.plus}</div>
-              <span>Nouvelle tâche</span>
+              <span>Nouvelle action</span>
             </button>
             <button class="add-task-square log" onclick="expandLogForm()">
               <div class="icon-circle">${icons.check}</div>
-              <span>Consigner tâche</span>
+              <span>Consigner action</span>
             </button>
             ${taskView === 'tasks' ? `
-            <button class="add-task-square rapport" onclick="openSummary()" title="Rapport des tâches (créées et terminées)">
+            <button class="add-task-square rapport" onclick="openSummary()" title="Rapport des actions (créées et terminées)">
               <div class="icon-circle rapport">${icons.fileText}</div>
               <span>Rapport</span>
             </button>` : ''}
@@ -3695,11 +3882,22 @@
         <div class="task-form">
           <div class="form-header">
             <div class="icon-circle"${isLog ? '' : ' style="background:#059669;"'}>${isLog ? icons.check : icons.plus}</div>
-            <h3>${isLog ? 'Consigner tâche' : 'Nouvelle tâche'}</h3>
+            <h3>${isLog ? 'Consigner action' : 'Nouvelle action'}</h3>
           </div>
           <div class="form-grid">
             <div class="full-width">
-              <label>Titre de la tâche <span class="required">*</span></label>
+              <label>Type d'action</label>
+              <div class="type-buttons">
+                <button type="button" class="type-btn ${currentActionType === 'task' ? 'active task' : ''}" data-type="task" onclick="setActionType('task')">
+                  ${icons.listTodo} Tâche
+                </button>
+                <button type="button" class="type-btn ${currentActionType === 'rdv' ? 'active rdv' : ''}" data-type="rdv" onclick="setActionType('rdv')">
+                  ${icons.calendarCheck} Rendez-vous
+                </button>
+              </div>
+            </div>
+            <div class="full-width">
+              <label>Titre de l'action <span class="required">*</span></label>
               <input type="text" id="taskTitle" placeholder="Ex: Préparer le devis client" required>
             </div>
             <div class="contact-field">
@@ -3741,7 +3939,7 @@
                 </button>
               </div>
             </div>
-            <div>
+            <div id="urgencyField" class="${currentActionType === 'rdv' ? 'hidden' : ''}">
               <label>Niveau d'urgence</label>
               <div class="urgency-buttons">
                 <button type="button" class="urgency-btn ${currentUrgency === 'normal' ? 'active normal' : ''}" data-urgency="normal" onclick="setUrgency('normal')">
@@ -3756,7 +3954,7 @@
           ${!isLog ? `
           <label class="recurrence-toggle">
             <input type="checkbox" id="taskRecurring" onchange="toggleRecurrencePanel()">
-            ${icons.repeat} Tâche récurrente
+            ${icons.repeat} Action récurrente
           </label>
           <div class="recurrence-panel hidden" id="recurrencePanel">
             <div class="form-grid">
@@ -3834,8 +4032,8 @@
     function renderFilters() {
       const container = document.getElementById('filtersContainer');
 
-      // Barre au-dessus des tâches (page Recherche) : filtre « Date »
-      // (le bouton Rapport est désormais un carré à côté de Nouvelle tâche)
+      // Barre au-dessus des actions (page Recherche) : filtre « Date »
+      // (le bouton Rapport est désormais un carré à côté de Nouvelle action)
       const showDateBtn = taskView === 'tasks';
       document.getElementById('periodFilters').innerHTML = showDateBtn ? `
         <button class="filter-btn ${filterPeriod ? 'active' : ''}" onclick="openPeriodFilterModal()">
@@ -3858,14 +4056,14 @@
       document.getElementById('taskSortBar')?.classList.toggle('project-mode', taskView !== 'tasks');
       document.getElementById('taskSortBar')?.classList.toggle('hidden', taskView !== 'tasks' && taskView !== 'project');
 
-      // Hors Mode Tâches, les filtres de la colonne latérale ne s'appliquent pas
+      // Hors Mode Actions, les filtres de la colonne latérale ne s'appliquent pas
       if (tasks.length === 0 || taskView !== 'tasks') {
         container.classList.add('hidden');
         return;
       }
       container.classList.remove('hidden');
       
-      // Base set for dynamic counts : on se base sur les tâches "dépliées" par occurrence
+      // Base set for dynamic counts : on se base sur les actions "dépliées" par occurrence
       // (comme dans renderTaskList) pour que les compteurs correspondent exactement à ce
       // qui est affiché : une occurrence de récurrence déjà terminée compte dans
       // "Terminées", jamais dans "À faire".
@@ -3909,6 +4107,12 @@
         perso: subBase.filter(t => (t.category || 'pro') === 'perso').length
       };
 
+      const typeCounts = {
+        all: subBase.length,
+        task: subBase.filter(t => t.type !== 'rdv').length,
+        rdv: subBase.filter(t => t.type === 'rdv').length
+      };
+
       // Sub-sub-base: apply category filter for dynamic urgency counts
       let urgBase = [...subBase];
       if (filterCategory !== 'all') {
@@ -3932,6 +4136,18 @@
         </button>
       `;
 
+      document.getElementById('typeFilters').innerHTML = `
+        <button class="filter-btn ${filterType === 'all' ? 'active' : ''}" onclick="setFilterType('all')">
+          ${icons.circle} <span>Tous</span> <span class="count">${typeCounts.all}</span>
+        </button>
+        <button class="filter-btn ${filterType === 'task' ? 'active' : ''}" onclick="setFilterType('task')">
+          ${icons.listTodo} <span>Tâches</span> <span class="count">${typeCounts.task}</span>
+        </button>
+        <button class="filter-btn ${filterType === 'rdv' ? 'active' : ''}" onclick="setFilterType('rdv')">
+          ${icons.calendarCheck} <span>RDV</span> <span class="count">${typeCounts.rdv}</span>
+        </button>
+      `;
+
       document.getElementById('urgencyFilters').innerHTML = `
         <button class="filter-btn ${filterUrgency === 'all' ? 'active' : ''}" onclick="setFilterUrgency('all')">
           ${icons.sparkles} <span>Toutes</span> <span class="count">${urgCounts.all}</span>
@@ -3950,7 +4166,7 @@
 
     // Recherche élargie : correspond si le terme apparaît dans le titre, le contact,
     // un tag, la description, l'un des commentaires ou le commentaire de clôture.
-    // Pour une occurrence de tâche récurrente, seuls les commentaires visibles
+    // Pour une occurrence d'action récurrente, seuls les commentaires visibles
     // pour cette occurrence (et ceux sans date d'occurrence) sont pris en compte.
     function taskMatchesQuery(task, q) {
       if (task.title && task.title.toLowerCase().includes(q)) return true;
@@ -3966,7 +4182,7 @@
     function renderTaskList() {
       const container = document.getElementById('taskListContainer');
 
-      // Page Accueil : le contenu (graphique, tâches du jour, boutons) est
+      // Page Accueil : le contenu (graphique, actions du jour, boutons) est
       // rendu par renderStats/renderAddTask dans la zone du haut
       if (taskView === 'home') {
         container.innerHTML = '';
@@ -3985,7 +4201,7 @@
         return;
       }
 
-      // Mode Calendrier : emploi du temps des tâches
+      // Mode Calendrier : emploi du temps des actions
       if (taskView === 'calendar') {
         renderCalendarView();
         return;
@@ -4013,6 +4229,13 @@
       // Filter by category
       if (filterCategory !== 'all') {
         filtered = filtered.filter(t => (t.category || 'pro') === filterCategory);
+      }
+      
+      // Filter by type (Tâche / Rendez-vous)
+      if (filterType === 'task') {
+        filtered = filtered.filter(t => t.type !== 'rdv');
+      } else if (filterType === 'rdv') {
+        filtered = filtered.filter(t => t.type === 'rdv');
       }
       
       // Filter by late
@@ -4056,10 +4279,15 @@
             result = a.title.localeCompare(b.title, 'fr');
             break;
         }
+        // Même clé (ex: même date) : RDV d'abord, puis actions urgentes, puis les autres
+        if (result === 0) {
+          const typeOrder = (t) => t.type === 'rdv' ? 0 : (t.urgency === 'urgent' ? 1 : 2);
+          return typeOrder(a) - typeOrder(b);
+        }
         return result * dir;
       });
       
-      const hasFilters = filterStatus !== 'all' || filterUrgency !== 'all' || filterCategory !== 'all' || filterLate || searchQuery.trim() || filterDate || filterPeriod;
+      const hasFilters = filterStatus !== 'all' || filterUrgency !== 'all' || filterCategory !== 'all' || filterType !== 'all' || filterLate || searchQuery.trim() || filterDate || filterPeriod;
       
       // Date filter banner
       const dateBanner = filterDate ? `
@@ -4083,8 +4311,8 @@
           ${periodBanner}
           <div class="empty-state">
             <div class="empty-icon">${hasFilters ? icons.search : icons.clipboard}</div>
-            <h3>${hasFilters ? 'Aucune tâche trouvée' : 'Aucune tâche pour le moment'}</h3>
-            <p>${hasFilters ? 'Essayez de modifier vos filtres pour voir plus de résultats.' : 'Cliquez sur le bouton ci-dessus pour créer votre première tâche.'}</p>
+            <h3>${hasFilters ? 'Aucune action trouvée' : 'Aucune action pour le moment'}</h3>
+            <p>${hasFilters ? 'Essayez de modifier vos filtres pour voir plus de résultats.' : 'Cliquez sur le bouton ci-dessus pour créer votre première action.'}</p>
           </div>
         `;
         return;
@@ -4094,7 +4322,7 @@
         ${dateBanner}
         ${periodBanner}
         <div class="task-list">
-          ${filtered.map(task => renderTaskCard(task)).join('')}
+          ${filtered.map(task => renderFicheTaskCard(task)).join('')}
         </div>
       `;
     }
@@ -4103,7 +4331,7 @@
       const isDone = task.status === 'done';
       const deadlineInfo = !isDone ? getDeadlineInfo(task.deadline) : null;
       const isOverdue = !isDone && deadlineInfo && deadlineInfo.class === 'overdue';
-      // Pour une tâche récurrente, un commentaire ajouté sur une occurrence donnée
+      // Pour une action récurrente, un commentaire ajouté sur une occurrence donnée
       // (task.deadline = date de l'occurrence affichée) ne doit être visible que sur
       // cette occurrence-là. Les anciens commentaires sans date d'occurrence (créés
       // avant ce correctif) restent affichés partout pour ne pas perdre de données.
@@ -4115,7 +4343,7 @@
       
       return `
         <div class="task-card ${isDone ? 'done' : ''} ${isOverdue ? 'overdue' : ''}" id="task-${task.id}">
-          <div class="task-stripe ${isDone ? 'done' : (isOverdue ? 'overdue' : task.urgency)}"></div>
+          <div class="task-stripe ${isDone ? (task.type === 'rdv' ? 'rdv' : 'done') : (isOverdue ? 'overdue' : (task.type === 'rdv' ? 'rdv' : task.urgency))}"></div>
           <div class="task-content">
             <div class="task-header">
               <div style="flex:1;min-width:0;">
@@ -4130,7 +4358,9 @@
                   </div>
                 ` : ''}
                 <div class="task-meta" style="margin-top:0.25rem;">
-                  ${!isDone ? `<span class="urgency-badge ${task.urgency}">${task.urgency === 'urgent' ? icons.zap : icons.clock} ${task.urgency === 'urgent' ? 'Urgent' : 'Normal'}</span>` : ''}
+                  ${!isDone ? (task.type === 'rdv'
+                    ? `<span class="rdv-badge">${icons.calendarCheck} Rendez-vous</span>`
+                    : `<span class="urgency-badge ${task.urgency}">${task.urgency === 'urgent' ? icons.zap : icons.clock} ${task.urgency === 'urgent' ? 'Urgent' : 'Normal'}</span>`) : ''}
                   <span class="category-badge ${task.category || 'pro'}">${(task.category || 'pro') === 'pro' ? icons.briefcase + ' Pro' : icons.home + ' Perso'}</span>
                   ${(task.tags || []).map(tag => `<span class="tag-badge" style="cursor:pointer;" onclick="searchByTag('${tag.replace(/'/g, "\\'")}')" title="Filtrer par ce tag">${icons.tag} ${tag}</span>`).join('')}
                 </div>
@@ -4157,7 +4387,7 @@
             <div class="task-actions">
               ${isDone ? `
                 <button class="task-action-btn reopen" onclick="reopenTask('${task.id}')">
-                  ${icons.rotateCcw} Réouvrir la tâche
+                  ${icons.rotateCcw} Réouvrir l'action
                 </button>
               ` : `
                 <button class="task-action-btn edit" onclick="handleEdit('${task.id}', '${task.deadline}', ${!!task.recurrence})">
@@ -4302,7 +4532,8 @@
         task.contact = contact;
         task.deadline = deadline;
         task.description = description || undefined;
-        task.urgency = editUrgency;
+        task.type = editActionType === 'rdv' ? 'rdv' : 'task';
+        task.urgency = editActionType === 'rdv' ? 'normal' : editUrgency;
         task.category = editCategory;
         task.tags = [...editTags];
         if (recurrence) {
@@ -4328,6 +4559,22 @@
     }
 
     let editCategory = 'pro';
+    let editActionType = 'task';
+    function setEditActionType(type) {
+      editActionType = type;
+      // Le tag « RDV » est géré automatiquement avec le type Rendez-vous
+      const idx = editTags.indexOf('RDV');
+      if (type === 'rdv' && idx === -1) editTags.push('RDV');
+      if (type === 'task' && idx !== -1) editTags.splice(idx, 1);
+      document.querySelectorAll('.modal .type-btn').forEach(btn => {
+        btn.classList.remove('active', 'task', 'rdv');
+        if (btn.dataset.type === type) btn.classList.add('active', type);
+      });
+      // Un rendez-vous n'a pas de niveau d'urgence
+      const urgField = document.getElementById('editUrgencyField');
+      if (urgField) urgField.classList.toggle('hidden', type === 'rdv');
+      renderTagsChips('editTagsChips', editTags, 'removeEditTag');
+    }
     function setEditCategory(cat) {
       editCategory = cat;
       document.querySelectorAll('.modal .category-btn').forEach(btn => {
@@ -4367,11 +4614,12 @@
       isFormExpanded = true;
       isLogFormExpanded = false;
       currentTags = [];
+      currentActionType = 'task';
       render();
     }
 
     // Clic sur le « + » d un jour (vues Semaine du calendrier) : ouvre le
-    // formulaire « Nouvelle tâche » en fenêtre popup, date du jour pré-remplie
+    // formulaire « Nouvelle action » en fenêtre popup, date du jour pré-remplie
     function openQuickAddModal(dateStr) {
       quickAddDate = dateStr || getTodayStr();
       quickCategory = settings.defaultCategory;
@@ -4479,11 +4727,11 @@
       quickTags = [];
       closeModal();
       render();
-      showToast('✓ Tâche ajoutée');
+      showToast('✓ Action ajoutée');
     }
 
-    // ---- Glisser-déposer : déplacer une tâche sur un autre jour ----
-    // (tâches non récurrentes uniquement ; modification de l'échéance)
+    // ---- Glisser-déposer : déplacer une action sur un autre jour ----
+    // (actions non récurrentes uniquement ; modification de l'échéance)
     function calDragTask(event, id) {
       event.dataTransfer.setData('text/plain', id);
       event.dataTransfer.effectAllowed = 'move';
@@ -4510,7 +4758,7 @@
       task.deadline = dateStr;
       saveTasks();
       render();
-      showToast('✓ Tâche déplacée au ' + formatDate(dateStr + 'T00:00:00'));
+      showToast('✓ Action déplacée au ' + formatDate(dateStr + 'T00:00:00'));
     }
 
     function expandLogForm() {
@@ -4550,6 +4798,23 @@
     }
 
     let currentCategory = settings.defaultCategory;
+    // Type d'action du formulaire de création : 'task' (Tâche) ou 'rdv' (Rendez-vous)
+    let currentActionType = 'task';
+    function setActionType(type) {
+      currentActionType = type;
+      // Le tag « RDV » est géré automatiquement avec le type Rendez-vous
+      const idx = currentTags.indexOf('RDV');
+      if (type === 'rdv' && idx === -1) currentTags.push('RDV');
+      if (type === 'task' && idx !== -1) currentTags.splice(idx, 1);
+      document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.classList.remove('active', 'task', 'rdv');
+        if (btn.dataset.type === type) btn.classList.add('active', type);
+      });
+      // Un rendez-vous n'a pas de niveau d'urgence
+      const urgField = document.getElementById('urgencyField');
+      if (urgField) urgField.classList.toggle('hidden', type === 'rdv');
+      renderTagsChips('tagsChips', currentTags, 'removeCreateTag');
+    }
     function setCategory(cat) {
       currentCategory = cat;
       document.querySelectorAll('.task-form .category-btn').forEach(btn => {
@@ -4628,7 +4893,8 @@
         contact,
         deadline,
         description: description || undefined,
-        urgency: currentUrgency,
+        type: currentActionType === 'rdv' ? 'rdv' : 'task',
+        urgency: currentActionType === 'rdv' ? 'normal' : currentUrgency,
         category: currentCategory,
         status: 'todo',
         createdAt: new Date().toISOString(),
@@ -4645,7 +4911,7 @@
       render();
     }
 
-    // Consigner tâche : la crée directement en état « Terminée »
+    // Consigner action : la crée directement en état « Terminée »
     // (pour tracer une action déjà réalisée, sans workflow)
     function logTask() {
       const title = document.getElementById('taskTitle').value.trim();
@@ -4670,7 +4936,8 @@
         contact,
         deadline,
         description: description || undefined,
-        urgency: currentUrgency,
+        type: currentActionType === 'rdv' ? 'rdv' : 'task',
+        urgency: currentActionType === 'rdv' ? 'normal' : currentUrgency,
         category: currentCategory,
         status: 'done',
         completedAt: now,
@@ -4687,7 +4954,7 @@
       isFormExpanded = false;
       isLogFormExpanded = false;
       render();
-      showToast('✓ Tâche consignée (terminée)');
+      showToast('✓ Action consignée (terminée)');
     }
 
     function deleteTask(id) {
@@ -4708,8 +4975,8 @@
         task.status = 'todo';
         task.completionComment = undefined;
         task.completedAt = undefined;
-        // Tâche récurrente entièrement terminée : on rouvre la dernière occurrence
-        // complétée, sinon la tâche reste "à faire" sans qu'aucune occurrence ne
+        // Action récurrente entièrement terminée : on rouvre la dernière occurrence
+        // complétée, sinon l'action reste "à faire" sans qu'aucune occurrence ne
         // redevienne visible (elle gonflerait le compteur "À faire" sans jamais
         // apparaître dans la liste).
         if (task.recurrence && task.completedDates && task.completedDates.length) {
@@ -4739,6 +5006,11 @@
 
     function setFilterCategory(cat) {
       filterCategory = cat;
+      render();
+    }
+
+    function setFilterType(t) {
+      filterType = t;
       render();
     }
 
@@ -4874,7 +5146,7 @@
       render();
     }
 
-    // ============ MODES (Tâches / Projet) ============
+    // ============ MODES (Actions / Projet) ============
     const NO_CONTACT_KEY = '__sans_contact__';
 
     function setTaskView(view) {
@@ -4920,7 +5192,7 @@
     }
 
     // Clic sur une carte de la grille : vue « gestion de projet » du contact
-    // (tâches en cours et terminées + création rapide pour ce contact)
+    // (actions en cours et terminées + création rapide pour ce contact)
     function openContactTasks(contactKey, focusTaskId) {
       projectContact = contactKey;
       recordRecentContact(contactKey);
@@ -4933,7 +5205,7 @@
       taskView = 'contact';
       render();
       if (focusTaskId) {
-        // Surbrillance passagère de la tâche cliquée (depuis le calendrier),
+        // Surbrillance passagère de l'action cliquée (depuis le calendrier),
         // comme sur l'Accueil depuis les listes du haut
         requestAnimationFrame(() => {
           const el = document.getElementById(`task-${focusTaskId}`);
@@ -4958,7 +5230,7 @@
       render();
     }
 
-    // ---- Renommage du contact (appliqué à toutes ses tâches) ----
+    // ---- Renommage du contact (appliqué à toutes ses actions) ----
     function startRenameContact() {
       renamingContact = true;
       render();
@@ -4986,12 +5258,12 @@
       }
       let count = 0;
       if (isNoContact) {
-        // Rattache toutes les tâches sans contact au nouveau nom
+        // Rattache toutes les actions sans contact au nouveau nom
         tasks.forEach(t => {
           if (!(t.contact || '').trim()) { t.contact = newName; count++; }
         });
       } else {
-        // Renomme toutes les tâches du contact (insensible à la casse)
+        // Renomme toutes les actions du contact (insensible à la casse)
         const norm = oldName.trim().toLowerCase();
         tasks.forEach(t => {
           if (t.contact && t.contact.trim().toLowerCase() === norm) { t.contact = newName; count++; }
@@ -5001,10 +5273,10 @@
       projectContact = newName;
       renamingContact = false;
       render();
-      showToast(`✓ Contact renommé — ${count} tâche${count > 1 ? 's' : ''} mise${count > 1 ? 's' : ''} à jour`);
+      showToast(`✓ Contact renommé — ${count} action${count > 1 ? 's' : ''} mise${count > 1 ? 's' : ''} à jour`);
     }
 
-    // Supprime le compte affiché et TOUTES ses tâches, après confirmation
+    // Supprime le compte affiché et TOUTES ses actions, après confirmation
     function deleteContactAccount() {
       const isNoContact = projectContact === NO_CONTACT_KEY;
       const contactName = isNoContact ? 'Sans contact' : projectContact;
@@ -5012,14 +5284,14 @@
       const related = tasks.filter(t => isNoContact
         ? !(t.contact || '').trim()
         : (t.contact && t.contact.trim().toLowerCase() === norm));
-      if (!confirm(`Supprimer « ${contactName} » ?\n\n${related.length} tâche${related.length > 1 ? 's' : ''} associée${related.length > 1 ? 's' : ''} ${related.length > 1 ? 'seront supprimées' : 'sera supprimée'} définitivement.`)) {
+      if (!confirm(`Supprimer « ${contactName} » ?\n\n${related.length} action${related.length > 1 ? 's' : ''} associée${related.length > 1 ? 's' : ''} ${related.length > 1 ? 'seront supprimées' : 'sera supprimée'} définitivement.`)) {
         return;
       }
       tasks = tasks.filter(t => isNoContact
         ? (t.contact || '').trim()
         : !(t.contact && t.contact.trim().toLowerCase() === norm));
       saveTasks();
-      showToast(`✓ ${contactName} supprimé (${related.length} tâche${related.length > 1 ? 's' : ''})`);
+      showToast(`✓ ${contactName} supprimé (${related.length} action${related.length > 1 ? 's' : ''})`);
       backToProjects();
     }
 
@@ -5057,7 +5329,7 @@
     }
 
     // Jours sélectionnés dans le panneau de récurrence de la fiche contact
-    // (sélecteur dédié pour ne pas interférer avec le formulaire du Mode Tâches)
+    // (sélecteur dédié pour ne pas interférer avec le formulaire du Mode Actions)
     function getCtSelectedDays() {
       const btns = document.querySelectorAll('#ctDaysGrid .day-btn.active');
       return Array.from(btns).map(b => parseInt(b.dataset.day));
@@ -5092,7 +5364,7 @@
       document.getElementById('ctTagSuggestions')?.classList.add('hidden');
     }
 
-    // Crée une tâche pour le contact de la fiche en cours
+    // Crée une action pour le contact de la fiche en cours
     function addCtTask() {
       const title = document.getElementById('ctTitle').value.trim();
       const description = document.getElementById('ctDescription').value.trim();
@@ -5141,10 +5413,10 @@
       ctUrgency = settings.defaultUrgency;
       ctCategory = settings.defaultCategory;
       render();
-      showToast('✓ Tâche ajoutée');
+      showToast('✓ Action ajoutée');
     }
 
-    // Consigne une tâche directement en « Terminée » pour ce compte
+    // Consigne une action directement en « Terminée » pour ce compte
     function logCtTask() {
       const title = document.getElementById('ctTitle').value.trim();
       const description = document.getElementById('ctDescription').value.trim();
@@ -5182,7 +5454,141 @@
       ctUrgency = settings.defaultUrgency;
       ctCategory = settings.defaultCategory;
       render();
-      showToast('✓ Tâche consignée (terminée)');
+      showToast('✓ Action consignée (terminée)');
+    }
+
+    // ---- Fiche contact : cartes d'actions compactes ----
+    // N'apparaissent que le nom, le compte, l'échéance, les tags et infos,
+    // et les boutons ; description et commentaires se déroulent au clic sur
+    // la carte. Un logo à gauche distingue Tâche et Rendez-vous.
+    let ficheExpandedTasks = new Set();
+    // Sections de la fiche repliées par l'utilisateur ('todo' / 'done')
+    let ficheCollapsedSections = new Set();
+
+    function toggleFicheSection(key) {
+      const list = document.getElementById('fiche-section-' + key);
+      const chev = document.getElementById('fiche-section-chev-' + key);
+      if (ficheCollapsedSections.has(key)) {
+        ficheCollapsedSections.delete(key);
+        if (list) list.classList.remove('hidden');
+        if (chev) chev.innerHTML = icons.chevronUp;
+      } else {
+        ficheCollapsedSections.add(key);
+        if (list) list.classList.add('hidden');
+        if (chev) chev.innerHTML = icons.chevronDown;
+      }
+    }
+
+    function toggleFicheTaskDetails(id, ev) {
+      // Les clics sur boutons, liens, champs de saisie ou dans la zone déjà
+      // déroulée ne déclenchent pas le repli de la carte
+      if (ev && ev.target && ev.target.closest('button, input, a, .fiche-task-details')) return;
+      const el = document.getElementById('fiche-details-' + id);
+      if (!el) return;
+      const chevron = document.getElementById('fiche-chevron-' + id);
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        ficheExpandedTasks.add(id);
+        if (chevron) chevron.innerHTML = icons.chevronUp;
+      } else {
+        el.classList.add('hidden');
+        ficheExpandedTasks.delete(id);
+        if (chevron) chevron.innerHTML = icons.chevronDown;
+      }
+    }
+
+    function renderFicheTaskCard(task) {
+      const isDone = task.status === 'done';
+      const deadlineInfo = !isDone ? getDeadlineInfo(task.deadline) : null;
+      const isOverdue = !isDone && deadlineInfo && deadlineInfo.class === 'overdue';
+      const isRdv = task.type === 'rdv';
+      const expanded = ficheExpandedTasks.has(task.id);
+      const allComments = task.comments || [];
+      const comments = allComments
+        .map((c, originalIndex) => ({ ...c, originalIndex }))
+        .filter(c => !task.recurrence || !c.occurrenceDate || c.occurrenceDate === task.deadline);
+      const commentCount = comments.length;
+      const contactName = (task.contact || '').trim();
+
+      return `
+        <div class="task-card fiche-card ${isDone ? 'done' : ''} ${isOverdue ? 'overdue' : ''}" id="task-${task.id}">
+          <div class="task-stripe ${isDone ? (isRdv ? 'rdv' : 'done') : (isOverdue ? 'overdue' : (isRdv ? 'rdv' : task.urgency))}"></div>
+          <div class="task-content" onclick="toggleFicheTaskDetails('${task.id}', event)" title="${expanded ? 'Replier la description et les commentaires' : 'Dérouler la description et les commentaires'}">
+            <div class="task-header">
+              <div class="fiche-type-logo ${isRdv ? 'rdv' : 'task'}" title="${isRdv ? 'Rendez-vous' : 'Action'}">${isRdv ? icons.calendarCheck : icons.listTodo}</div>
+              <div style="flex:1;min-width:0;">
+                <div class="task-title">${task.title}<span class="fiche-chevron" id="fiche-chevron-${task.id}">${expanded ? icons.chevronUp : icons.chevronDown}</span></div>
+                <div class="task-meta">
+                  ${contactName ? `<span class="task-meta-item" style="cursor:pointer;" onclick="openContactSheet('${contactName.replace(/'/g, "\\'")}')" title="Voir la fiche">${icons.building} ${contactName}</span>` : ''}
+                  ${!isDone && deadlineInfo ? `<span class="task-meta-item ${deadlineInfo.class}">${icons.calendar} ${deadlineInfo.text}</span>` : ''}
+                  ${isDone && isRdv && task.deadline ? `<span class="task-meta-item">${icons.calendar} Rendez-vous du ${formatDate(task.deadline)}</span>` : ''}
+                  ${isDone && task.completedAt ? `<span class="task-meta-item" style="color:#059669;font-weight:500;">${icons.calendarCheck} Terminée le ${formatDate(task.completedAt, true)}</span>` : ''}
+                  ${commentCount ? `<span class="task-meta-item">${icons.message} ${commentCount} commentaire${commentCount > 1 ? 's' : ''}</span>` : ''}
+                </div>
+                <div class="task-meta" style="margin-top:0.25rem;">
+                  ${!isDone ? (isRdv
+                    ? `<span class="rdv-badge">${icons.calendarCheck} Rendez-vous</span>`
+                    : `<span class="urgency-badge ${task.urgency}">${task.urgency === 'urgent' ? icons.zap : icons.clock} ${task.urgency === 'urgent' ? 'Urgent' : 'Normal'}</span>`) : ''}
+                  <span class="category-badge ${task.category || 'pro'}">${(task.category || 'pro') === 'pro' ? icons.briefcase + ' Pro' : icons.home + ' Perso'}</span>
+                  ${task.recurrence ? `<span class="recurrence-badge">${icons.repeat} ${getRecurrenceLabel(task)}${task._remainingCount ? ' · ' + task._remainingCount + ' restante' + (task._remainingCount > 1 ? 's' : '') : ''}</span>` : ''}
+                  ${(task.tags || []).map(tag => `<span class="tag-badge" style="cursor:pointer;" onclick="searchByTag('${tag.replace(/'/g, "\\'")}')" title="Filtrer par ce tag">${icons.tag} ${tag}</span>`).join('')}
+                </div>
+              </div>
+              <button class="delete-btn" onclick="handleDelete('${task.id}', '${task.deadline}', ${!!task.recurrence})" title="Supprimer">${icons.trash}</button>
+            </div>
+            <div class="task-actions">
+              ${isDone ? `
+                <button class="task-action-btn reopen" onclick="reopenTask('${task.id}')">
+                  ${icons.rotateCcw} Réouvrir l'action
+                </button>
+              ` : `
+                <button class="task-action-btn edit" onclick="handleEdit('${task.id}', '${task.deadline}', ${!!task.recurrence})">
+                  ${icons.pencil} Modifier
+                </button>
+                <button class="task-action-btn finish" onclick="openCompletionModal('${task.id}', 'terminate', '${task.deadline}')">
+                  ${icons.checkCircle} Terminer
+                </button>
+                <button class="task-action-btn followup" onclick="openCompletionModal('${task.id}', 'followup', '${task.deadline}')">
+                  ${icons.refresh} Assurer un suivi
+                </button>
+              `}
+            </div>
+            <div class="fiche-task-details ${expanded ? '' : 'hidden'}" id="fiche-details-${task.id}">
+              ${task.description ? `<div class="fiche-desc" style="${isDone ? 'text-decoration:line-through;opacity:0.6;' : ''}">${task.description}</div>` : ''}
+              ${isDone && task.completionComment ? `
+                <div class="task-comment">
+                  ${icons.message}
+                  <p>${task.completionComment}</p>
+                </div>` : ''}
+              ${commentCount > 0 ? comments.map(c => `
+                <div class="comment-item">
+                  ${icons.message}
+                  <div style="flex:1;min-width:0;">
+                    <p>${c.text}</p>
+                    <div class="comment-date">${formatDate(c.date, true)}</div>
+                  </div>
+                  <button class="comment-delete" onclick="deleteComment('${task.id}', ${c.originalIndex})" title="Supprimer">${icons.xSmall}</button>
+                </div>`).join('') : ''}
+              ${(task.history || []).length ? `
+              <div class="fiche-history">
+                <div class="fiche-history-title">${icons.history} Historique des clôtures</div>
+                ${task.history.slice().reverse().map(h => `
+                  <div class="fiche-history-item">
+                    ${icons.message}
+                    <div style="flex:1;min-width:0;">
+                      <p>${h.text}</p>
+                      ${h.date ? `<div class="comment-date">${formatDate(h.date, true)}</div>` : ''}
+                    </div>
+                  </div>`).join('')}
+              </div>` : ''}
+              <div class="add-comment-row">
+                <input type="text" id="comment-input-${task.id}" placeholder="Écrire un commentaire..." onkeydown="if(event.key==='Enter')addComment('${task.id}', '${task.deadline || ''}')">
+                <button class="add-comment-btn" onclick="addComment('${task.id}', '${task.deadline || ''}')">${icons.send}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     // ---- Fiche contact : vue gestion de projet ----
@@ -5194,7 +5600,7 @@
       const todayStr = getTodayStr();
       const today = new Date().toISOString().split('T')[0];
 
-      // Tâches du contact (occurrences récurrentes dépliées comme en Mode Tâches)
+      // Actions du contact (occurrences récurrentes dépliées comme en Mode Actions)
       const expanded = expandRecurringTasks([...tasks], null).filter(t => {
         const c = (t.contact || '').trim().toLowerCase();
         return isNoContact ? c === '' : c === norm;
@@ -5221,22 +5627,22 @@
         <div class="add-task-grid">
           <button class="add-task-square" onclick="expandCtForm()">
             <div class="icon-circle">${icons.plus}</div>
-            <span>Nouvelle tâche</span>
+            <span>Nouvelle action</span>
           </button>
           <button class="add-task-square log" onclick="expandCtLogForm()">
             <div class="icon-circle">${icons.check}</div>
-            <span>Consigner tâche</span>
+            <span>Consigner action</span>
           </button>
         </div>
       ` : `
         <div class="task-form">
           <div class="form-header">
             <div class="icon-circle"${ctLogMode ? '' : ' style="background:#059669;"'}>${ctLogMode ? icons.check : icons.plus}</div>
-            <h3>${ctLogMode ? 'Consigner tâche — ' + contactName : 'Nouvelle tâche — ' + contactName}</h3>
+            <h3>${ctLogMode ? 'Consigner action — ' + contactName : 'Nouvelle action — ' + contactName}</h3>
           </div>
           <div class="form-grid">
             <div class="full-width">
-              <label>Titre de la tâche <span class="required">*</span></label>
+              <label>Titre de l'action <span class="required">*</span></label>
               <input type="text" id="ctTitle" placeholder="Ex: Préparer le devis client">
             </div>
             <div id="ctDeadlineField">
@@ -5279,7 +5685,7 @@
           ${!ctLogMode ? `
           <label class="recurrence-toggle">
             <input type="checkbox" id="ctRecurring" onchange="toggleCtRecurrencePanel()">
-            ${icons.repeat} Tâche récurrente
+            ${icons.repeat} Action récurrente
           </label>
           <div class="recurrence-panel hidden" id="ctRecurrencePanel">
             <div class="form-grid">
@@ -5309,6 +5715,18 @@
         </div>
       `;
 
+      // Stats de synthèse du compte
+      const ficheTodayStr = getTodayStr();
+      const withDeadline = todo.filter(t => t.deadline);
+      const upcomingList = withDeadline.filter(t => t.deadline >= ficheTodayStr).sort((a, b) => a.deadline.localeCompare(b.deadline));
+      const overdueList = withDeadline.filter(t => t.deadline < ficheTodayStr).sort((a, b) => a.deadline.localeCompare(b.deadline));
+      const nextAction = upcomingList[0] || overdueList[0] || null;
+      const lastDoneAt = done.reduce((m, t) => (t.completedAt && (!m || t.completedAt > m)) ? t.completedAt : m, null);
+      const allFicheActions = todo.concat(done);
+      const lastCreatedAt = allFicheActions.reduce((m, t) => (t.createdAt && (!m || t.createdAt > m)) ? t.createdAt : m, null);
+      const rdvTotal = allFicheActions.filter(t => t.type === 'rdv').length;
+      const taskTotal = allFicheActions.length - rdvTotal;
+
       container.innerHTML = `
         <button class="back-btn" onclick="backToProjects()">
           ${icons.arrowLeft} Retour
@@ -5328,7 +5746,7 @@
               <div class="cp-name">${contactName}</div>
               <div class="cp-actions">
                 <button class="cp-edit-btn" onclick="startRenameContact()" title="Modifier le nom du compte">${icons.pencil}</button>
-                <button class="cp-edit-btn danger" onclick="deleteContactAccount()" title="Supprimer ce compte et toutes ses tâches">${icons.trash}</button>
+                <button class="cp-edit-btn danger" onclick="deleteContactAccount()" title="Supprimer ce compte et toutes ses actions">${icons.trash}</button>
               </div>
             </div>
           `}
@@ -5338,15 +5756,47 @@
             ${overdueCount > 0 ? `<span class="cp-stat danger">${overdueCount} en retard</span>` : ''}
             <span class="cp-stat ok">${done.length} terminée${done.length > 1 ? 's' : ''}</span>
           </div>
+          <div class="fiche-info-grid">
+            <div class="fiche-info-item">
+              <span class="fiche-info-label">${icons.calendar} Prochaine action</span>
+              <span class="fiche-info-value">${nextAction ? formatDate(nextAction.deadline) : '—'}</span>
+            </div>
+            <div class="fiche-info-item">
+              <span class="fiche-info-label">${icons.calendarCheck} Dernière action terminée</span>
+              <span class="fiche-info-value">${lastDoneAt ? formatDate(lastDoneAt) : '—'}</span>
+            </div>
+            <div class="fiche-info-item">
+              <span class="fiche-info-label">${icons.plus} Dernière action créée</span>
+              <span class="fiche-info-value">${lastCreatedAt ? formatDate(lastCreatedAt) : '—'}</span>
+            </div>
+            <div class="fiche-info-item">
+              <span class="fiche-info-label">${icons.calendarCheck} Rendez-vous</span>
+              <span class="fiche-info-value">${rdvTotal}</span>
+            </div>
+            <div class="fiche-info-item">
+              <span class="fiche-info-label">${icons.listTodo} Tâches</span>
+              <span class="fiche-info-value">${taskTotal}</span>
+            </div>
+          </div>
         </div>
 
         <div id="ctAddContainer">${addArea}</div>
 
-        <div class="cp-section-title">${icons.clock} Tâches en cours (${todo.length})</div>
-        ${todo.length > 0 ? `<div class="task-list">${todo.map(renderTaskCard).join('')}</div>` : `<div class="sheet-empty">Aucune tâche en cours pour ce contact.</div>`}
+        <div class="cp-section-title cp-section-toggle" onclick="toggleFicheSection('todo')" title="Replier / déplier cette section">
+          ${icons.clock} Actions en cours (${todo.length})
+          <span class="cp-section-chev" id="fiche-section-chev-todo">${ficheCollapsedSections.has('todo') ? icons.chevronDown : icons.chevronUp}</span>
+        </div>
+        <div id="fiche-section-todo" class="${ficheCollapsedSections.has('todo') ? 'hidden' : ''}">
+          ${todo.length > 0 ? `<div class="task-list">${todo.map(renderFicheTaskCard).join('')}</div>` : `<div class="sheet-empty">Aucune action en cours pour ce contact.</div>`}
+        </div>
 
-        <div class="cp-section-title">${icons.checkCircle} Tâches terminées (${done.length})</div>
-        ${done.length > 0 ? `<div class="task-list">${done.map(renderTaskCard).join('')}</div>` : `<div class="sheet-empty">Aucune tâche terminée pour ce contact.</div>`}
+        <div class="cp-section-title cp-section-toggle" onclick="toggleFicheSection('done')" title="Replier / déplier cette section">
+          ${icons.checkCircle} Actions terminées (${done.length})
+          <span class="cp-section-chev" id="fiche-section-chev-done">${ficheCollapsedSections.has('done') ? icons.chevronDown : icons.chevronUp}</span>
+        </div>
+        <div id="fiche-section-done" class="${ficheCollapsedSections.has('done') ? 'hidden' : ''}">
+          ${done.length > 0 ? `<div class="task-list">${done.map(renderFicheTaskCard).join('')}</div>` : `<div class="sheet-empty">Aucune action terminée pour ce contact.</div>`}
+        </div>
       `;
 
       if (ctFormExpanded) {
@@ -5363,8 +5813,8 @@
       }
     }
 
-    // ---- Mode Calendrier : emploi du temps des tâches ----
-    // (tâches à faire uniquement, occurrences récurrentes restantes incluses)
+    // ---- Mode Calendrier : emploi du temps des actions ----
+    // (actions à faire uniquement, occurrences récurrentes restantes incluses)
     function getCalendarTaskMap() {
       const map = {};
       const push = (date, item) => {
@@ -5373,20 +5823,20 @@
         map[date].push(Object.assign({ date: date }, item));
       };
       tasks.forEach(t => {
-        // Le calendrier n'affiche que les tâches à faire :
-        // tâches terminées et occurrences récurrentes complétées exclues
+        // Le calendrier n'affiche que les actions à faire :
+        // actions terminées et occurrences récurrentes complétées exclues
         if (t.recurrence && t.recurrence.startDate && t.recurrence.endDate) {
           const excluded = (t.completedDates || []).concat(t.deletedDates || []);
           getRecurrenceOccurrences(t).forEach(date => {
             if (excluded.includes(date)) return;
-            push(date, { title: t.title, contact: t.contact, status: 'todo', urgency: t.urgency, id: t.id, recurring: true });
+            push(date, { title: t.title, contact: t.contact, status: 'todo', urgency: t.urgency, type: t.type, id: t.id, recurring: true });
           });
         } else if (t.deadline && t.status !== 'done') {
-          push(t.deadline, { title: t.title, contact: t.contact, status: 'todo', urgency: t.urgency, id: t.id });
+          push(t.deadline, { title: t.title, contact: t.contact, status: 'todo', urgency: t.urgency, type: t.type, id: t.id });
         }
       });
-      // Dans chaque jour : urgentes d'abord, puis à faire, puis terminées
-      const order = t => t.status === 'done' ? 2 : (t.urgency === 'urgent' ? 0 : 1);
+      // Dans chaque jour : RDV d'abord, puis actions urgentes, puis les autres
+      const order = t => t.type === 'rdv' ? 0 : (t.status === 'done' ? 3 : (t.urgency === 'urgent' ? 1 : 2));
       Object.keys(map).forEach(d => map[d].sort((a, b) => order(a) - order(b) || a.title.localeCompare(b.title, 'fr')));
       return map;
     }
@@ -5402,20 +5852,20 @@
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
-    // Élément de tâche (même présentation que les listes de l Accueil) ;
+    // Élément d'action (même présentation que les listes de l Accueil) ;
     // un clic ouvre la fiche du compte concerné
     function renderCalTask(t) {
-      // Tâche en retard (date passée, non terminée) : point rouge
+      // Action en retard (date passée, non terminée) : point rouge
       const todayStr = getTodayStr();
       const isOverdue = t.status !== 'done' && t.date && t.date < todayStr;
-      const dot = t.status === 'done' ? '#94a3b8' : (isOverdue ? '#dc2626' : (t.urgency === 'urgent' ? '#f59e0b' : '#10b981'));
-      const when = t.status === 'done' ? '✓' : (isOverdue ? 'Retard' : (t.urgency === 'urgent' ? 'Urgent' : ''));
-      const clickAttr = ` onclick="event.stopPropagation();openTaskDetail('${t.id}', '${t.date}')" title="Consulter la tâche"`;
+      const dot = t.status === 'done' ? '#94a3b8' : (isOverdue ? '#dc2626' : (t.type === 'rdv' ? '#2563eb' : (t.urgency === 'urgent' ? '#f59e0b' : '#10b981')));
+      const when = t.status === 'done' ? '✓' : (isOverdue ? 'Retard' : (t.type === 'rdv' ? 'RDV' : (t.urgency === 'urgent' ? 'Urgent' : '')));
+      const clickAttr = ` onclick="event.stopPropagation();openTaskDetail('${t.id}', '${t.date}')" title="Consulter l'action"`;
       const dragAttr = !t.recurring ? ` draggable="true" ondragstart="calDragTask(event, '${t.id}')"` : '';
       return `<button class="mini-task-item cal-task"${clickAttr}${dragAttr}>
         <span class="dot" style="background:${dot}"></span>
         <span class="txt">${t.title}</span>
-        ${t.recurring ? `<span class="cal-rec-logo" title="Tâche récurrente">${icons.repeat}</span>` : ''}
+        ${t.recurring ? `<span class="cal-rec-logo" title="Action récurrente">${icons.repeat}</span>` : ''}
         ${when ? `<span class="when">${when}</span>` : ''}
       </button>`;
     }
@@ -5474,8 +5924,8 @@
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">${icons.clipboard}</div>
-            <h3>Aucune tâche pour le moment</h3>
-            <p>Cliquez sur le bouton ci-dessus pour créer votre première tâche.</p>
+            <h3>Aucune action pour le moment</h3>
+            <p>Cliquez sur le bouton ci-dessus pour créer votre première action.</p>
           </div>
         `;
         return;
@@ -5504,7 +5954,7 @@
 
     // Cellule d'un jour de la vue Mois ; les jours des mois adjacents
     // (début/fin de grille) sont affichés en atténué mais restent cliquables
-    // (tâches visibles, clic, glisser-déposer)
+    // (actions visibles, clic, glisser-déposer)
     function calMonthCell(d, map, todayStr, muted) {
       const dateStr = isoDate(d);
       const items = map[dateStr] || [];
@@ -5557,9 +6007,9 @@
           <div class="cal-week-col" ondragover="calAllowDrop(event, this)" ondragleave="calDragLeave(event, this)" ondrop="calDropTask(event, '${dateStr}')">
             <div class="cal-week-head ${dateStr === todayStr ? 'today' : ''}">
               <span class="cal-week-day-label">${d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
-              <button class="cal-add-day-btn" onclick="openQuickAddModal('${dateStr}')" title="Nouvelle tâche le ${dateStr}">+</button>
+              <button class="cal-add-day-btn" onclick="openQuickAddModal('${dateStr}')" title="Nouvelle action le ${dateStr}">+</button>
             </div>
-            <div class="cal-tasks">${items.length ? items.map(renderCalTask).join('') : '<div class="cal-empty-day">Aucune tâche</div>'}</div>
+            <div class="cal-tasks">${items.length ? items.map(renderCalTask).join('') : '<div class="cal-empty-day">Aucune action</div>'}</div>
           </div>`;
       }
       return `<div class="cal-scroll"><div class="cal-week-grid" style="grid-template-columns:repeat(${days},1fr);min-width:${days * 130}px;">${cols}</div></div>`;
@@ -5588,7 +6038,7 @@
           else if (hasUrgent) cls += ' has-urgent';
           else if (hasTodo) cls += ' has-normal';
           else if (items.length) cls += ' has-done';
-          cells += `<div class="${cls}" onclick="calJumpToDate('${dateStr}')" title="${items.length} tâche${items.length > 1 ? 's' : ''}" style="cursor:pointer;">${day}</div>`;
+          cells += `<div class="${cls}" onclick="calJumpToDate('${dateStr}')" title="${items.length} action${items.length > 1 ? 's' : ''}" style="cursor:pointer;">${day}</div>`;
         }
         months += `
           <div class="cal-year-month">
@@ -5607,8 +6057,8 @@
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">${icons.clipboard}</div>
-            <h3>Aucune tâche pour le moment</h3>
-            <p>Cliquez sur le bouton ci-dessus pour créer votre première tâche.</p>
+            <h3>Aucune action pour le moment</h3>
+            <p>Cliquez sur le bouton ci-dessus pour créer votre première action.</p>
           </div>
         `;
         return;
@@ -5616,22 +6066,22 @@
 
       const todayStr = getTodayStr();
 
-      // Compte les tâches à faire par contact (occurrences récurrentes incluses,
-      // comme en Mode Tâches, pour rester cohérent avec les compteurs de filtres)
+      // Compte les actions à faire par contact (occurrences récurrentes incluses,
+      // comme en Mode Actions, pour rester cohérent avec les compteurs de filtres)
       const expanded = expandRecurringTasks([...tasks], null);
       const map = new Map();
       const ensure = (key, displayName, isNoContact) => {
         if (!map.has(key)) map.set(key, { key, name: displayName, noContact: !!isNoContact, todo: 0, overdue: 0, urgent: 0, nextDeadline: null, nextTaskTitle: '', nextTaskUrgency: 'normal' });
         return map.get(key);
       };
-      // Tous les contacts connus, même sans tâche en cours
+      // Tous les contacts connus, même sans action en cours
       tasks.forEach(t => {
         const k = (t.contact || '').trim();
         if (k) ensure(k, k, false);
       });
-      // Tâches sans contact (données importées) regroupées sous une carte dédiée
+      // Actions sans contact (données importées) regroupées sous une carte dédiée
       if (tasks.some(t => !(t.contact || '').trim())) ensure(NO_CONTACT_KEY, 'Sans contact', true);
-      // Comptage des tâches à faire
+      // Comptage des actions à faire
       expanded.forEach(t => {
         if (t.status !== 'todo') return;
         const k = (t.contact || '').trim() || NO_CONTACT_KEY;
@@ -5655,8 +6105,8 @@
         // Tri alphabétique : tous les comptes, actifs et inactifs mélangés
         list = [...cards].sort((a, b) => a.name.localeCompare(b.name, 'fr'));
       } else {
-        // Tri par échéance : la tâche à faire la moins lointaine de chaque compte
-        // (retards en tête), comptes actifs d'abord, puis sans tâche en cours
+        // Tri par échéance : l'action à faire la moins lointaine de chaque compte
+        // (retards en tête), comptes actifs d'abord, puis sans action en cours
         const active = cards.filter(c => c.todo > 0).sort((a, b) => {
           const da = a.nextDeadline || '9999-12-31';
           const db = b.nextDeadline || '9999-12-31';
@@ -5689,11 +6139,11 @@
           ${list.map(c => {
             const dl = c.nextDeadline ? getDeadlineInfo(c.nextDeadline) : null;
             return `
-            <button class="project-card ${c.todo > 0 ? '' : 'inactive'}" onclick="openContactTasks('${c.key.replace(/'/g, "\\'")}')" title="Voir les tâches de ${c.name.replace(/"/g, '&quot;')}">
+            <button class="project-card ${c.todo > 0 ? '' : 'inactive'}" onclick="openContactTasks('${c.key.replace(/'/g, "\\'")}')" title="Voir les actions de ${c.name.replace(/"/g, '&quot;')}">
               <div class="project-card-name">${c.noContact ? icons.tag : icons.building}<span class="project-card-name-txt">${c.name}</span><span class="project-card-go">›</span></div>
               ${c.todo > 0 && c.nextTaskTitle ? `
                 <div class="project-card-next">
-                  <div class="project-card-next-label">Prochaine tâche</div>
+                  <div class="project-card-next-label">Prochaine action</div>
                   <div class="project-card-next-title">${c.nextTaskTitle}</div>
                   <div class="project-card-next-date ${dl ? dl.class : ''}">${icons.calendar} ${dl ? dl.text : ''}${c.nextTaskUrgency === 'urgent' ? ' · urgent' : ''}</div>
                 </div>` : ''}
@@ -5702,7 +6152,7 @@
                   <span class="project-stat">${c.todo} à faire</span>
                   ${c.urgent > 0 ? `<span class="project-stat urgent">${c.urgent} urgent${c.urgent > 1 ? 'es' : ''}</span>` : ''}
                   ${c.overdue > 0 ? `<span class="project-stat overdue">${c.overdue} en retard</span>` : ''}
-                ` : `<span class="project-stat ok">Aucune tâche en cours</span>`}
+                ` : `<span class="project-stat ok">Aucune action en cours</span>`}
               </div>
             </button>
           `;}).join('')}
@@ -5714,9 +6164,12 @@
     function openCompletionModal(id, mode, displayDeadline) {
       const srcTask = tasks.find(t => t.id === id);
       completingTask = { ...srcTask, _displayDeadline: displayDeadline };
-      // Par défaut, le suivi reprend les tags de la tâche d'origine
+      // Par défaut, le suivi reprend les tags de l'action d'origine
       // (modifiables librement : suppression ou ajout dans le formulaire)
-      if (mode === 'followup') followUpTags = [...((srcTask && srcTask.tags) || [])];
+      if (mode === 'followup') {
+        followUpTags = [...((srcTask && srcTask.tags) || [])];
+        followUpType = (srcTask && srcTask.type === 'rdv') ? 'rdv' : 'task';
+      }
       modalMode = mode;
       renderModal();
       document.getElementById('modalOverlay').classList.remove('hidden');
@@ -5742,10 +6195,10 @@
       document.getElementById('modalOverlay').classList.remove('hidden');
     }
 
-    function setHomeWidget(type, data) {
+    function setHomeWidget(type, data, filter) {
       if (widgetPickSlot === null) return;
       if (!Array.isArray(settings.homeWidgets)) settings.homeWidgets = [];
-      settings.homeWidgets[widgetPickSlot] = { type: type, data: data };
+      settings.homeWidgets[widgetPickSlot] = { type: type, data: data, filter: filter === 'rdv' ? 'rdv' : 'task' };
       saveSettings();
       closeModal();
       render();
@@ -5763,9 +6216,9 @@
       const modal = document.getElementById('modal');
       const current = (widgetPickSlot !== null) ? (getHomeWidgets()[widgetPickSlot] || null) : null;
       const optionBtn = (type, o) => {
-        const isCurrent = current && current.type === type && current.data === o.id;
+        const isCurrent = current && current.type === type && current.data === o.id && current.filter === o.filter;
         return `
-          <button class="widget-option ${isCurrent ? 'current' : ''}" onclick="setHomeWidget('${type}', '${o.id}')">
+          <button class="widget-option ${isCurrent ? 'current' : ''}" onclick="setHomeWidget('${type}', '${o.id}', '${o.filter}')">
             <span class="widget-option-icon">${icons[o.icon] || icons.layoutList}</span>
             <span class="widget-option-label">${o.label}</span>
             ${isCurrent ? `<span class="widget-option-check">${icons.check}</span>` : ''}
@@ -5800,7 +6253,7 @@
       `;
     }
 
-    // Consultation d une tâche du calendrier en popup ; le nom de
+    // Consultation d une action du calendrier en popup ; le nom de
     // l entreprise y est cliquable et ouvre la fiche du compte
     function openTaskDetail(id, dateStr) {
       const task = tasks.find(t => t.id === id);
@@ -5814,7 +6267,7 @@
       document.getElementById('modalOverlay').classList.remove('hidden');
     }
 
-    // Rafraîchit la pop-up de tâche (calendrier) avec les données à jour
+    // Rafraîchit la pop-up d'action (calendrier) avec les données à jour
     function refreshTaskDetail(id, dateStr) {
       const task = tasks.find(t => t.id === id);
       if (!task) { closeModal(); return; }
@@ -5823,7 +6276,7 @@
       renderModal();
     }
 
-    // Ajout d'un commentaire depuis la pop-up de tâche (calendrier) :
+    // Ajout d'un commentaire depuis la pop-up d'action (calendrier) :
     // même logique que addComment, puis la pop-up est rafraîchie
     function addDetailComment(id, occurrenceDate) {
       if (occurrenceDate === 'undefined' || occurrenceDate === 'null') occurrenceDate = '';
@@ -5843,7 +6296,7 @@
       setTimeout(() => document.getElementById('detailCommentInput')?.focus(), 50);
     }
 
-    // Réouverture d'une tâche depuis la pop-up (calendrier) ; pour une tâche
+    // Réouverture d'une action depuis la pop-up (calendrier) ; pour une action
     // récurrente, c'est l'occurrence consultée qui est rouverte spécifiquement
     function reopenTaskOccurrence(id, dateStr) {
       const task = tasks.find(t => t.id === id);
@@ -5935,11 +6388,11 @@
               </div>
             </div>
 
-            <div class="sheet-section-title">${icons.clock} Tâches en cours</div>
-            ${sheet.todo.length > 0 ? sheet.todo.map(t => renderSheetTask(t, false)).join('') : `<div class="sheet-empty">Aucune tâche en cours pour ce contact.</div>`}
+            <div class="sheet-section-title">${icons.clock} Actions en cours</div>
+            ${sheet.todo.length > 0 ? sheet.todo.map(t => renderSheetTask(t, false)).join('') : `<div class="sheet-empty">Aucune action en cours pour ce contact.</div>`}
 
-            <div class="sheet-section-title">${icons.checkCircle} Tâches terminées</div>
-            ${sheet.done.length > 0 ? sheet.done.map(t => renderSheetTask(t, true)).join('') : `<div class="sheet-empty">Aucune tâche terminée pour ce contact.</div>`}
+            <div class="sheet-section-title">${icons.checkCircle} Actions terminées</div>
+            ${sheet.done.length > 0 ? sheet.done.map(t => renderSheetTask(t, true)).join('') : `<div class="sheet-empty">Aucune action terminée pour ce contact.</div>`}
 
             <div class="modal-actions">
               <button class="btn btn-secondary" style="width:100%;" onclick="closeModal()">Fermer</button>
@@ -6041,7 +6494,7 @@
             
             ${!isConnected ? `
               <p style="font-size:0.8rem;color:#64748b;margin-bottom:0.75rem;">
-                Suivez ces étapes pour synchroniser vos tâches via Google Sheets :
+                Suivez ces étapes pour synchroniser vos actions via Google Sheets :
               </p>
               <ol class="cloud-steps">
                 <li>Créez un nouveau <strong>Google Sheet</strong> (sheets.google.com)</li>
@@ -6159,7 +6612,7 @@
             </div>` : `
             <div class="task-actions" style="margin-top:1rem;">
               <button class="task-action-btn reopen" onclick="reopenTaskOccurrence('${t.id}', '${t._date}')">
-                ${icons.rotateCcw} Réouvrir la tâche
+                ${icons.rotateCcw} Réouvrir l'action
               </button>
             </div>`}
             <div class="modal-actions">
@@ -6175,9 +6628,9 @@
         modal.innerHTML = `
           <div class="modal-header">
             <div class="modal-header-left">
-              <div class="icon-circle" style="background:#4f46e5;color:white;">${icons.plus}</div>
+              <div class="icon-circle" style="background:#5B72F5;color:white;">${icons.plus}</div>
               <div>
-                <div class="modal-title">Nouvelle tâche</div>
+                <div class="modal-title">Nouvelle action</div>
                 <div class="modal-subtitle">${dateLabel}</div>
               </div>
             </div>
@@ -6223,7 +6676,7 @@
 
             <label class="recurrence-toggle" style="margin-top:0.75rem;">
               <input type="checkbox" id="quickRecurring" onchange="toggleQuickRecurrencePanel()">
-              ${icons.repeat} Tâche récurrente
+              ${icons.repeat} Action récurrente
             </label>
             <div class="recurrence-panel hidden" id="quickRecurrencePanel">
               <div class="form-row">
@@ -6285,20 +6738,27 @@
       if (modalMode === 'edit') {
         editUrgency = task.urgency;
         editCategory = task.category || 'pro';
+        editActionType = task.type === 'rdv' ? 'rdv' : 'task';
         const today = new Date().toISOString().split('T')[0];
         modal.innerHTML = `
           <div class="modal-header">
             <div class="modal-header-left">
-              <div class="modal-icon" style="background:#f1f5f9;color:#475569;">${icons.pencil}</div>
+              <div class="modal-icon" style="background:linear-gradient(135deg,#3B8DF7,#7B5CF3);color:white;">${icons.pencil}</div>
               <div>
-                <div class="modal-title">Modifier la tâche</div>
+                <div class="modal-title">Modifier l'action</div>
                 <div class="modal-subtitle">${task.title}</div>
               </div>
             </div>
             <button class="modal-close" onclick="closeModal()">${icons.x}</button>
           </div>
           <div class="modal-body edit-form">
-            <label>Titre <span class="required">*</span></label>
+            <label>Type d'action</label>
+            <div class="type-buttons">
+              <button type="button" class="type-btn ${editActionType === 'task' ? 'active task' : ''}" data-type="task" onclick="setEditActionType('task')">${icons.listTodo} Tâche</button>
+              <button type="button" class="type-btn ${editActionType === 'rdv' ? 'active rdv' : ''}" data-type="rdv" onclick="setEditActionType('rdv')">${icons.calendarCheck} Rendez-vous</button>
+            </div>
+
+            <label style="margin-top:0.75rem;">Titre <span class="required">*</span></label>
             <input type="text" id="editTitle" value="${task.title.replace(/"/g, '&quot;')}" required>
             
             <label>Entreprise / Contact <span class="required">*</span></label>
@@ -6323,15 +6783,17 @@
               <button type="button" class="category-btn ${(task.category || 'pro') === 'perso' ? 'active perso' : ''}" data-cat="perso" onclick="setEditCategory('perso')">${icons.home} Perso</button>
             </div>
 
-            <label>Urgence</label>
-            <div class="urgency-buttons" style="margin-top:0;">
-              <button type="button" class="urgency-btn ${task.urgency === 'normal' ? 'active normal' : ''}" data-urgency="normal" onclick="setEditUrgency('normal')">${icons.clock} Normal</button>
-              <button type="button" class="urgency-btn ${task.urgency === 'urgent' ? 'active urgent' : ''}" data-urgency="urgent" onclick="setEditUrgency('urgent')">${icons.zap} Urgent</button>
+            <div id="editUrgencyField" class="${editActionType === 'rdv' ? 'hidden' : ''}">
+              <label>Urgence</label>
+              <div class="urgency-buttons" style="margin-top:0;">
+                <button type="button" class="urgency-btn ${task.urgency === 'normal' ? 'active normal' : ''}" data-urgency="normal" onclick="setEditUrgency('normal')">${icons.clock} Normal</button>
+                <button type="button" class="urgency-btn ${task.urgency === 'urgent' ? 'active urgent' : ''}" data-urgency="urgent" onclick="setEditUrgency('urgent')">${icons.zap} Urgent</button>
+              </div>
             </div>
 
             <label class="recurrence-toggle" style="margin-top:0.75rem;">
               <input type="checkbox" id="editRecurring" ${task.recurrence ? 'checked' : ''} onchange="toggleEditRecurrencePanel()">
-              ${icons.repeat} Tâche récurrente
+              ${icons.repeat} Action récurrente
             </label>
             <div class="recurrence-panel ${task.recurrence ? '' : 'hidden'}" id="editRecurrencePanel">
               <div class="form-row">
@@ -6372,7 +6834,7 @@
             <div class="modal-header-left">
               <div class="modal-icon green">${icons.checkCircle}</div>
               <div>
-                <div class="modal-title">Terminer la tâche</div>
+                <div class="modal-title">Terminer l'action</div>
                 <div class="modal-subtitle">${task.title}</div>
               </div>
             </div>
@@ -6404,11 +6866,17 @@
           </div>
           <div class="modal-body">
             <label>${icons.message} Commentaire de clôture</label>
-            <textarea id="completionComment" placeholder="Résultat, notes sur la tâche actuelle..." style="min-height:80px;"></textarea>
+            <textarea id="completionComment" placeholder="Résultat, notes sur l'action actuelle..." style="min-height:80px;"></textarea>
             
-            <div class="divider"><span>Nouvelle tâche de suivi</span></div>
+            <div class="divider"><span>Nouvelle action de suivi</span></div>
             
-            <label>Titre <span class="required">*</span></label>
+            <label>Type d'action</label>
+            <div class="type-buttons">
+              <button type="button" class="type-btn ${followUpType === 'task' ? 'active task' : ''}" data-type="task" onclick="setFollowUpType('task')">${icons.listTodo} Tâche</button>
+              <button type="button" class="type-btn ${followUpType === 'rdv' ? 'active rdv' : ''}" data-type="rdv" onclick="setFollowUpType('rdv')">${icons.calendarCheck} Rendez-vous</button>
+            </div>
+
+            <label style="margin-top:0.75rem;">Titre <span class="required">*</span></label>
             <input type="text" id="followUpTitle" placeholder="Ex: Relancer le client...">
 
             <label style="margin-top:0.75rem;">Description</label>
@@ -6426,7 +6894,7 @@
                 <label>${icons.calendar} Date limite <span class="required">*</span></label>
                 <input type="date" id="followUpDeadline" min="${today}" required>
               </div>
-              <div>
+              <div id="followUpUrgencyField" class="${followUpType === 'rdv' ? 'hidden' : ''}">
                 <label>Urgence</label>
                 <div class="urgency-buttons" style="margin-top:0;">
                   <button type="button" class="urgency-btn active normal" data-urgency="normal" onclick="setFollowUpUrgency('normal')">${icons.clock}</button>
@@ -6435,7 +6903,7 @@
               </div>
             </div>
             
-            ${task.contact ? `<div class="modal-note" style="margin-top:0.75rem;">Le contact <strong>« ${task.contact} »</strong> sera repris dans la nouvelle tâche.</div>` : ''}
+            ${task.contact ? `<div class="modal-note" style="margin-top:0.75rem;">Le contact <strong>« ${task.contact} »</strong> sera repris dans la nouvelle action.</div>` : ''}
             
             <div class="modal-actions">
               <button class="btn btn-blue" onclick="createFollowUp()">${icons.refresh} Terminer et créer le suivi</button>
@@ -6457,6 +6925,22 @@
     }
 
     let followUpUrgency = 'normal';
+    let followUpType = 'task';
+    function setFollowUpType(type) {
+      followUpType = type;
+      // Le tag « RDV » est géré automatiquement avec le type Rendez-vous
+      const idx = followUpTags.indexOf('RDV');
+      if (type === 'rdv' && idx === -1) followUpTags.push('RDV');
+      if (type === 'task' && idx !== -1) followUpTags.splice(idx, 1);
+      document.querySelectorAll('.modal .type-btn').forEach(btn => {
+        btn.classList.remove('active', 'task', 'rdv');
+        if (btn.dataset.type === type) btn.classList.add('active', type);
+      });
+      // Un rendez-vous n'a pas de niveau d'urgence
+      const urgField = document.getElementById('followUpUrgencyField');
+      if (urgField) urgField.classList.toggle('hidden', type === 'rdv');
+      renderTagsChips('followUpTagsChips', followUpTags, 'removeFollowUpTag');
+    }
     function setFollowUpUrgency(urgency) {
       followUpUrgency = urgency;
       document.querySelectorAll('.modal .urgency-btn').forEach(btn => {
@@ -6467,7 +6951,7 @@
       });
     }
 
-    // Tags du formulaire de suivi : pré-remplis depuis la tâche d'origine,
+    // Tags du formulaire de suivi : pré-remplis depuis l'action d'origine,
     // puis librement modifiables (suppression d'une puce ou ajout)
     let followUpTags = [];
     function removeFollowUpTag(i) {
@@ -6538,6 +7022,11 @@
       }
 
       const now = new Date().toISOString();
+
+      // L'historique des commentaires de clôture suit la chaîne d'actions de suivi :
+      // on reprend celui de l'action qui se termine et on y ajoute sa clôture
+      const carriedHistory = [...(completingTask.history || [])];
+      if (comment) carriedHistory.push({ text: comment, date: now });
       
       // Complete current task (or current occurrence if recurring)
       const task = tasks.find(t => t.id === completingTask.id);
@@ -6573,16 +7062,19 @@
         contact: completingTask.contact,
         deadline,
         description: description || undefined,
-        urgency: followUpUrgency,
+        type: followUpType === 'rdv' ? 'rdv' : 'task',
+        urgency: followUpType === 'rdv' ? 'normal' : followUpUrgency,
         category: completingTask.category || 'pro',
         status: 'todo',
         createdAt: now,
         tags: [...followUpTags],
+        history: carriedHistory.length ? carriedHistory : undefined,
       };
       
       tasks.unshift(newTask);
       saveTasks();
       followUpUrgency = 'normal';
+      followUpType = 'task';
       followUpTags = [];
       
       closeModal();
@@ -6616,11 +7108,11 @@
         try {
           const imported = JSON.parse(e.target.result);
           if (!Array.isArray(imported)) {
-            alert('Fichier invalide : le contenu doit être une liste de tâches.');
+            alert("Fichier invalide : le contenu doit être une liste d'actions.");
             return;
           }
           const count = imported.length;
-          if (confirm(`Importer ${count} tâche${count > 1 ? 's' : ''} ?\n\nCela remplacera toutes vos données actuelles.`)) {
+          if (confirm(`Importer ${count} action${count > 1 ? 's' : ''} ?\n\nCela remplacera toutes vos données actuelles.`)) {
             tasks = imported;
             saveTasks();
             render();
@@ -6649,7 +7141,7 @@
       try {
         const data = JSON.stringify(tasks);
         await navigator.clipboard.writeText(data);
-        showToast(`✓ ${tasks.length} tâche${tasks.length > 1 ? 's' : ''} copiée${tasks.length > 1 ? 's' : ''} dans le presse-papier`);
+        showToast(`✓ ${tasks.length} action${tasks.length > 1 ? 's' : ''} copiée${tasks.length > 1 ? 's' : ''} dans le presse-papier`);
       } catch (err) {
         // Fallback for older browsers
         const textarea = document.createElement('textarea');
@@ -6660,7 +7152,7 @@
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        showToast(`✓ ${tasks.length} tâche${tasks.length > 1 ? 's' : ''} copiée${tasks.length > 1 ? 's' : ''}`);
+        showToast(`✓ ${tasks.length} action${tasks.length > 1 ? 's' : ''} copiée${tasks.length > 1 ? 's' : ''}`);
       }
     }
 
@@ -6673,11 +7165,11 @@
           return;
         }
         const count = imported.length;
-        if (confirm(`Coller ${count} tâche${count > 1 ? 's' : ''} ?\n\nCela remplacera toutes vos données actuelles.`)) {
+        if (confirm(`Coller ${count} action${count > 1 ? 's' : ''} ?\n\nCela remplacera toutes vos données actuelles.`)) {
           tasks = imported;
           saveTasks();
           render();
-          showToast(`✓ ${count} tâche${count > 1 ? 's' : ''} importée${count > 1 ? 's' : ''}`);
+          showToast(`✓ ${count} action${count > 1 ? 's' : ''} importée${count > 1 ? 's' : ''}`);
         }
       } catch (err) {
         alert('Impossible de lire le presse-papier.\n\nVérifiez que vous avez bien copié les données depuis l\'autre appareil et que le navigateur autorise l\'accès au presse-papier.');
@@ -6699,7 +7191,7 @@
             </button>
             <button class="rec-choice-btn" id="recChoiceAll">
               ${icons.repeat}
-              <div><strong>Toutes les occurrences</strong><span>La tâche récurrente entière est concernée</span></div>
+              <div><strong>Toutes les occurrences</strong><span>L'action récurrente entière est concernée</span></div>
             </button>
             <button class="rec-choice-btn" style="justify-content:center;color:#94a3b8;" id="recChoiceCancel">
               Annuler
@@ -6717,8 +7209,8 @@
     function handleDelete(id, displayDeadline, isRecurring) {
       if (isRecurring) {
         showRecurrenceChoice(
-          'Supprimer la tâche',
-          'Cette tâche est récurrente. Que souhaitez-vous supprimer ?',
+          "Supprimer l'action",
+          'Cette action est récurrente. Que souhaitez-vous supprimer ?',
           () => {
             // Delete only this occurrence — add to completedDates to skip it
             const task = tasks.find(t => t.id === id);
@@ -6761,8 +7253,8 @@
     function handleEdit(id, displayDeadline, isRecurring) {
       if (isRecurring) {
         showRecurrenceChoice(
-          'Modifier la tâche',
-          'Cette tâche est récurrente. Que souhaitez-vous modifier ?',
+          "Modifier l'action",
+          'Cette action est récurrente. Que souhaitez-vous modifier ?',
           () => {
             // Edit only this occurrence: extract it as a standalone task
             const original = tasks.find(t => t.id === id);
@@ -6779,8 +7271,8 @@
             }
             
             // Create a new standalone task with this occurrence's date
-            // Les commentaires propres à cette occurrence suivent la tâche extraite ;
-            // ils quittent la tâche récurrente d'origine pour ne plus s'y afficher.
+            // Les commentaires propres à cette occurrence suivent l'action extraite ;
+            // ils quittent l'action récurrente d'origine pour ne plus s'y afficher.
             const occurrenceComments = (original.comments || []).filter(c => c.occurrenceDate === displayDeadline);
             if (occurrenceComments.length) {
               original.comments = original.comments.filter(c => c.occurrenceDate !== displayDeadline);
@@ -6790,6 +7282,7 @@
               title: original.title,
               contact: original.contact,
               deadline: displayDeadline,
+              type: original.type === 'rdv' ? 'rdv' : 'task',
               urgency: original.urgency,
               category: original.category || 'pro',
               status: 'todo',
@@ -6823,8 +7316,8 @@
       }
     }
 
-    // ============ BILAN / RÉSUMÉ DES TÂCHES TERMINÉES ============
-    // Récapitulatif des tâches terminées sur une période choisie
+    // ============ BILAN / RÉSUMÉ DES ACTIONS TERMINÉES ============
+    // Récapitulatif des actions terminées sur une période choisie
     // (semaine précédente ou plage personnalisée), avec les commentaires
     // de clôture et les commentaires associés, regroupés par contact.
     let summaryFrom = '';
@@ -6878,11 +7371,11 @@
       renderModal();
     }
 
-    // Renvoie les tâches terminées dont la date d'achèvement (completedAt)
+    // Renvoie les actions terminées dont la date d'achèvement (completedAt)
     // tombe dans la période [fromDate ; toDate] (inclus).
-    // Pour les tâches récurrentes, chaque occurrence terminée compte
+    // Pour les actions récurrentes, chaque occurrence terminée compte
     // comme une entrée distincte (via completionLog).
-    // Tâches créées dans la période (date de création comprise dans [from ; to])
+    // Actions créées dans la période (date de création comprise dans [from ; to])
     function getCreatedInPeriod(fromDate, toDate) {
       if (!fromDate || !toDate) return [];
       const fromMs = new Date(fromDate + 'T00:00:00').getTime();
@@ -6909,7 +7402,7 @@
       return results;
     }
 
-    // Entrées du Rapport : tâches créées + tâches terminées sur la période
+    // Entrées du Rapport : actions créées + actions terminées sur la période
     function getReportEntries(fromDate, toDate) {
       return getCreatedInPeriod(fromDate, toDate).concat(getCompletedInPeriod(fromDate, toDate));
     }
@@ -7051,7 +7544,7 @@
             <div class="modal-icon indigo">${icons.fileText}</div>
             <div>
               <div class="modal-title">Rapport</div>
-              <div class="modal-subtitle">Tâches créées et terminées sur une période</div>
+              <div class="modal-subtitle">Actions créées et terminées sur une période</div>
             </div>
           </div>
           <button class="modal-close" onclick="closeModal()">${icons.x}</button>
@@ -7087,7 +7580,7 @@
           ${entries.length === 0 ? `
             <div class="summary-empty">
               <div class="emoji">🗂️</div>
-              <p>Aucune tâche créée ou terminée sur cette période.</p>
+              <p>Aucune action créée ou terminée sur cette période.</p>
             </div>
           ` : groupKeys.map(key => {
             const isNoContact = key === NO_CONTACT_KEY;
@@ -7116,7 +7609,7 @@
       const doneCount = entries.filter(e => e.kind === 'done').length;
       const lines = [];
       lines.push(`Rapport — du ${formatDate(summaryFrom + 'T00:00:00')} au ${formatDate(summaryTo + 'T00:00:00')}`);
-      lines.push(`${createdCount} tâche${createdCount > 1 ? 's' : ''} créée${createdCount > 1 ? 's' : ''}, ${doneCount} terminée${doneCount > 1 ? 's' : ''}`);
+      lines.push(`${createdCount} action${createdCount > 1 ? 's' : ''} créée${createdCount > 1 ? 's' : ''}, ${doneCount} terminée${doneCount > 1 ? 's' : ''}`);
       groupKeys.forEach(key => {
         lines.push('');
         lines.push(key === NO_CONTACT_KEY ? 'Sans contact' : key);
@@ -7185,7 +7678,7 @@
       modal.innerHTML = `
         <div class="modal-header">
           <div class="modal-header-left">
-            <div class="modal-icon" style="background:#f1f5f9;color:#475569;">
+            <div class="modal-icon" style="background:linear-gradient(135deg,#3B8DF7,#7B5CF3);color:white;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
             </div>
             <div>
@@ -7247,9 +7740,9 @@
             </div>
           </div>
 
-          <!-- Création de tâche -->
+          <!-- Création d'action -->
           <div class="settings-section">
-            <div class="settings-section-title">${icons.plus} Création de tâches</div>
+            <div class="settings-section-title">${icons.plus} Création d'actions</div>
             <div class="settings-row">
               <div class="settings-row-label">Catégorie par défaut</div>
               <select class="settings-select" onchange="updateSetting('defaultCategory', this.value)">
@@ -7274,8 +7767,8 @@
             </div>
             <div class="settings-row">
               <div class="settings-row-label">
-                Rappels des tâches
-                <small>Tâches du jour à l'ouverture, et rappel 1x/jour si en retard</small>
+                Rappels des actions
+                <small>Actions du jour à l'ouverture, et rappel 1x/jour si en retard</small>
               </div>
               <button class="settings-toggle ${settings.notificationsEnabled ? 'on' : ''}" onclick="toggleNotifications(this)"></button>
             </div>
@@ -7300,7 +7793,7 @@
               </div>
             ` : `
               <p style="font-size:0.8rem;color:#64748b;margin-bottom:0.75rem;">
-                Synchronisez vos tâches via Google Sheets. <a href="#" onclick="openCloudSetup();return false;" style="color:#4f46e5;">Configurer →</a>
+                Synchronisez vos actions via Google Sheets. <a href="#" onclick="openCloudSetup();return false;" style="color:#5B72F5;">Configurer →</a>
               </p>
             `}
             ${isConnected ? `
@@ -7362,15 +7855,15 @@
             <div class="settings-row">
               <div class="settings-row-label">Contenu du récap</div>
               <select class="settings-select" id="emailRecapContent">
-                <option value="all" ${emailRecap.content === 'all' ? 'selected' : ''}>Toutes les tâches à faire</option>
-                <option value="today" ${emailRecap.content === 'today' ? 'selected' : ''}>Uniquement les tâches du jour</option>
+                <option value="all" ${emailRecap.content === 'all' ? 'selected' : ''}>Toutes les actions à faire</option>
+                <option value="today" ${emailRecap.content === 'today' ? 'selected' : ''}>Uniquement les actions du jour</option>
                 <option value="week" ${emailRecap.content === 'week' ? 'selected' : ''}>Échéances des 7 prochains jours</option>
                 <option value="attention" ${emailRecap.content === 'attention' ? 'selected' : ''}>Retards et urgentes seulement</option>
               </select>
             </div>
             <div class="settings-row">
               <div class="settings-row-label">
-                Inclure les tâches terminées
+                Inclure les actions terminées
                 <small>Depuis le dernier envoi (24 h ou 7 jours selon la fréquence)</small>
               </div>
               <button class="settings-toggle ${emailRecap.includeDone ? 'on' : ''}" id="emailRecapDoneToggle" onclick="this.classList.toggle('on')" title="Inclure/exclure"></button>
@@ -7390,10 +7883,10 @@
               </button>
             </div>
             <div id="emailDiagResult" class="hidden" style="margin-top:0.5rem;font-size:0.72rem;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem 0.625rem;white-space:pre-wrap;word-break:break-all;"></div>
-            <p class="modal-note" style="margin-top:0.5rem;">Le récap reflète la <strong>dernière synchronisation cloud</strong> de vos tâches. Si le déclencheur refuse de se créer : dans l'éditeur Apps Script, sélectionnez la fonction <strong>activerRecap</strong> et cliquez une fois sur <strong>Exécuter</strong>, puis autorisez toutes les permissions.</p>
+            <p class="modal-note" style="margin-top:0.5rem;">Le récap reflète la <strong>dernière synchronisation cloud</strong> de vos actions. Si le déclencheur refuse de se créer : dans l'éditeur Apps Script, sélectionnez la fonction <strong>activerRecap</strong> et cliquez une fois sur <strong>Exécuter</strong>, puis autorisez toutes les permissions.</p>
             ` : `
             <p style="font-size:0.8rem;color:#64748b;margin-bottom:0.75rem;">
-              Nécessite la synchronisation cloud (Google Sheets). <a href="#" onclick="openCloudSetup();return false;" style="color:#4f46e5;">Configurer →</a>
+              Nécessite la synchronisation cloud (Google Sheets). <a href="#" onclick="openCloudSetup();return false;" style="color:#5B72F5;">Configurer →</a>
             </p>
             `}
           </div>
@@ -7426,6 +7919,42 @@
 
         </div>
       `;
+      // Sections pliables, pliées par défaut
+      makeSettingsSectionsCollapsible(modal);
+    }
+
+    // Sections des paramètres pliables / dépliables (pliées par défaut)
+    let settingsOpenSections = new Set();
+
+    function toggleSettingsSection(key) {
+      // La clé peut venir d'un attribut onclick (nombre) ou du rendu (chaîne) :
+      // on normalise pour que la comparaison dans le Set fonctionne
+      const k = String(key);
+      if (settingsOpenSections.has(k)) settingsOpenSections.delete(k);
+      else settingsOpenSections.add(k);
+      renderSettingsModal();
+    }
+
+    // Enveloppe le contenu de chaque section (tout ce qui suit le titre) dans
+    // un bloc dépliable, et rend le titre cliquable avec un chevron
+    function makeSettingsSectionsCollapsible(modal) {
+      modal.querySelectorAll('.settings-section').forEach((section, i) => {
+        const title = section.querySelector('.settings-section-title');
+        if (!title) return;
+        const key = String(i);
+        const isOpen = settingsOpenSections.has(key);
+        const body = document.createElement('div');
+        body.className = 'settings-section-body' + (isOpen ? '' : ' hidden');
+        while (title.nextSibling) body.appendChild(title.nextSibling);
+        section.appendChild(body);
+        title.classList.add('settings-section-toggle');
+        title.onclick = () => toggleSettingsSection(key);
+        title.setAttribute('title', isOpen ? 'Replier cette section' : 'Déplier cette section');
+        const chev = document.createElement('span');
+        chev.className = 'settings-section-chev';
+        chev.innerHTML = isOpen ? icons.chevronUp : icons.chevronDown;
+        title.appendChild(chev);
+      });
     }
 
     function updateSetting(key, value) {
@@ -7444,7 +7973,7 @@
 var MOT_DE_PASSE = 'MonMotDePasse123';
 
 // ============================================================
-//  SYNCHRONISATION DES TÂCHES
+//  SYNCHRONISATION DES ACTIONS
 // ============================================================
 function checkPassword(e) {
   var pwd = (e && e.parameter && e.parameter.pwd) || '';
@@ -7468,8 +7997,8 @@ function getSheet() {
   return sheet;
 }
 
-// ==== Stockage : UNE LIGNE PAR TÂCHE ====
-// Colonne A = JSON complet de la tâche (source de vérité), colonnes B à H
+// ==== Stockage : UNE LIGNE PAR ACTION ====
+// Colonne A = JSON complet de l'action (source de vérité), colonnes B à H
 // = informations lisibles (titre, contact, échéance, statut...).
 // Lève définitivement la limite des 50 000 caractères d'une cellule.
 var TASK_HEADERS = ['JSON (ne pas modifier)', 'Titre', 'Entreprise / Contact', 'Échéance', 'Statut', 'Urgence', 'Catégorie', 'Terminée le'];
@@ -7496,7 +8025,7 @@ function writeTasks(tasks) {
   sheet.setFrozenRows(1);
 }
 
-// Lecture : une ligne par tâche. L'ancien format (tout le tableau dans la
+// Lecture : une ligne par action. L'ancien format (tout le tableau dans la
 // cellule A1) reste accepté pour la migration automatique : dès le premier
 // enregistrement, les données sont réécrites au nouveau format.
 function readTasks() {
@@ -7543,7 +8072,7 @@ function doGet(e) {
       }
     }
     try {
-      return jsonOut({ ok: true, version: 5, config: loadEmailConfig() });
+      return jsonOut({ ok: true, version: 6, config: loadEmailConfig() });
     } catch (err) {
       return jsonOut({ ok: false, error: 'Lecture impossible : ' + errMsg(err) });
     }
@@ -7557,7 +8086,7 @@ function doGet(e) {
 // (une page d erreur HTML serait bloquée par le navigateur et semblerait
 // être un problème réseau).
 function handleEmailConfigSet(p) {
-  var result = { ok: true, version: 5, sent: false };
+  var result = { ok: true, version: 6, sent: false };
   var config = null;
   try {
     config = JSON.parse(p.set);
@@ -7588,7 +8117,7 @@ function doPost(e) {
   if (!checkPassword(e)) return jsonOut({ error: 'Mot de passe incorrect' });
   var body = null;
   try { body = JSON.parse(e.postData.contents); } catch (err) { body = null; }
-  // Un tableau = synchronisation des tâches (une ligne par tâche)
+  // Un tableau = synchronisation des actions (une ligne par action)
   if (Array.isArray(body)) {
     writeTasks(body);
     return jsonOut({ success: true });
@@ -7610,7 +8139,7 @@ function doPost(e) {
 
 // ============================================================
 //  RÉCAP E-MAIL AUTOMATIQUE
-//  Envoi planifié des tâches à faire (déclencheur horaire).
+//  Envoi planifié des actions à faire (déclencheur horaire).
 // ============================================================
 var MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 var JOURS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
@@ -7716,8 +8245,8 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
-// ---------- préparation des tâches ----------
-// Déplie les tâches récurrentes : 1 entrée « à faire » pour la prochaine
+// ---------- préparation des actions ----------
+// Déplie les actions récurrentes : 1 entrée « à faire » pour la prochaine
 // occurrence restante + 1 entrée « terminée » par occurrence complétée
 function expandForEmail(tasks) {
   var out = [], i, j;
@@ -7793,7 +8322,7 @@ function countIf(arr, fn) {
   return n;
 }
 
-// Sélectionne les tâches selon le contenu choisi et la période « terminées »
+// Sélectionne les actions selon le contenu choisi et la période « terminées »
 function buildRecapData(config) {
   var today = todayStr();
   var in7 = plusDaysStr(7);
@@ -7874,12 +8403,12 @@ function buildRecapHtml(data, isTest) {
   var dateLabel = JOURS_FR[now.getDay()] + ' ' + now.getDate() + ' ' + MOIS_FR[now.getMonth()] + ' ' + now.getFullYear();
   var html = '';
   html += '<div style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;color:#1e293b;">';
-  html += '<div style="background:#4f46e5;color:#ffffff;padding:18px 22px;border-radius:10px 10px 0 0;">';
-  html += '<div style="font-size:18px;font-weight:bold;">📋 Récap de vos tâches' + (isTest ? ' — TEST' : '') + '</div>';
+  html += '<div style="background:#5B72F5;color:#ffffff;padding:18px 22px;border-radius:10px 10px 0 0;">';
+  html += '<div style="font-size:18px;font-weight:bold;">📋 Récap de vos actions' + (isTest ? ' — TEST' : '') + '</div>';
   html += '<div style="font-size:12px;opacity:0.9;margin-top:4px;">' + dateLabel + '</div></div>';
   html += '<div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 10px 10px;padding:18px 22px;background:#ffffff;">';
   if (data.todo.length === 0 && data.done.length === 0) {
-    html += '<p style="font-size:14px;color:#059669;margin:0;">🎉 Rien à signaler : aucune tâche en attente.</p>';
+    html += '<p style="font-size:14px;color:#059669;margin:0;">🎉 Rien à signaler : aucune action en attente.</p>';
   } else {
     html += '<p style="font-size:14px;margin:0 0 14px;"><b>' + data.todo.length + '</b> à faire';
     if (data.urgentCount > 0) html += ' · <b style="color:#b45309;">' + data.urgentCount + '</b> urgent' + (data.urgentCount > 1 ? 'es' : '');
@@ -7898,7 +8427,7 @@ function buildRecapHtml(data, isTest) {
       html += '<h3 style="color:#334155;font-size:14px;margin:14px 0 8px;">📍 À faire (' + upcoming.length + ')</h3>';
       var g = groupByContact(upcoming);
       for (i = 0; i < g.keys.length; i++) {
-        html += '<div style="font-size:12px;font-weight:bold;color:#4338ca;margin:10px 0 4px;">🏢 ' + esc(g.keys[i]) + ' (' + g.groups[g.keys[i]].length + ')</div>';
+        html += '<div style="font-size:12px;font-weight:bold;color:#4D5FD8;margin:10px 0 4px;">🏢 ' + esc(g.keys[i]) + ' (' + g.groups[g.keys[i]].length + ')</div>';
         for (var j = 0; j < g.groups[g.keys[i]].length; j++) {
           html += taskHtml(g.groups[g.keys[i]][j], data.today, false);
         }
@@ -7917,7 +8446,7 @@ function buildRecapHtml(data, isTest) {
       }
     }
   }
-  html += '<p style="font-size:11px;color:#94a3b8;margin:16px 0 0;">Récap généré automatiquement — basé sur la dernière synchronisation de vos tâches.</p>';
+  html += '<p style="font-size:11px;color:#94a3b8;margin:16px 0 0;">Récap généré automatiquement — basé sur la dernière synchronisation de vos actions.</p>';
   html += '</div></div>';
   return html;
 }
@@ -7925,7 +8454,7 @@ function buildRecapHtml(data, isTest) {
 function buildRecapText(data, isTest) {
   var NL = String.fromCharCode(10);
   var lines = [];
-  lines.push('Récap de vos tâches' + (isTest ? ' — TEST' : ''));
+  lines.push('Récap de vos actions' + (isTest ? ' — TEST' : ''));
   lines.push(data.todo.length + ' à faire' +
     (data.lateCount ? ', ' + data.lateCount + ' en retard' : '') +
     (data.urgentCount ? ', ' + data.urgentCount + ' urgentes' : ''));
@@ -7950,19 +8479,19 @@ function buildRecapText(data, isTest) {
     }
   }
   if (data.todo.length === 0 && data.done.length === 0) {
-    lines.push('Rien à signaler : aucune tâche en attente.');
+    lines.push('Rien à signaler : aucune action en attente.');
   }
   return lines.join(NL);
 }
 
 function sendRecapEmail(config, isTest) {
   var data = buildRecapData(config);
-  var subject = (isTest ? '[TEST] ' : '') + '📋 Récap tâches — ' + data.todo.length + ' à faire';
+  var subject = (isTest ? '[TEST] ' : '') + '📋 Récap actions — ' + data.todo.length + ' à faire';
   if (data.lateCount > 0) subject += ', ' + data.lateCount + ' en retard';
   if (data.urgentCount > 0) subject += ', ' + data.urgentCount + ' urgentes';
   MailApp.sendEmail(config.email, subject, buildRecapText(data, isTest), {
     htmlBody: buildRecapHtml(data, isTest),
-    name: 'Récap Tâches'
+    name: 'Récap Actions'
   });
   return true;
 }`;
@@ -8016,7 +8545,7 @@ function sendRecapEmail(config, isTest) {
           localStorage.setItem('taskflow-tasks', JSON.stringify(tasks));
           syncStatus = 'synced';
           render();
-          showToast(`✓ ${tasks.length} tâche${tasks.length > 1 ? 's' : ''} chargée${tasks.length > 1 ? 's' : ''} depuis le cloud`);
+          showToast(`✓ ${tasks.length} action${tasks.length > 1 ? 's' : ''} chargée${tasks.length > 1 ? 's' : ''} depuis le cloud`);
         } else {
           syncStatus = 'error';
         }
@@ -8037,9 +8566,9 @@ function sendRecapEmail(config, isTest) {
     // ============ FUSION LOCAL / CLOUD (première configuration) ============
     // À la première connexion au cloud, on ne veut ni effacer les données
     // locales ni ignorer celles déjà présentes dans le cloud : on fusionne les
-    // deux jeux de tâches (union par identifiant) afin de tout conserver.
-    // En cas de conflit (même tâche des deux côtés), la version locale est
-    // conservée pour les champs simples ; une tâche terminée d'un côté reste
+    // deux jeux d'actions (union par identifiant) afin de tout conserver.
+    // En cas de conflit (même action des deux côtés), la version locale est
+    // conservée pour les champs simples ; une action terminée d'un côté reste
     // terminée ; les commentaires, occurrences et journal de récurrence sont
     // réunis sans doublon.
     function mergeTasks(localArr, cloudArr) {
@@ -8064,7 +8593,7 @@ function sendRecapEmail(config, isTest) {
       result.description = pick(a.description, b.description) || undefined;
       result.category = pick(a.category, b.category) || 'pro';
       result.urgency = pick(a.urgency, b.urgency) || 'normal';
-      // Une tâche terminée d'un côté reste terminée (la clôture est « collante »)
+      // Une action terminée d'un côté reste terminée (la clôture est « collante »)
       if (a.status === 'done' || b.status === 'done') {
         result.status = 'done';
         result.completedAt = pick(a.completedAt, b.completedAt);
@@ -8137,7 +8666,7 @@ function sendRecapEmail(config, isTest) {
         await syncToCloud();
         const gained = tasks.length - before;
         showToast(gained > 0
-          ? `✓ Cloud configuré · ${gained} tâche${gained>1?'s':''} récupérée${gained>1?'s':''} du cloud`
+          ? `✓ Cloud configuré · ${gained} action${gained>1?'s':''} récupérée${gained>1?'s':''} du cloud`
           : '✓ Cloud configuré et synchronisé');
       } catch (err) {
         console.error('First sync error:', err);
@@ -8206,7 +8735,7 @@ function sendRecapEmail(config, isTest) {
     }
 
     // ============ RÉCAP E-MAIL AUTOMATIQUE ============
-    // Envoi planifié des tâches à faire via Google Apps Script (déclencheur
+    // Envoi planifié des actions à faire via Google Apps Script (déclencheur
     // horaire + MailApp). Les réglages sont conservés en local ET côté script.
     const defaultEmailRecap = { enabled: false, email: '', frequency: 'weekly', day: 1, hour: 8, content: 'all', includeDone: false };
     let emailRecap = { ...defaultEmailRecap, ...safeParseJSON(localStorage.getItem('taskflow-email-recap')) };
@@ -8277,7 +8806,7 @@ function sendRecapEmail(config, isTest) {
         const text = await response.text();
         let data = null;
         try { data = JSON.parse(text); } catch (e) { data = null; }
-        if (data && data.ok && data.version >= 5) return 'ok';
+        if (data && data.ok && data.version >= 6) return 'ok';
         if (data) return 'old';
         return 'unreachable';
       } catch (err) {
@@ -8305,7 +8834,7 @@ function sendRecapEmail(config, isTest) {
         }
         // Un script version < 3 répond « ok » mais IGNORE la commande
         // d'enregistrement : il faut recopier le dernier code et redéployer
-        if (data.ok && !(data.version >= 5)) {
+        if (data.ok && !(data.version >= 6)) {
           showToast('⚠ Le script déployé est trop ancien (version ' + (data.version || '?') + ') — recopiez le DERNIER code et redéployez en choisissant « Version : Nouvelle »', 6000);
           const diag = document.getElementById('emailDiagResult');
           if (diag) {
@@ -8352,7 +8881,7 @@ function sendRecapEmail(config, isTest) {
     }
 
     // Au démarrage : récupère la configuration du récap depuis le script
-    // (le cloud reste la référence, comme pour les tâches)
+    // (le cloud reste la référence, comme pour les actions)
     async function fetchEmailRecapConfig() {
       if (!cloudUrl) return;
       try {
@@ -8385,7 +8914,7 @@ function sendRecapEmail(config, isTest) {
         lines.push('Statut HTTP : ' + response.status);
         let parsed = null;
         try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
-        if (parsed && parsed.ok && parsed.version >= 5) {
+        if (parsed && parsed.ok && parsed.version >= 6) {
           lines.push('Script : version ' + parsed.version + ' ✓ (à jour, récap e-mail pris en charge)');
           lines.push('Récap configuré : ' + (parsed.config && parsed.config.enabled ? 'activé — ' + (parsed.config.email || '(sans adresse)') : 'désactivé'));
         } else if (parsed && parsed.ok) {
@@ -8434,5 +8963,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a42bb73c5ed15014',t:'MTc5MDY5MjU0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
