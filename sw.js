@@ -1,11 +1,12 @@
-const CACHE_NAME = 'taches-cache-v62';
+const CACHE_NAME = 'taches-cache-v66';
 const APP_SHELL = [
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
   './icon-maskable-512.png',
-  './app-logo.png'
+  './app-logo.png',
+  './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {

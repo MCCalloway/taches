@@ -9,7 +9,7 @@
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2d44e5">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -439,7 +439,7 @@
     
     .contact-field { position: relative; }
     .contact-field input { padding-left: 2.5rem; }
-    .contact-field > svg { position: absolute; left: 0.75rem; top: 38px; color: #94a3b8; }
+    .contact-field > svg { position: absolute; left: 0.75rem; bottom: 0.75rem; color: #94a3b8; }
     
     .suggestions {
       position: absolute;
@@ -2249,8 +2249,8 @@
     }
     .project-card-next-title {
       font-size: 0.82rem;
-      font-weight: 600;
-      color: #1e293b;
+      font-weight: 400;
+      color: #334155;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -2758,6 +2758,7 @@
     let ctLogMode = false; // formulaire en mode « consigner » dans la vue contact
     let ctCategory = settings.defaultCategory;
     let ctUrgency = settings.defaultUrgency;
+    let ctActionType = 'task'; // type d'action du formulaire de la fiche : 'task' ou 'rdv'
     let ctTags = [];
     let filterCategory = settings.defaultFilterCategory;
     let filterLate = false;
@@ -2765,6 +2766,7 @@
     let isLogFormExpanded = false; // formulaire « Consigner action » (créée directement terminée)
     let quickAddDate = null; // date du « + » du calendrier (formulaire popup)
     let quickCategory = 'pro';
+    let quickActionType = 'task'; // type du formulaire rapide du calendrier : 'task' ou 'rdv'
     let quickUrgency = 'normal';
     let quickTags = [];
     let completingTask = null;
@@ -3886,7 +3888,7 @@
           </div>
           <div class="form-grid">
             <div class="full-width">
-              <label>Type d'action</label>
+              <label>Type</label>
               <div class="type-buttons">
                 <button type="button" class="type-btn ${currentActionType === 'task' ? 'active task' : ''}" data-type="task" onclick="setActionType('task')">
                   ${icons.listTodo} Tâche
@@ -3897,7 +3899,7 @@
               </div>
             </div>
             <div class="full-width">
-              <label>Titre de l'action <span class="required">*</span></label>
+              <label>Titre <span class="required">*</span></label>
               <input type="text" id="taskTitle" placeholder="Ex: Préparer le devis client" required>
             </div>
             <div class="contact-field">
@@ -4624,11 +4626,28 @@
       quickAddDate = dateStr || getTodayStr();
       quickCategory = settings.defaultCategory;
       quickUrgency = settings.defaultUrgency;
+      quickActionType = 'task';
       quickTags = [];
       completingTask = null;
       modalMode = 'quickAdd';
       renderModal();
       document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function setQuickActionType(type) {
+      quickActionType = type;
+      // Le tag « RDV » est géré automatiquement avec le type Rendez-vous
+      const idx = quickTags.indexOf('RDV');
+      if (type === 'rdv' && idx === -1) quickTags.push('RDV');
+      if (type === 'task' && idx !== -1) quickTags.splice(idx, 1);
+      document.querySelectorAll('.modal .type-btn').forEach(btn => {
+        btn.classList.remove('active', 'task', 'rdv');
+        if (btn.dataset.type === type) btn.classList.add('active', type);
+      });
+      // Un rendez-vous n'a pas de niveau d'urgence
+      const urgField = document.getElementById('quickUrgencyField');
+      if (urgField) urgField.classList.toggle('hidden', type === 'rdv');
+      renderTagsChips('quickTagsChips', quickTags, 'removeQuickTag');
     }
 
     function setQuickCategory(cat) {
@@ -4714,7 +4733,8 @@
         contact,
         deadline,
         description: description || undefined,
-        urgency: quickUrgency,
+        type: quickActionType === 'rdv' ? 'rdv' : 'task',
+        urgency: quickActionType === 'rdv' ? 'normal' : quickUrgency,
         category: quickCategory,
         status: 'todo',
         createdAt: new Date().toISOString(),
@@ -4725,6 +4745,7 @@
       tasks.unshift(task);
       saveTasks();
       quickTags = [];
+      quickActionType = 'task';
       closeModal();
       render();
       showToast('✓ Action ajoutée');
@@ -5202,6 +5223,7 @@
       ctTags = [];
       ctCategory = settings.defaultCategory;
       ctUrgency = settings.defaultUrgency;
+      ctActionType = 'task';
       taskView = 'contact';
       render();
       if (focusTaskId) {
@@ -5299,12 +5321,14 @@
     function expandCtForm() {
       ctFormExpanded = true;
       ctLogMode = false;
+      ctActionType = 'task';
       render();
     }
 
     function expandCtLogForm() {
       ctFormExpanded = true;
       ctLogMode = true;
+      ctActionType = 'task';
       render();
     }
 
@@ -5312,6 +5336,7 @@
       ctFormExpanded = false;
       ctLogMode = false;
       ctTags = [];
+      ctActionType = 'task';
       render();
     }
 
@@ -5333,6 +5358,22 @@
     function getCtSelectedDays() {
       const btns = document.querySelectorAll('#ctDaysGrid .day-btn.active');
       return Array.from(btns).map(b => parseInt(b.dataset.day));
+    }
+
+    function setCtActionType(type) {
+      ctActionType = type;
+      // Le tag « RDV » est géré automatiquement avec le type Rendez-vous
+      const idx = ctTags.indexOf('RDV');
+      if (type === 'rdv' && idx === -1) ctTags.push('RDV');
+      if (type === 'task' && idx !== -1) ctTags.splice(idx, 1);
+      document.querySelectorAll('#ctAddContainer .type-btn').forEach(btn => {
+        btn.classList.remove('active', 'task', 'rdv');
+        if (btn.dataset.type === type) btn.classList.add('active', type);
+      });
+      // Un rendez-vous n'a pas de niveau d'urgence
+      const urgField = document.getElementById('ctUrgencyField');
+      if (urgField) urgField.classList.toggle('hidden', type === 'rdv');
+      renderTagsChips('ctTagsChips', ctTags, 'removeCtTag');
     }
 
     function setCtCategory(cat) {
@@ -5399,7 +5440,8 @@
         contact: projectContact === NO_CONTACT_KEY ? '' : projectContact,
         deadline,
         description: description || undefined,
-        urgency: ctUrgency,
+        type: ctActionType === 'rdv' ? 'rdv' : 'task',
+        urgency: ctActionType === 'rdv' ? 'normal' : ctUrgency,
         category: ctCategory,
         status: 'todo',
         createdAt: new Date().toISOString(),
@@ -5411,6 +5453,7 @@
       ctFormExpanded = false;
       ctTags = [];
       ctUrgency = settings.defaultUrgency;
+      ctActionType = 'task';
       ctCategory = settings.defaultCategory;
       render();
       showToast('✓ Action ajoutée');
@@ -5438,7 +5481,8 @@
         contact: projectContact === NO_CONTACT_KEY ? '' : projectContact,
         deadline,
         description: description || undefined,
-        urgency: ctUrgency,
+        type: ctActionType === 'rdv' ? 'rdv' : 'task',
+        urgency: ctActionType === 'rdv' ? 'normal' : ctUrgency,
         category: ctCategory,
         status: 'done',
         completedAt: now,
@@ -5452,6 +5496,7 @@
       ctLogMode = false;
       ctTags = [];
       ctUrgency = settings.defaultUrgency;
+      ctActionType = 'task';
       ctCategory = settings.defaultCategory;
       render();
       showToast('✓ Action consignée (terminée)');
@@ -5642,7 +5687,14 @@
           </div>
           <div class="form-grid">
             <div class="full-width">
-              <label>Titre de l'action <span class="required">*</span></label>
+              <label>Type</label>
+              <div class="type-buttons">
+                <button type="button" class="type-btn ${ctActionType === 'task' ? 'active task' : ''}" data-type="task" onclick="setCtActionType('task')">${icons.listTodo} Tâche</button>
+                <button type="button" class="type-btn ${ctActionType === 'rdv' ? 'active rdv' : ''}" data-type="rdv" onclick="setCtActionType('rdv')">${icons.calendarCheck} Rendez-vous</button>
+              </div>
+            </div>
+            <div class="full-width">
+              <label>Titre <span class="required">*</span></label>
               <input type="text" id="ctTitle" placeholder="Ex: Préparer le devis client">
             </div>
             <div id="ctDeadlineField">
@@ -5674,7 +5726,7 @@
                 <button type="button" class="category-btn ${ctCategory === 'perso' ? 'active perso' : ''}" data-cat="perso" onclick="setCtCategory('perso')">${icons.home} Perso</button>
               </div>
             </div>
-            <div>
+            <div id="ctUrgencyField" class="${ctActionType === 'rdv' ? 'hidden' : ''}">
               <label>Niveau d'urgence</label>
               <div class="urgency-buttons">
                 <button type="button" class="urgency-btn ${ctUrgency === 'normal' ? 'active normal' : ''}" data-urgency="normal" onclick="setCtUrgency('normal')">${icons.clock} Normal</button>
@@ -6554,7 +6606,7 @@
         modal.innerHTML = `
           <div class="modal-header">
             <div class="modal-header-left">
-              <div class="modal-icon ${isDone ? 'green' : 'indigo'}">${isDone ? icons.checkCircle : icons.listTodo}</div>
+              <div class="modal-icon ${(!isDone || t.type === 'rdv') ? 'indigo' : 'green'}">${t.type === 'rdv' ? icons.calendarCheck : (isDone ? icons.checkCircle : icons.listTodo)}</div>
               <div style="min-width:0;">
                 <div class="modal-title" style="white-space:normal;">${t.title}</div>
                 ${contactName ? `<div class="modal-subtitle clickable"${contactAttr}>${contactName}</div>` : ''}
@@ -6637,7 +6689,13 @@
             <button class="modal-close" onclick="closeModal()">${icons.x}</button>
           </div>
           <div class="modal-body edit-form">
-            <label>Titre <span class="required">*</span></label>
+            <label>Type</label>
+            <div class="type-buttons">
+              <button type="button" class="type-btn ${quickActionType === 'task' ? 'active task' : ''}" data-type="task" onclick="setQuickActionType('task')">${icons.listTodo} Tâche</button>
+              <button type="button" class="type-btn ${quickActionType === 'rdv' ? 'active rdv' : ''}" data-type="rdv" onclick="setQuickActionType('rdv')">${icons.calendarCheck} Rendez-vous</button>
+            </div>
+
+            <label style="margin-top:0.75rem;">Titre <span class="required">*</span></label>
             <input type="text" id="quickTitle" placeholder="Ex: Préparer le devis client">
 
             <label>Entreprise / Contact <span class="required">*</span></label>
@@ -6668,10 +6726,12 @@
               <button type="button" class="category-btn ${quickCategory === 'perso' ? 'active perso' : ''}" data-cat="perso" onclick="setQuickCategory('perso')">${icons.home} Perso</button>
             </div>
 
-            <label>Urgence</label>
-            <div class="urgency-buttons" style="margin-top:0;">
-              <button type="button" class="urgency-btn ${quickUrgency === 'normal' ? 'active normal' : ''}" data-urgency="normal" onclick="setQuickUrgency('normal')">${icons.clock} Normal</button>
-              <button type="button" class="urgency-btn ${quickUrgency === 'urgent' ? 'active urgent' : ''}" data-urgency="urgent" onclick="setQuickUrgency('urgent')">${icons.zap} Urgent</button>
+            <div id="quickUrgencyField" class="${quickActionType === 'rdv' ? 'hidden' : ''}">
+              <label>Urgence</label>
+              <div class="urgency-buttons" style="margin-top:0;">
+                <button type="button" class="urgency-btn ${quickUrgency === 'normal' ? 'active normal' : ''}" data-urgency="normal" onclick="setQuickUrgency('normal')">${icons.clock} Normal</button>
+                <button type="button" class="urgency-btn ${quickUrgency === 'urgent' ? 'active urgent' : ''}" data-urgency="urgent" onclick="setQuickUrgency('urgent')">${icons.zap} Urgent</button>
+              </div>
             </div>
 
             <label class="recurrence-toggle" style="margin-top:0.75rem;">
@@ -6752,7 +6812,7 @@
             <button class="modal-close" onclick="closeModal()">${icons.x}</button>
           </div>
           <div class="modal-body edit-form">
-            <label>Type d'action</label>
+            <label>Type</label>
             <div class="type-buttons">
               <button type="button" class="type-btn ${editActionType === 'task' ? 'active task' : ''}" data-type="task" onclick="setEditActionType('task')">${icons.listTodo} Tâche</button>
               <button type="button" class="type-btn ${editActionType === 'rdv' ? 'active rdv' : ''}" data-type="rdv" onclick="setEditActionType('rdv')">${icons.calendarCheck} Rendez-vous</button>
@@ -6870,7 +6930,7 @@
             
             <div class="divider"><span>Nouvelle action de suivi</span></div>
             
-            <label>Type d'action</label>
+            <label>Type</label>
             <div class="type-buttons">
               <button type="button" class="type-btn ${followUpType === 'task' ? 'active task' : ''}" data-type="task" onclick="setFollowUpType('task')">${icons.listTodo} Tâche</button>
               <button type="button" class="type-btn ${followUpType === 'rdv' ? 'active rdv' : ''}" data-type="rdv" onclick="setFollowUpType('rdv')">${icons.calendarCheck} Rendez-vous</button>
@@ -8963,5 +9023,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a42bb73c5ed15014',t:'MTc5MDY5MjU0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a42c02b97cf360d4',t:'MTc5MDY5NTYzMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
