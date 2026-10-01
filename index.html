@@ -795,6 +795,13 @@
       cursor: default;
     }
     .fiche-desc { font-size: 0.825rem; color: #64748b; line-height: 1.4; margin-bottom: 0.4rem; }
+    /* Les textes saisis (descriptions, commentaires, clôtures) gardent leur forme :
+       retours à la ligne conservés à l'affichage */
+    .fiche-desc, .task-comment p, .comment-item p, .fiche-history-item p,
+    .summary-comment p, .sheet-task-desc, .sheet-task-comment {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
     /* Historique des commentaires de clôture (chaîne de suivis), plus récent en haut */
     .fiche-history { margin-top: 0.5rem; }
     .fiche-history-title {
@@ -1400,6 +1407,23 @@
       outline: none;
     }
     .add-comment-row input:focus {
+      border-color: #8B9CF8;
+      box-shadow: 0 0 0 2px rgba(91,114,245,0.1);
+    }
+    .add-comment-row textarea {
+      flex: 1;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8rem;
+      font-family: inherit;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      outline: none;
+      resize: vertical;
+      min-height: 2.1rem;
+      max-height: 8rem;
+      line-height: 1.4;
+    }
+    .add-comment-row textarea:focus {
       border-color: #8B9CF8;
       box-shadow: 0 0 0 2px rgba(91,114,245,0.1);
     }
@@ -4436,7 +4460,7 @@
                 </div>
               `).join('')}
               <div class="add-comment-row">
-                <input type="text" id="comment-input-${task.id}" placeholder="Écrire un commentaire..." onkeydown="if(event.key==='Enter')addComment('${task.id}', '${task.deadline || ''}')">
+                <textarea rows="1" id="comment-input-${task.id}" placeholder="Écrire un commentaire... (Maj+Entrée pour une nouvelle ligne)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addComment('${task.id}', '${task.deadline || ''}')}"></textarea>
                 <button class="add-comment-btn" onclick="addComment('${task.id}', '${task.deadline || ''}')">${icons.send}</button>
               </div>
             </div>
@@ -5636,7 +5660,7 @@
                   </div>`).join('')}
               </div>` : ''}
               <div class="add-comment-row">
-                <input type="text" id="comment-input-${task.id}" placeholder="Écrire un commentaire..." onkeydown="if(event.key==='Enter')addComment('${task.id}', '${task.deadline || ''}')">
+                <textarea rows="1" id="comment-input-${task.id}" placeholder="Écrire un commentaire... (Maj+Entrée pour une nouvelle ligne)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addComment('${task.id}', '${task.deadline || ''}')}"></textarea>
                 <button class="add-comment-btn" onclick="addComment('${task.id}', '${task.deadline || ''}')">${icons.send}</button>
               </div>
             </div>
@@ -6661,7 +6685,7 @@
             <div class="task-meta" style="margin-top:0.375rem;">
               ${(t.tags || []).map(tag => `<span class="tag-badge">${icons.tag} ${tag}</span>`).join('')}
             </div>` : ''}
-            ${t.description ? `<div style="margin-top:0.75rem;font-size:0.85rem;color:#475569;line-height:1.5;">${t.description}</div>` : ''}
+            ${t.description ? `<div class="sheet-task-desc" style="margin-top:0.75rem;">${t.description}</div>` : ''}
             ${completionComment ? `
               <div class="task-comment" style="margin-top:0.75rem;">
                 ${icons.message}
@@ -6680,7 +6704,7 @@
               `).join('')}` : ''}
             <div class="sheet-section-title" style="margin-top:1rem;">${icons.msgPlus} Ajouter un commentaire</div>
             <div class="add-comment-row">
-              <input type="text" id="detailCommentInput" placeholder="Écrire un commentaire..." onkeydown="if(event.key==='Enter')addDetailComment('${t.id}', '${t._date}')">
+              <textarea rows="1" id="detailCommentInput" placeholder="Écrire un commentaire... (Maj+Entrée pour une nouvelle ligne)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addDetailComment('${t.id}', '${t._date}')}"></textarea>
               <button class="add-comment-btn" onclick="addDetailComment('${t.id}', '${t._date}')" title="Envoyer le commentaire">${icons.send}</button>
             </div>
             ${!isDone ? `
@@ -9056,5 +9080,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a42c257eba63e1b5',t:'MTc5MDY5NzA1Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a439b771ad34e1d4',t:'MTc5MDgzOTM1MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
