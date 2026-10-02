@@ -38,15 +38,13 @@
       border-bottom: 1px solid rgba(226,232,240,0.8);
       padding: 1rem;
     }
+    /* Toute la largeur de l'écran : logo tout à gauche,
+       voyant de sync et réglages tout à droite, recherche au centre */
     .header-inner {
-      max-width: 960px;
-      margin: 0 auto;
+      width: 100%;
       display: flex;
       align-items: center;
       gap: 1rem;
-    }
-    @media (min-width: 901px) {
-      .header-inner { max-width: 1200px; }
     }
     .header-center {
       flex: 1;
@@ -256,7 +254,9 @@
       0%, 100% { box-shadow: none; }
       30% { box-shadow: 0 0 0 3px #8B9CF8; }
     }
-    .task-card.flash-highlight { animation: flashHighlight 1.5s ease; }
+    /* Surbrillance passagère générique : s'applique à tout élément
+       (cartes d'action, cartes de comptes, actions du calendrier...) */
+    .flash-highlight { animation: flashHighlight 1.5s ease; }
     .chart-tooltip {
       position: absolute;
       background: #1e293b;
@@ -689,7 +689,7 @@
     .filter-btn:hover { background: rgba(255,255,255,0.5); color: #1e293b; }
     .filter-btn.active {
       background: white;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+      box-shadow: 0 2px 8px rgba(91,114,245,0.25);
     }
     .filter-btn .count {
       padding: 0.125rem 0.375rem;
@@ -2178,13 +2178,9 @@
     .view-switcher {
       display: flex;
       gap: 0.25rem;
-      background: #E9EDFD;
-      border-radius: 12px;
-      padding: 0.25rem;
       width: fit-content;
       max-width: 100%;
-      /* Même hauteur que le carré du logo (44px) : les deux éléments
-         alignés côte à côte dans le header apparaissent égaux */
+      /* Même hauteur que le logo (44px), aligné côte à côte dans le header */
       height: 44px;
     }
     .view-btn {
@@ -2193,7 +2189,7 @@
       align-items: center;
       justify-content: center;
       gap: 0.375rem;
-      padding: 0.5rem 1.25rem;
+      padding: 0.5rem 1rem;
       border: none;
       background: transparent;
       border-radius: 8px;
@@ -2204,12 +2200,11 @@
       transition: all 0.2s;
       min-width: 0;
       white-space: nowrap;
-      border-radius: 10px;
     }
-    .view-btn:hover { background: rgba(255,255,255,0.5); color: #1e293b; }
+    .view-btn:hover { background: rgba(91,114,245,0.1); color: #1e293b; }
     .view-btn.active {
       background: white;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+      box-shadow: 0 2px 8px rgba(91,114,245,0.25);
     }
     .view-btn svg { flex-shrink: 0; }
 
@@ -2458,7 +2453,7 @@
       transition: all 0.15s; white-space: nowrap;
     }
     .cal-view-btn:hover { background: rgba(255,255,255,0.5); color: #1e293b; }
-    .cal-view-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .cal-view-btn.active { background: white; box-shadow: 0 2px 8px rgba(91,114,245,0.25); }
 
     .cal-scroll { overflow-x: auto; }
     .cal-month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; min-width: 780px; }
@@ -5247,7 +5242,13 @@
 
     // Clic sur une carte de la grille : vue « gestion de projet » du contact
     // (actions en cours et terminées + création rapide pour ce contact)
-    function openContactTasks(contactKey, focusTaskId) {
+    function openContactTasks(contactKey, focusTaskId, focusDate) {
+      // Mémorise la page d'origine : le bouton Retour y reviendra
+      // (grille Comptes, ou page de la pop-up d'où la fiche a été ouverte),
+      // ainsi que l'action consultée pour la surligner au retour
+      if (taskView !== 'contact') {
+        contactViewOrigin = { view: taskView, contact: contactKey, focusTaskId: focusTaskId || null, focusDate: focusDate || null };
+      }
       projectContact = contactKey;
       recordRecentContact(contactKey);
       renamingContact = false;
@@ -5275,14 +5276,45 @@
       }
     }
 
+    let contactViewOrigin = null; // page d'origine de la fiche consultée
+
     function backToProjects() {
+      const origin = contactViewOrigin;
       projectContact = null;
       renamingContact = false;
       ctFormExpanded = false;
       ctLogMode = false;
       ctTags = [];
-      taskView = 'project';
+      contactViewOrigin = null;
+      // Retour à la page d'origine (grille Comptes par défaut ; page de la
+      // pop-up si la fiche a été ouverte depuis une pop-up)
+      const targetView = (origin && origin.view && origin.view !== 'contact') ? origin.view : 'project';
+      taskView = targetView;
       render();
+      // Depuis la grille Comptes : repositionne à la hauteur du compte consulté
+      if (targetView === 'project' && origin && origin.contact) {
+        requestAnimationFrame(() => {
+          const el = Array.from(document.querySelectorAll('.project-card'))
+            .find(c => c.dataset.contactKey === origin.contact);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('flash-highlight');
+            setTimeout(() => el.classList.remove('flash-highlight'), 1500);
+          }
+        });
+      }
+      // Depuis le calendrier : surligne un court instant l'action consultée
+      // avant d'aller voir la fiche du compte
+      if (targetView === 'calendar' && origin && origin.focusTaskId) {
+        requestAnimationFrame(() => {
+          const el = document.getElementById(`cal-task-${origin.focusTaskId}-${origin.focusDate || ''}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('flash-highlight');
+            setTimeout(() => el.classList.remove('flash-highlight'), 1500);
+          }
+        });
+      }
     }
 
     // ---- Renommage du contact (appliqué à toutes ses actions) ----
@@ -5947,7 +5979,7 @@
       const when = t.status === 'done' ? '✓' : (isOverdue ? 'Retard' : (t.type === 'rdv' ? 'RDV' : (t.urgency === 'urgent' ? 'Urgent' : '')));
       const clickAttr = ` onclick="event.stopPropagation();openTaskDetail('${t.id}', '${t.date}')" title="Consulter l'action"`;
       const dragAttr = !t.recurring ? ` draggable="true" ondragstart="calDragTask(event, '${t.id}')"` : '';
-      return `<button class="mini-task-item cal-task"${clickAttr}${dragAttr}>
+      return `<button class="mini-task-item cal-task" id="cal-task-${t.id}-${t.date}"${clickAttr}${dragAttr}>
         <span class="dot" style="background:${dot}"></span>
         <span class="txt">${t.title}</span>
         ${t.recurring ? `<span class="cal-rec-logo" title="Action récurrente">${icons.repeat}</span>` : ''}
@@ -6224,7 +6256,7 @@
           ${list.map(c => {
             const dl = c.nextDeadline ? getDeadlineInfo(c.nextDeadline) : null;
             return `
-            <button class="project-card ${c.todo > 0 ? '' : 'inactive'}" onclick="openContactTasks('${c.key.replace(/'/g, "\\'")}')" title="Voir les actions de ${c.name.replace(/"/g, '&quot;')}">
+            <button class="project-card ${c.todo > 0 ? '' : 'inactive'}" data-contact-key="${c.key.replace(/"/g, '&quot;')}" onclick="openContactTasks('${c.key.replace(/'/g, "\\'")}')" title="Voir les actions de ${c.name.replace(/"/g, '&quot;')}">
               <div class="project-card-name">${c.noContact ? icons.tag : icons.building}<span class="project-card-name-txt">${c.name}</span><span class="project-card-go">›</span></div>
               ${c.todo > 0 && c.nextTaskTitle ? `
                 <div class="project-card-next">
@@ -6657,7 +6689,7 @@
         const deadline = t._date || t.deadline;
         const contactName = (t.contact || '').trim();
         const contactAttr = contactName
-          ? ` onclick="closeModal();openContactTasks('${contactName.replace(/'/g, "\\'")}', '${t.id}')" title="Voir la fiche du compte"`
+          ? ` onclick="closeModal();openContactTasks('${contactName.replace(/'/g, "\\'")}', '${t.id}', '${t._date || ''}')" title="Voir la fiche du compte"`
           : '';
 
         modal.innerHTML = `
@@ -9080,5 +9112,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a439b771ad34e1d4',t:'MTc5MDgzOTM1MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
