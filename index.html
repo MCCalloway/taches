@@ -284,17 +284,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      width: 150px;
+      gap: 0.4rem;
+      width: 118px;
       aspect-ratio: 1 / 1;
-      padding: 0.75rem;
+      padding: 0.6rem;
       background: white;
       border: 2px solid #a7f3d0;
-      border-radius: 16px;
+      border-radius: 14px;
       box-shadow: 0 2px 10px rgba(5,150,105,0.14);
       cursor: pointer;
       transition: all 0.2s;
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       font-weight: 500;
       color: #334155;
       text-align: center;
@@ -308,17 +308,17 @@
       transform: translateY(-2px);
     }
     .add-task-square .icon-circle {
-      width: 44px;
-      height: 44px;
+      width: 36px;
+      height: 36px;
       background: #d1fae5;
       color: #059669;
-      border-radius: 14px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
     }
-    .add-task-square .icon-circle svg { width: 22px; height: 22px; }
+    .add-task-square .icon-circle svg { width: 18px; height: 18px; }
     .add-task-square:hover .icon-circle { background: #059669; color: white; }
     .add-task-square.log { border-color: #D4DCFA; box-shadow: 0 2px 10px rgba(91,114,245,0.14); }
     .add-task-square.log .icon-circle { background: #E9EDFD; color: #5B72F5; }
@@ -341,7 +341,7 @@
     }
     .add-task-square.rapport:hover .icon-circle { background: #2563eb; color: white; }
     @media (max-width: 640px) {
-      .add-task-square { width: 130px; font-size: 0.8rem; }
+      .add-task-square { width: 104px; font-size: 0.74rem; }
     }
 
     /* Add Task Button */
@@ -829,6 +829,85 @@
     .fiche-history-item:last-child { margin-bottom: 0; }
     .fiche-history-item svg { color: #94a3b8; flex-shrink: 0; margin-top: 2px; }
     .fiche-history-item p { color: #475569; line-height: 1.35; }
+    /* Contacts du compte (fiche) */
+    .cp-contacts {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .cp-contacts-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+    .cp-contacts-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    .cp-contacts-title svg { color: #5B72F5; }
+    .cp-contact-add-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid #D4DCFA;
+      border-radius: 8px;
+      background: white;
+      color: #4D5FD8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .cp-contact-add-btn:hover { background: #EEF1FE; border-color: #8B9CF8; }
+    .cp-contact-add-btn svg { width: 13px; height: 13px; }
+    .cp-contact-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.5rem 0.6rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: white;
+      margin-bottom: 0.4rem;
+    }
+    .cp-contact-card:last-child { margin-bottom: 0; }
+    .cp-contact-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #EEF1FE;
+      color: #5B72F5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .cp-contact-avatar svg { width: 15px; height: 15px; }
+    .cp-contact-info { flex: 1; min-width: 0; }
+    .cp-contact-name { font-size: 0.85rem; font-weight: 600; color: #1e293b; }
+    .cp-contact-role { font-weight: 400; color: #64748b; font-size: 0.78rem; }
+    .cp-contact-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.9rem;
+      margin-top: 0.2rem;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+    .cp-contact-details span { display: inline-flex; align-items: center; gap: 0.3rem; }
+    .cp-contact-details svg { color: #94a3b8; width: 12px; height: 12px; }
+    .cp-contact-actions { display: flex; gap: 0.25rem; flex-shrink: 0; }
+    .cp-contact-empty { font-size: 0.8rem; color: #94a3b8; padding: 0.35rem 0; }
+
     /* Sections pliables de la fiche */
     .cp-section-toggle { cursor: pointer; user-select: none; }
     .cp-section-toggle:hover { color: #5B72F5; }
@@ -2098,6 +2177,15 @@
       gap: 0.2rem;
     }
     .summary-task.done .summary-task-when { color: #64748b; }
+    /* Rapport : cartes pliables (commentaires déroulés au clic) */
+    .summary-task { cursor: pointer; }
+    .summary-task-details { cursor: default; margin-top: 0.4rem; }
+    .summary-chev {
+      display: inline-flex;
+      vertical-align: middle;
+      margin-left: 0.35rem;
+      color: #94a3b8;
+    }
     .summary-task-meta {
       display: flex;
       flex-wrap: wrap;
@@ -2352,6 +2440,19 @@
       flex-direction: column;
       gap: 0.8rem;
     }
+    .cp-main-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+    .cp-account-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 1.1rem;
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+    .cp-account-details span { display: inline-flex; align-items: center; gap: 0.3rem; min-width: 0; }
+    .cp-account-details svg { color: #94a3b8; width: 13px; height: 13px; flex-shrink: 0; }
+    .cp-edit-block { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; }
+    .cp-edit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.6rem; }
+    .cp-edit-grid label { display: block; font-size: 0.75rem; font-weight: 500; color: #475569; margin-bottom: 0.25rem; }
     .cp-main {
       display: flex;
       align-items: center;
@@ -2699,6 +2800,7 @@
              <div class="filter-group" id="periodFilters"></div>
              <div class="filter-group" id="summaryFilters"></div>
              <select id="projectSortSelect" class="settings-select hidden" onchange="setProjectSort(this.value)" title="Trier les comptes"></select>
+             <button class="sort-dir-btn hidden" id="projectSortDirBtn" onclick="toggleProjectSortDir()" title="Inverser l'ordre des comptes"></button>
             </div>
             <select id="sortSelect">
               <option value="deadline">Date limite</option>
@@ -2756,6 +2858,87 @@
       localStorage.setItem('taskflow-settings', JSON.stringify(settings));
     }
 
+    // ============ INFOS DE COMPTE (adresse, téléphone, e-mail) ============
+    let accountInfo = JSON.parse(localStorage.getItem('taskflow-accounts') || '{}');
+    function saveAccountInfo() {
+      localStorage.setItem('taskflow-accounts', JSON.stringify(accountInfo));
+    }
+    function getAccountInfo(name) {
+      const norm = (name || '').trim().toLowerCase();
+      if (!norm) return null;
+      const key = Object.keys(accountInfo).find(k => k.toLowerCase() === norm);
+      return key ? accountInfo[key] : null;
+    }
+    // Renomme la clé d'infos de compte (le nom du compte a changé)
+    function renameAccountInfoKey(oldName, newName) {
+      const norm = (oldName || '').trim().toLowerCase();
+      const key = Object.keys(accountInfo).find(k => k.toLowerCase() === norm);
+      if (key) {
+        const info = accountInfo[key];
+        delete accountInfo[key];
+        accountInfo[newName] = info;
+        saveAccountInfo();
+      }
+    }
+
+    // ============ CONTACTS (personnes associées aux comptes) ============
+    let contactList = JSON.parse(localStorage.getItem('taskflow-contacts') || '[]');
+    function saveContacts() {
+      localStorage.setItem('taskflow-contacts', JSON.stringify(contactList));
+    }
+    function getAccountContacts(account) {
+      const norm = (account || '').trim().toLowerCase();
+      if (!norm) return [];
+      return contactList.filter(c => (c.account || '').trim().toLowerCase() === norm);
+    }
+    // Nom affichable du contact assigné à une action (par id, sinon nom historique)
+    function getPersonName(task) {
+      if (!task.personId && !task.person) return '';
+      const c = contactList.find(p => p.id === task.personId);
+      return c ? c.name : (task.person || '');
+    }
+    // Résout un nom saisi en contact du compte donné (assignation d'action)
+    function resolvePerson(account, personName) {
+      if (!personName || !personName.trim()) return undefined;
+      const list = getAccountContacts(account);
+      const found = list.find(c => c.name.toLowerCase() === personName.trim().toLowerCase());
+      return found ? { personId: found.id, person: found.name } : undefined;
+    }
+    // Champ de sélection d'un contact avec suggestions filtrées par compte
+    function setupPersonField(opts) {
+      const input = document.getElementById(opts.inputId);
+      const sug = document.getElementById(opts.suggestionsId);
+      if (!input || !sug) return;
+      const refresh = () => {
+        const account = (opts.companyGetter ? opts.companyGetter() : '') || '';
+        const norm = account.trim().toLowerCase();
+        const q = (input.value || '').trim().toLowerCase();
+        // Seuls les contacts associés au compte renseigné sont proposés
+        const list = contactList.filter(p => (p.account || '').trim().toLowerCase() === norm && (!q || p.name.toLowerCase().includes(q)));
+        if (list.length > 0) {
+          sug.innerHTML = list.map(p => `
+            <div class="suggestion-item" onclick="selectPersonInput('${opts.inputId}', '${p.name.replace(/'/g, "\\'")}')">
+              <span>${icons.user} ${p.name}${p.role ? ' <small>— ' + p.role + '</small>' : ''}</span>
+            </div>`).join('');
+          sug.classList.remove('hidden');
+        } else {
+          sug.classList.add('hidden');
+        }
+      };
+      input.addEventListener('input', refresh);
+      input.addEventListener('focus', refresh);
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.contact-field')) sug.classList.add('hidden');
+      });
+    }
+    function selectPersonInput(inputId, name) {
+      const input = document.getElementById(inputId);
+      if (input) input.value = name;
+      const field = input ? input.closest('.contact-field') : null;
+      const sug = field ? field.querySelector('.suggestions') : null;
+      if (sug) sug.classList.add('hidden');
+    }
+
     // ============ STATE ============
     let tasks = JSON.parse(localStorage.getItem('taskflow-tasks') || '[]');
     let filterStatus = settings.defaultFilterStatus;
@@ -2778,6 +2961,7 @@
     let periodDraft = null;
     let taskView = settings.defaultView || 'tasks'; // 'tasks' (liste) | 'project' (grille par contact) | 'contact' (fiche contact) | 'calendar' (emploi du temps)
     let projectSort = settings.defaultProjectSort || 'deadline'; // tri des comptes : 'deadline' | 'name'
+    let projectSortAsc = true; // ordre de tri des comptes : croissant / décroissant
     let calendarMode = settings.defaultCalendarMode || 'month'; // 'year' | 'month' | 'week' | 'workweek'
     let calMainDate = new Date(); // date de référence du calendrier
     let projectContact = null; // contact affiché dans la vue « gestion de projet »
@@ -2843,6 +3027,10 @@
       fileText: `<svg width="20" height="20" ${sv}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
       copy: `<svg width="14" height="14" ${sv}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>`,
       arrowLeft: `<svg width="14" height="14" ${sv}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
+      user: `<svg width="14" height="14" ${sv}><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+      phone: `<svg width="14" height="14" ${sv}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>`,
+      mail: `<svg width="14" height="14" ${sv}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+      mapPin: `<svg width="14" height="14" ${sv}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
       pieChart: `<svg width="15" height="15" ${sv}><path d="M21.21 15.89A10 10 0 118 2.83"/><path d="M22 12A10 10 0 0012 2v10z"/></svg>`,
     };
 
@@ -3931,10 +4119,16 @@
               <input type="text" id="taskTitle" placeholder="Ex: Préparer le devis client" required>
             </div>
             <div class="contact-field">
-              <label>Entreprise / Contact <span class="required">*</span></label>
+              <label>Compte <span class="required">*</span></label>
               ${icons.building}
               <input type="text" id="taskContact" placeholder="Ex: Acme Corp" autocomplete="off" required>
               <div class="suggestions hidden" id="contactSuggestions"></div>
+            </div>
+            <div class="contact-field full-width">
+              <label>${icons.user} Contact du compte (optionnel)</label>
+              ${icons.user}
+              <input type="text" id="taskPerson" placeholder="Personne à assigner à l'action..." autocomplete="off">
+              <div class="suggestions hidden" id="personSuggestions"></div>
             </div>
             <div id="deadlineField">
               <label>${isLog ? 'Date <span style="color:#94a3b8;font-weight:400;">(facultative)</span>' : 'Date limite <span class="required">*</span>'}</label>
@@ -4045,6 +4239,13 @@
         }
       });
 
+      // Suggestions du contact (personne) : filtrées selon l'entreprise saisie
+      setupPersonField({
+        inputId: 'taskPerson',
+        suggestionsId: 'personSuggestions',
+        companyGetter: () => document.getElementById('taskContact').value,
+      });
+
       // Setup tag autocomplete
       setupTagInput({
         inputId: 'taskTagInput',
@@ -4077,10 +4278,16 @@
       const sortSel = document.getElementById('projectSortSelect');
       if (sortSel) {
         sortSel.innerHTML = `
-          <option value="deadline" ${projectSort === 'deadline' ? 'selected' : ''}>Trier : échéance proche</option>
-          <option value="name" ${projectSort === 'name' ? 'selected' : ''}>Trier : nom</option>
+          <option value="deadline" ${projectSort === 'deadline' ? 'selected' : ''}>Trier : Échéance</option>
+          <option value="name" ${projectSort === 'name' ? 'selected' : ''}>Trier : Nom</option>
         `;
         sortSel.classList.toggle('hidden', taskView !== 'project');
+      }
+      // Bouton d'inversion de l'ordre des comptes (croissant / décroissant)
+      const projectDirBtn = document.getElementById('projectSortDirBtn');
+      if (projectDirBtn) {
+        projectDirBtn.innerHTML = projectSortAsc ? icons.sortAsc : icons.sortDesc;
+        projectDirBtn.classList.toggle('hidden', taskView !== 'project');
       }
       // Hors Recherche/Comptes, la barre d'outils est masquée
       document.getElementById('taskSortBar')?.classList.toggle('project-mode', taskView !== 'tasks');
@@ -4566,6 +4773,14 @@
         task.urgency = editActionType === 'rdv' ? 'normal' : editUrgency;
         task.category = editCategory;
         task.tags = [...editTags];
+        const editedPerson = resolvePerson(contact, document.getElementById('editPerson') ? document.getElementById('editPerson').value : '');
+        if (editedPerson) {
+          task.personId = editedPerson.personId;
+          task.person = editedPerson.person;
+        } else {
+          delete task.personId;
+          delete task.person;
+        }
         if (recurrence) {
           task.recurrence = recurrence;
         } else {
@@ -4767,6 +4982,7 @@
         status: 'todo',
         createdAt: new Date().toISOString(),
         tags: [...quickTags],
+        ...(resolvePerson(contact, document.getElementById('quickPerson') ? document.getElementById('quickPerson').value : '') || {}),
       };
       if (recurrence) task.recurrence = recurrence;
 
@@ -4948,6 +5164,7 @@
         status: 'todo',
         createdAt: new Date().toISOString(),
         tags: [...currentTags],
+        ...(resolvePerson(contact, document.getElementById('taskPerson') ? document.getElementById('taskPerson').value : '') || {}),
       };
       if (recurrence) task.recurrence = recurrence;
       
@@ -4993,6 +5210,7 @@
         completionComment: comment || undefined,
         createdAt: now,
         tags: [...currentTags],
+        ...(resolvePerson(contact, document.getElementById('taskPerson') ? document.getElementById('taskPerson').value : '') || {}),
       };
 
       tasks.unshift(task);
@@ -5219,6 +5437,11 @@
       render();
     }
 
+    function toggleProjectSortDir() {
+      projectSortAsc = !projectSortAsc;
+      render();
+    }
+
     function renderViewSwitcher() {
       const el = document.getElementById('viewSwitcherContainer');
       if (!el) return;
@@ -5338,11 +5561,28 @@
       if (!newName) { if (input) input.focus(); return; }
       const isNoContact = projectContact === NO_CONTACT_KEY;
       const oldName = projectContact;
-      if (newName === (isNoContact ? 'Sans contact' : oldName)) {
+      const nameChanged = newName !== (isNoContact ? 'Sans contact' : oldName);
+
+      // Infos du compte (adresse, téléphone, e-mail) : lues depuis le formulaire
+      const addrInput = document.getElementById('accountAddress');
+      const phoneInput = document.getElementById('accountPhone');
+      const emailInput = document.getElementById('accountEmail');
+      if (addrInput || phoneInput || emailInput) {
+        accountInfo[newName] = {
+          address: addrInput ? addrInput.value.trim() : '',
+          phone: phoneInput ? phoneInput.value.trim() : '',
+          email: emailInput ? emailInput.value.trim() : '',
+        };
+      }
+
+      if (!nameChanged) {
+        saveAccountInfo();
         renamingContact = false;
         render();
+        showToast('✓ Compte mis à jour');
         return;
       }
+
       let count = 0;
       if (isNoContact) {
         // Rattache toutes les actions sans contact au nouveau nom
@@ -5355,12 +5595,28 @@
         tasks.forEach(t => {
           if (t.contact && t.contact.trim().toLowerCase() === norm) { t.contact = newName; count++; }
         });
+        // Les contacts du compte suivent le nouveau nom
+        contactList.forEach(c => {
+          if ((c.account || '').trim().toLowerCase() === norm) c.account = newName;
+        });
+        saveContacts();
+        // Les infos du compte (adresse...) suivent aussi le nouveau nom
+        renameAccountInfoKey(oldName, newName);
+        // ... puis l édition éventuelle des infos est enregistrée sous ce nom
+        if (addrInput || phoneInput || emailInput) {
+          accountInfo[newName] = {
+            address: addrInput ? addrInput.value.trim() : '',
+            phone: phoneInput ? phoneInput.value.trim() : '',
+            email: emailInput ? emailInput.value.trim() : '',
+          };
+        }
       }
+      saveAccountInfo();
       saveTasks();
       projectContact = newName;
       renamingContact = false;
       render();
-      showToast(`✓ Contact renommé — ${count} action${count > 1 ? 's' : ''} mise${count > 1 ? 's' : ''} à jour`);
+      showToast(`✓ Compte mis à jour — ${count} action${count > 1 ? 's' : ''} reno${count > 1 ? 'mmées' : 'mmée'}`);
     }
 
     // Supprime le compte affiché et TOUTES ses actions, après confirmation
@@ -5377,6 +5633,13 @@
       tasks = tasks.filter(t => isNoContact
         ? (t.contact || '').trim()
         : !(t.contact && t.contact.trim().toLowerCase() === norm));
+      // Les contacts et les infos (adresse...) du compte sont supprimés avec lui
+      contactList = isNoContact ? contactList : contactList.filter(c => (c.account || '').trim().toLowerCase() !== norm);
+      saveContacts();
+      if (!isNoContact) {
+        const infoKey = Object.keys(accountInfo).find(k => k.toLowerCase() === norm);
+        if (infoKey) { delete accountInfo[infoKey]; saveAccountInfo(); }
+      }
       saveTasks();
       showToast(`✓ ${contactName} supprimé (${related.length} action${related.length > 1 ? 's' : ''})`);
       backToProjects();
@@ -5499,10 +5762,11 @@
       if (pendingTagInput && pendingTagInput.value.trim()) {
         addTagsToList(pendingTagInput.value, ctTags);
       }
+      const ctAccount = projectContact === NO_CONTACT_KEY ? '' : projectContact;
       const task = {
         id: generateId(),
         title,
-        contact: projectContact === NO_CONTACT_KEY ? '' : projectContact,
+        contact: ctAccount,
         deadline,
         description: description || undefined,
         type: ctActionType === 'rdv' ? 'rdv' : 'task',
@@ -5511,6 +5775,7 @@
         status: 'todo',
         createdAt: new Date().toISOString(),
         tags: [...ctTags],
+        ...(resolvePerson(ctAccount, document.getElementById('ctPerson') ? document.getElementById('ctPerson').value : '') || {}),
       };
       if (recurrence) task.recurrence = recurrence;
       tasks.unshift(task);
@@ -5540,10 +5805,11 @@
       }
 
       const now = new Date().toISOString();
+      const ctAccount = projectContact === NO_CONTACT_KEY ? '' : projectContact;
       const task = {
         id: generateId(),
         title,
-        contact: projectContact === NO_CONTACT_KEY ? '' : projectContact,
+        contact: ctAccount,
         deadline,
         description: description || undefined,
         type: ctActionType === 'rdv' ? 'rdv' : 'task',
@@ -5554,6 +5820,7 @@
         completionComment: comment || undefined,
         createdAt: now,
         tags: [...ctTags],
+        ...(resolvePerson(ctAccount, document.getElementById('ctPerson') ? document.getElementById('ctPerson').value : '') || {}),
       };
       tasks.unshift(task);
       saveTasks();
@@ -5619,6 +5886,7 @@
         .filter(c => !task.recurrence || !c.occurrenceDate || c.occurrenceDate === task.deadline);
       const commentCount = comments.length;
       const contactName = (task.contact || '').trim();
+      const personName = getPersonName(task);
 
       return `
         <div class="task-card fiche-card ${isDone ? 'done' : ''} ${isOverdue ? 'overdue' : ''}" id="task-${task.id}">
@@ -5630,6 +5898,7 @@
                 <div class="task-title">${task.title}<span class="fiche-chevron" id="fiche-chevron-${task.id}">${expanded ? icons.chevronUp : icons.chevronDown}</span></div>
                 <div class="task-meta">
                   ${contactName ? `<span class="task-meta-item" style="cursor:pointer;" onclick="openContactSheet('${contactName.replace(/'/g, "\\'")}')" title="Voir la fiche">${icons.building} ${contactName}</span>` : ''}
+                  ${personName ? `<span class="task-meta-item">${icons.user} ${personName}</span>` : ''}
                   ${!isDone && deadlineInfo ? `<span class="task-meta-item ${deadlineInfo.class}">${icons.calendar} ${deadlineInfo.text}</span>` : ''}
                   ${isDone && isRdv && task.deadline ? `<span class="task-meta-item">${icons.calendar} Rendez-vous du ${formatDate(task.deadline)}</span>` : ''}
                   ${isDone && task.completedAt ? `<span class="task-meta-item" style="color:#059669;font-weight:500;">${icons.calendarCheck} Terminée le ${formatDate(task.completedAt, true)}</span>` : ''}
@@ -5762,6 +6031,12 @@
               <label>Titre <span class="required">*</span></label>
               <input type="text" id="ctTitle" placeholder="Ex: Préparer le devis client">
             </div>
+            <div class="full-width contact-field">
+              <label>${icons.user} Contact du compte (optionnel)</label>
+              ${icons.user}
+              <input type="text" id="ctPerson" placeholder="Personne à assigner à l'action..." autocomplete="off">
+              <div class="suggestions hidden" id="ctPersonSuggestions"></div>
+            </div>
             <div id="ctDeadlineField">
               <label>${ctLogMode ? 'Date <span style="color:#94a3b8;font-weight:400;">(facultative)</span>' : 'Date limite <span class="required">*</span>'}</label>
               <input type="date" id="ctDeadline" ${ctLogMode ? `value="${getTodayStr()}"` : `min="${today}"`}>
@@ -5844,6 +6119,10 @@
       const rdvTotal = allFicheActions.filter(t => t.type === 'rdv').length;
       const taskTotal = allFicheActions.length - rdvTotal;
 
+      const accountKey = isNoContact ? '' : (projectContact || '');
+      const accountContacts = getAccountContacts(accountKey);
+      const accountDetails = isNoContact ? null : (getAccountInfo(accountKey) || {});
+
       container.innerHTML = `
         <button class="back-btn" onclick="backToProjects()">
           ${icons.arrowLeft} Retour
@@ -5851,18 +6130,43 @@
 
         <div class="contact-project-header">
           ${renamingContact ? `
-            <div class="contact-rename-row">
-              ${isNoContact ? icons.tag : icons.building}
-              <input type="text" id="renameContactInput" value="${contactName.replace(/"/g, '&quot;')}" placeholder="Nom de l'entreprise / du contact" onkeydown="if(event.key==='Enter')applyRenameContact();if(event.key==='Escape')cancelRenameContact()">
-              <button class="btn btn-primary" style="padding:0.4rem 0.9rem;font-size:0.8rem;flex:0 0 auto;" onclick="applyRenameContact()">${icons.check} Enregistrer</button>
-              <button class="btn btn-secondary" style="padding:0.4rem 0.9rem;font-size:0.8rem;flex:0 0 auto;" onclick="cancelRenameContact()">Annuler</button>
+            <div class="cp-edit-block">
+              <div class="contact-rename-row">
+                ${isNoContact ? icons.tag : icons.building}
+                <input type="text" id="renameContactInput" value="${contactName.replace(/"/g, '&quot;')}" placeholder="Nom du compte" onkeydown="if(event.key==='Enter')applyRenameContact();if(event.key==='Escape')cancelRenameContact()">
+                <button class="btn btn-primary" style="padding:0.4rem 0.9rem;font-size:0.8rem;flex:0 0 auto;" onclick="applyRenameContact()">${icons.check} Enregistrer</button>
+                <button class="btn btn-secondary" style="padding:0.4rem 0.9rem;font-size:0.8rem;flex:0 0 auto;" onclick="cancelRenameContact()">Annuler</button>
+              </div>
+              ${!isNoContact ? `
+              <div class="cp-edit-grid">
+                <div>
+                  <label>Adresse</label>
+                  <input type="text" id="accountAddress" value="${(accountDetails.address || '').replace(/"/g, '&quot;')}" placeholder="Ex: 12 rue des Lilas, 50170 Le Mont-Saint-Michel">
+                </div>
+                <div>
+                  <label>Téléphone</label>
+                  <input type="tel" id="accountPhone" value="${(accountDetails.phone || '').replace(/"/g, '&quot;')}" placeholder="Ex: 02 31 00 00 00">
+                </div>
+                <div>
+                  <label>E-mail</label>
+                  <input type="email" id="accountEmail" value="${(accountDetails.email || '').replace(/"/g, '&quot;')}" placeholder="Ex: contact@entreprise.fr">
+                </div>
+              </div>` : ''}
             </div>
           ` : `
             <div class="cp-main">
               <div class="cp-icon">${isNoContact ? icons.tag : icons.building}</div>
-              <div class="cp-name">${contactName}</div>
+              <div class="cp-main-text">
+                <div class="cp-name">${contactName}</div>
+                ${accountDetails && (accountDetails.address || accountDetails.phone || accountDetails.email) ? `
+                <div class="cp-account-details">
+                  ${accountDetails.address ? `<span title="Adresse">${icons.mapPin} ${accountDetails.address}</span>` : ''}
+                  ${accountDetails.phone ? `<span title="Téléphone">${icons.phone} ${accountDetails.phone}</span>` : ''}
+                  ${accountDetails.email ? `<span title="E-mail">${icons.mail} ${accountDetails.email}</span>` : ''}
+                </div>` : ''}
+              </div>
               <div class="cp-actions">
-                <button class="cp-edit-btn" onclick="startRenameContact()" title="Modifier le nom du compte">${icons.pencil}</button>
+                <button class="cp-edit-btn" onclick="startRenameContact()" title="Modifier le compte (nom, adresse, téléphone, e-mail)">${icons.pencil}</button>
                 <button class="cp-edit-btn danger" onclick="deleteContactAccount()" title="Supprimer ce compte et toutes ses actions">${icons.trash}</button>
               </div>
             </div>
@@ -5897,6 +6201,28 @@
           </div>
         </div>
 
+        <div class="cp-contacts">
+          <div class="cp-contacts-head">
+            <div class="cp-contacts-title">${icons.user} Contacts (${accountContacts.length})</div>
+            <button class="cp-contact-add-btn" onclick="openPersonForm()" title="Ajouter un contact à ce compte">${icons.plus} Ajouter</button>
+          </div>
+          ${accountContacts.length > 0 ? accountContacts.map(c => `
+            <div class="cp-contact-card">
+              <div class="cp-contact-avatar">${icons.user}</div>
+              <div class="cp-contact-info">
+                <div class="cp-contact-name">${c.name}${c.role ? ` <span class="cp-contact-role">— ${c.role}</span>` : ''}</div>
+                <div class="cp-contact-details">
+                  ${c.phone ? `<span title="Téléphone">${icons.phone} ${c.phone}</span>` : ''}
+                  ${c.email ? `<span title="E-mail">${icons.mail} ${c.email}</span>` : ''}
+                </div>
+              </div>
+              <div class="cp-contact-actions">
+                <button class="cp-edit-btn" onclick="openPersonForm('${c.id}')" title="Modifier ce contact">${icons.pencil}</button>
+                <button class="cp-edit-btn danger" onclick="deletePerson('${c.id}')" title="Supprimer ce contact">${icons.trash}</button>
+              </div>
+            </div>`).join('') : `<div class="cp-contact-empty">Aucun contact enregistré pour ce compte.</div>`}
+        </div>
+
         <div id="ctAddContainer">${addArea}</div>
 
         <div class="cp-section-title cp-section-toggle" onclick="toggleFicheSection('todo')" title="Replier / déplier cette section">
@@ -5917,6 +6243,11 @@
       `;
 
       if (ctFormExpanded) {
+        setupPersonField({
+          inputId: 'ctPerson',
+          suggestionsId: 'ctPersonSuggestions',
+          companyGetter: () => (projectContact === NO_CONTACT_KEY ? '' : projectContact),
+        });
         setupTagInput({
           inputId: 'ctTagInput',
           suggestionsId: 'ctTagSuggestions',
@@ -6217,17 +6548,23 @@
       });
 
       const cards = Array.from(map.values());
+      const dir = projectSortAsc ? 1 : -1;
       let list;
       if (projectSort === 'name') {
         // Tri alphabétique : tous les comptes, actifs et inactifs mélangés
-        list = [...cards].sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+        list = [...cards].sort((a, b) => a.name.localeCompare(b.name, 'fr') * dir);
       } else {
-        // Tri par échéance : l'action à faire la moins lointaine de chaque compte
-        // (retards en tête), comptes actifs d'abord, puis sans action en cours
+        // Tri par échéance : l'action à faire la plus proche de chaque compte,
+        // comptes actifs d'abord, puis sans action en cours (quel que soit le sens)
         const active = cards.filter(c => c.todo > 0).sort((a, b) => {
           const da = a.nextDeadline || '9999-12-31';
           const db = b.nextDeadline || '9999-12-31';
-          if (da !== db) return da < db ? -1 : 1;
+          if (da !== db) {
+            // les comptes sans échéance restent en fin de liste dans les deux sens
+            if (da === '9999-12-31') return 1;
+            if (db === '9999-12-31') return -1;
+            return (da < db ? -1 : 1) * dir;
+          }
           return a.name.localeCompare(b.name, 'fr');
         });
         const inactive = cards.filter(c => c.todo === 0).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
@@ -6333,6 +6670,107 @@
     }
 
     // Fenêtre de choix d'un widget : Liste ou Graphique, puis la donnée à présenter
+    // ---- Contacts d'un compte : formulaire d'ajout / modification ----
+    let personFormState = null; // { id: null = ajout, sinon modification }
+
+    function openPersonForm(id) {
+      personFormState = { id: id || null };
+      completingTask = null;
+      viewingContact = null;
+      detailTask = null;
+      modalMode = 'personForm';
+      renderModal();
+      document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function savePersonForm() {
+      const name = document.getElementById('personName').value.trim();
+      const role = document.getElementById('personRole').value.trim();
+      const phone = document.getElementById('personPhone').value.trim();
+      const email = document.getElementById('personEmail').value.trim();
+      if (!name) { document.getElementById('personName').focus(); return; }
+      const account = projectContact === NO_CONTACT_KEY ? '' : (projectContact || '');
+      if (personFormState && personFormState.id) {
+        const c = contactList.find(p => p.id === personFormState.id);
+        if (c) {
+          const oldName = c.name;
+          c.name = name;
+          c.role = role || undefined;
+          c.phone = phone || undefined;
+          c.email = email || undefined;
+          // Renommage : le nom affiché sur les actions suit
+          if (oldName !== name) {
+            tasks.forEach(t => { if (t.personId === c.id) t.person = name; });
+            saveTasks();
+          }
+          showToast('✓ Contact modifié');
+        }
+      } else {
+        contactList.push({
+          id: generateId(),
+          account: account,
+          name: name,
+          role: role || undefined,
+          phone: phone || undefined,
+          email: email || undefined,
+        });
+        showToast('✓ Contact ajouté');
+      }
+      saveContacts();
+      personFormState = null;
+      closeModal();
+      render();
+    }
+
+    function deletePerson(id) {
+      const c = contactList.find(p => p.id === id);
+      if (!c) return;
+      if (!confirm(`Supprimer le contact « ${c.name} » ?`)) return;
+      contactList = contactList.filter(p => p.id !== id);
+      saveContacts();
+      render();
+      showToast('✓ Contact supprimé');
+    }
+
+    // Rendu du formulaire de contact
+    function renderPersonFormModal() {
+      const modal = document.getElementById('modal');
+      const editing = personFormState && personFormState.id ? contactList.find(p => p.id === personFormState.id) : null;
+      const accountName = projectContact === NO_CONTACT_KEY ? '' : (projectContact || '');
+      modal.style.maxWidth = '440px';
+      modal.innerHTML = `
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="modal-icon indigo">${icons.user}</div>
+            <div>
+              <div class="modal-title">${editing ? 'Modifier le contact' : 'Ajouter un contact'}</div>
+              <div class="modal-subtitle">${accountName ? accountName : 'Sans compte'}</div>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">${icons.x}</button>
+        </div>
+        <div class="modal-body edit-form">
+          <label>Nom <span class="required">*</span></label>
+          <input type="text" id="personName" value="${editing ? editing.name.replace(/"/g, '&quot;') : ''}" placeholder="Ex: Jean Dupont">
+
+          <label>Fonction</label>
+          <input type="text" id="personRole" value="${editing && editing.role ? editing.role.replace(/"/g, '&quot;') : ''}" placeholder="Ex: Directeur commercial">
+
+          <label>Téléphone</label>
+          <input type="tel" id="personPhone" value="${editing && editing.phone ? editing.phone.replace(/"/g, '&quot;') : ''}" placeholder="Ex: 06 12 34 56 78">
+
+          <label>Adresse e-mail</label>
+          <input type="email" id="personEmail" value="${editing && editing.email ? editing.email.replace(/"/g, '&quot;') : ''}" placeholder="Ex: jean@entreprise.fr">
+
+          <div class="modal-actions">
+            <button class="btn btn-primary" onclick="savePersonForm()">${icons.checkCircle} Enregistrer</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+          </div>
+        </div>
+      `;
+      setTimeout(() => document.getElementById('personName')?.focus(), 100);
+    }
+
     // Fenêtre de choix d'un widget : sections Liste / Graphique dépliables
     // (comme les sections des paramètres), pliées par défaut
     let widgetPickOpenSections = new Set();
@@ -6479,6 +6917,11 @@
         return;
       }
 
+      if (modalMode === 'personForm') {
+        renderPersonFormModal();
+        return;
+      }
+
       if (modalMode === 'contactSheet') {
         const contact = viewingContact;
         const sheet = getContactSheet(contact);
@@ -6511,7 +6954,7 @@
             <div class="modal-header-left">
               <div class="modal-icon indigo">${icons.building}</div>
               <div>
-                <div class="modal-title">Fiche entreprise/contact</div>
+                <div class="modal-title">Résumé compte</div>
                 <div class="modal-subtitle clickable" onclick="closeModal();openContactTasks('${contact.replace(/'/g, "\\'")}')" title="Voir la fiche du compte">${contact}</div>
               </div>
             </div>
@@ -6787,11 +7230,18 @@
             <label style="margin-top:0.75rem;">Titre <span class="required">*</span></label>
             <input type="text" id="quickTitle" placeholder="Ex: Préparer le devis client">
 
-            <label>Entreprise / Contact <span class="required">*</span></label>
+            <label>Compte <span class="required">*</span></label>
             <div class="contact-field">
               ${icons.building}
               <input type="text" id="quickContact" placeholder="Ex: Acme Corp" autocomplete="off">
               <div class="suggestions hidden" id="quickContactSuggestions"></div>
+            </div>
+
+            <label>${icons.user} Contact du compte (optionnel)</label>
+            <div class="contact-field">
+              ${icons.user}
+              <input type="text" id="quickPerson" placeholder="Personne à assigner à l'action..." autocomplete="off">
+              <div class="suggestions hidden" id="quickPersonSuggestions"></div>
             </div>
 
             <div id="quickDeadlineField">
@@ -6871,6 +7321,11 @@
         contactInput.addEventListener('focus', () => {
           if (contacts.length > 0) contactInput.dispatchEvent(new Event('input'));
         });
+        setupPersonField({
+          inputId: 'quickPerson',
+          suggestionsId: 'quickPersonSuggestions',
+          companyGetter: () => document.getElementById('quickContact').value,
+        });
         setupTagInput({
           inputId: 'quickTagInput',
           suggestionsId: 'quickTagSuggestions',
@@ -6910,8 +7365,15 @@
             <label style="margin-top:0.75rem;">Titre <span class="required">*</span></label>
             <input type="text" id="editTitle" value="${task.title.replace(/"/g, '&quot;')}" required>
             
-            <label>Entreprise / Contact <span class="required">*</span></label>
+            <label>Compte <span class="required">*</span></label>
             <input type="text" id="editContact" value="${(task.contact || '').replace(/"/g, '&quot;')}" required>
+
+            <label style="margin-top:0.75rem;">${icons.user} Contact du compte (optionnel)</label>
+            <div class="contact-field">
+              ${icons.user}
+              <input type="text" id="editPerson" value="${(getPersonName(task) || '').replace(/"/g, '&quot;')}" autocomplete="off">
+              <div class="suggestions hidden" id="editPersonSuggestions"></div>
+            </div>
             
             <label>Date limite <span class="required">*</span></label>
             <input type="date" id="editDeadline" value="${task.deadline || ''}" min="${today}" required>
@@ -6967,6 +7429,11 @@
             </div>
           </div>
         `;
+        setupPersonField({
+          inputId: 'editPerson',
+          suggestionsId: 'editPersonSuggestions',
+          companyGetter: () => document.getElementById('editContact').value,
+        });
         setupTagInput({
           inputId: 'editTagInput',
           suggestionsId: 'editTagSuggestions',
@@ -7028,6 +7495,13 @@
             <label style="margin-top:0.75rem;">Titre <span class="required">*</span></label>
             <input type="text" id="followUpTitle" placeholder="Ex: Relancer le client...">
 
+            <label style="margin-top:0.75rem;">${icons.user} Contact du compte (optionnel)</label>
+            <div class="contact-field">
+              ${icons.user}
+              <input type="text" id="followUpPerson" placeholder="Personne à assigner à l'action..." autocomplete="off">
+              <div class="suggestions hidden" id="followUpPersonSuggestions"></div>
+            </div>
+
             <label style="margin-top:0.75rem;">Description</label>
             <textarea id="followUpDescription" placeholder="Détails, contexte, instructions..." rows="2" style="resize:vertical;"></textarea>
 
@@ -7060,6 +7534,11 @@
             </div>
           </div>
         `;
+        setupPersonField({
+          inputId: 'followUpPerson',
+          suggestionsId: 'followUpPersonSuggestions',
+          companyGetter: () => (task.contact || ''),
+        });
         setupTagInput({
           inputId: 'followUpTagInput',
           suggestionsId: 'followUpTagSuggestions',
@@ -7218,6 +7697,7 @@
         createdAt: now,
         tags: [...followUpTags],
         history: carriedHistory.length ? carriedHistory : undefined,
+        ...(resolvePerson(completingTask.contact, document.getElementById('followUpPerson') ? document.getElementById('followUpPerson').value : '') || {}),
       };
       
       tasks.unshift(newTask);
@@ -7510,6 +7990,7 @@
       }
       summaryFrom = toISODateLocal(from);
       summaryTo = toISODateLocal(to);
+      summaryExpandedEntries.clear();
       if (modalMode === 'summary') renderModal();
     }
 
@@ -7517,6 +7998,7 @@
       if (!value) return;
       if (which === 'from') summaryFrom = value; else summaryTo = value;
       summaryQuick = 'custom';
+      summaryExpandedEntries.clear();
       renderModal();
     }
 
@@ -7537,6 +8019,8 @@
         const comments = (t.comments || []).map(c => ({ text: c.text, date: c.date }));
         results.push({
           kind: 'created',
+          id: t.id,
+          type: t.type === 'rdv' ? 'rdv' : 'task',
           title: t.title,
           contact: t.contact || '',
           category: t.category || 'pro',
@@ -7577,6 +8061,8 @@
               .map(c => ({ text: c.text, date: c.date }));
             results.push({
               kind: 'done',
+              id: t.id,
+              type: t.type === 'rdv' ? 'rdv' : 'task',
               title: t.title,
               contact: t.contact || '',
               category: t.category || 'pro',
@@ -7593,6 +8079,8 @@
           const comments = (t.comments || []).map(c => ({ text: c.text, date: c.date }));
           results.push({
             kind: 'done',
+            id: t.id,
+            type: t.type === 'rdv' ? 'rdv' : 'task',
             title: t.title,
             contact: t.contact || '',
             category: t.category || 'pro',
@@ -7628,6 +8116,25 @@
       return { groups, groupKeys, NO_CONTACT_KEY };
     }
 
+    // Cartes du Rapport dépliées par l'utilisateur (index des entrées)
+    let summaryExpandedEntries = new Set();
+
+    function toggleSummaryEntry(idx, ev) {
+      // Les clics sur la zone déjà déroulée ne replient pas la carte
+      if (ev && ev.target && ev.target.closest('.summary-task-details, button, a')) return;
+      const el = document.getElementById('sum-details-' + idx);
+      const chev = document.getElementById('sum-chev-' + idx);
+      if (summaryExpandedEntries.has(idx)) {
+        summaryExpandedEntries.delete(idx);
+        if (el) el.classList.add('hidden');
+        if (chev) chev.innerHTML = icons.chevronDown;
+      } else {
+        summaryExpandedEntries.add(idx);
+        if (el) el.classList.remove('hidden');
+        if (chev) chev.innerHTML = icons.chevronUp;
+      }
+    }
+
     function renderSummaryModal() {
       const modal = document.getElementById('modal');
       if (!summaryFrom || !summaryTo) setSummaryQuick('lastWeek');
@@ -7635,43 +8142,62 @@
       const { groups, groupKeys, NO_CONTACT_KEY } = buildSummaryGroups(entries);
       const createdCount = entries.filter(r => r.kind === 'created').length;
       const doneCount = entries.filter(r => r.kind === 'done').length;
+      // Nombre de rendez-vous distincts dans le rapport (en cours ou terminés)
+      const rdvCount = new Set(entries.filter(r => r.type === 'rdv').map(r => r.id)).size;
+      // Index stable de chaque entrée (pour l'état plié/déplié des cartes)
+      entries.forEach((e, i) => { e._idx = i; });
 
       // Une entrée du rapport : « créée » (vert) ou « terminée » (gris),
-      // avec pastille d'état à gauche pour une lecture rapide
+      // avec pastille d'état à gauche pour une lecture rapide ; les
+      // commentaires et commentaire de clôture se déroulent au clic sur la carte
       const renderTask = (r) => {
         const isCreated = r.kind === 'created';
+        const isRdv = r.type === 'rdv';
+        // Un rendez-vous terminé est « tenu » à sa date d'échéance initiale
+        // (et non à sa date de clôture) ; l'échéance n'est alors pas répétée
+        const isDoneRdv = !isCreated && isRdv && !!r.deadline;
+        const idx = r._idx;
+        const expanded = summaryExpandedEntries.has(idx);
+        const hasDetails = (!isCreated && r.completionComment) || r.comments.length > 0;
+        const whenLabel = isCreated
+          ? 'Créée le ' + formatDate(r.at, true)
+          : (isDoneRdv ? 'Tenu le ' + formatDate(r.deadline) : 'Terminée le ' + formatDate(r.at, true));
         return `
-        <div class="summary-task ${isCreated ? 'created' : 'done'}">
+        <div class="summary-task ${isCreated ? 'created' : 'done'}" onclick="toggleSummaryEntry(${idx}, event)" title="${hasDetails ? (expanded ? 'Replier les commentaires' : 'Dérouler les commentaires') : ''}">
           <div class="summary-task-icon">${isCreated ? icons.plus : icons.checkCircle}</div>
           <div class="summary-task-body">
             <div class="summary-task-head">
-              <span class="summary-task-title">${r.title}</span>
-              <span class="summary-task-when">${isCreated ? 'Créée le ' + formatDate(r.at, true) : 'Terminée le ' + formatDate(r.at, true)}</span>
+              <span class="summary-task-title">${r.title}${hasDetails ? `<span class="summary-chev" id="sum-chev-${idx}">${expanded ? icons.chevronUp : icons.chevronDown}</span>` : ''}</span>
+              <span class="summary-task-when">${whenLabel}</span>
             </div>
             <div class="summary-task-meta">
+              ${isRdv ? `<span class="rdv-badge">${icons.calendarCheck} Rendez-vous</span>` : ''}
               <span class="category-badge ${r.category}">${r.category === 'pro' ? icons.briefcase + ' Pro' : icons.home + ' Perso'}</span>
-              ${r.deadline ? `<span class="task-meta-item">${icons.calendar} Échéance ${formatDate(r.deadline)}</span>` : ''}
+              ${r.deadline && !isDoneRdv ? `<span class="task-meta-item">${icons.calendar} Échéance ${formatDate(r.deadline)}</span>` : ''}
             </div>
-            ${!isCreated && r.completionComment ? `
-              <div class="summary-comment completion">
-                ${icons.message}
-                <div style="min-width:0;">
-                  <div class="summary-comment-label">Commentaire de clôture</div>
-                  <p>${r.completionComment}</p>
-                </div>
-              </div>` : ''}
-            ${r.comments.length ? `
-              <div class="summary-comment-list">
-                ${r.comments.map(c => `
-                  <div class="summary-comment other">
-                    ${icons.message}
-                    <div style="min-width:0;">
-                      <p>${c.text}</p>
-                      ${c.date ? `<span>${formatDate(c.date, true)}</span>` : ''}
-                    </div>
+            ${hasDetails ? `
+            <div class="summary-task-details ${expanded ? '' : 'hidden'}" id="sum-details-${idx}">
+              ${!isCreated && r.completionComment ? `
+                <div class="summary-comment completion">
+                  ${icons.message}
+                  <div style="min-width:0;">
+                    <div class="summary-comment-label">Commentaire de clôture</div>
+                    <p>${r.completionComment}</p>
                   </div>
-                `).join('')}
-              </div>` : ''}
+                </div>` : ''}
+              ${r.comments.length ? `
+                <div class="summary-comment-list">
+                  ${r.comments.map(c => `
+                    <div class="summary-comment other">
+                      ${icons.message}
+                      <div style="min-width:0;">
+                        <p>${c.text}</p>
+                        ${c.date ? `<span>${formatDate(c.date, true)}</span>` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>` : ''}
+            </div>` : ''}
           </div>
         </div>
       `;
@@ -7723,7 +8249,7 @@
           <div class="summary-stats">
             <div class="summary-stat created"><span class="num">${createdCount}</span><span>Créées</span></div>
             <div class="summary-stat"><span class="num">${doneCount}</span><span>Terminées</span></div>
-            <div class="summary-stat"><span class="num">${groupKeys.length}</span><span>Contact(s)</span></div>
+            <div class="summary-stat"><span class="num">${rdvCount}</span><span>RDV</span></div>
           </div>
 
           ${entries.length === 0 ? `
@@ -7763,8 +8289,11 @@
         lines.push('');
         lines.push(key === NO_CONTACT_KEY ? 'Sans contact' : key);
         groups[key].forEach(r => {
-          const verb = r.kind === 'created' ? 'créée le' : 'terminée le';
-          lines.push(`• ${r.title} (${verb} ${formatDate(r.at, true)})`);
+          const doneRdv = r.kind !== 'created' && r.type === 'rdv' && r.deadline;
+          const verb = r.kind === 'created' ? 'créée le' : (doneRdv ? 'tenu le' : 'terminée le');
+          const when = r.kind === 'created' ? formatDate(r.at, true) : (doneRdv ? formatDate(r.deadline) : formatDate(r.at, true));
+          const rdvPrefix = r.type === 'rdv' ? 'RDV — ' : '';
+          lines.push(`• ${rdvPrefix}${r.title} (${verb} ${when})`);
           if (r.kind === 'done' && r.completionComment) lines.push(`   → ${r.completionComment}`);
           r.comments.forEach(c => lines.push(`   · ${c.text}`));
         });
@@ -7875,8 +8404,11 @@
               </select>
             </div>
             <div class="settings-row">
-              <div class="settings-row-label">Ordre croissant</div>
-              <button class="settings-toggle ${settings.defaultSortAsc ? 'on' : ''}" onclick="toggleSetting('defaultSortAsc', this)"></button>
+              <div class="settings-row-label">Ordre de tri des actions<small>Du plus proche au plus lointain (A→Z), ou l'inverse</small></div>
+              <select class="settings-select" onchange="updateSetting('defaultSortAsc', this.value === 'true')">
+                <option value="true" ${settings.defaultSortAsc ? 'selected' : ''}>Croissant — plus proche en premier</option>
+                <option value="false" ${!settings.defaultSortAsc ? 'selected' : ''}>Décroissant — plus lointain en premier</option>
+              </select>
             </div>
             <div class="settings-row">
               <div class="settings-row-label">Vue calendrier par défaut</div>
@@ -8150,7 +8682,7 @@ function getSheet() {
 // Colonne A = JSON complet de l'action (source de vérité), colonnes B à H
 // = informations lisibles (titre, contact, échéance, statut...).
 // Lève définitivement la limite des 50 000 caractères d'une cellule.
-var TASK_HEADERS = ['JSON (ne pas modifier)', 'Titre', 'Entreprise / Contact', 'Échéance', 'Statut', 'Urgence', 'Catégorie', 'Terminée le'];
+var TASK_HEADERS = ['JSON (ne pas modifier)', 'Titre', 'Compte', 'Échéance', 'Statut', 'Urgence', 'Catégorie', 'Terminée le'];
 
 function writeTasks(tasks) {
   var sheet = getSheet();
@@ -8207,6 +8739,115 @@ function readTasks() {
   }
 }
 
+// ==== Contacts (personnes associées aux comptes) : feuille « Contacts » ====
+// Même principe que les actions : colonne A = JSON complet (source de vérité),
+// colonnes suivantes = informations lisibles.
+var CONTACT_HEADERS = ['JSON (ne pas modifier)', 'Compte', 'Nom', 'Fonction', 'Téléphone', 'E-mail'];
+
+function getContactsSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Contacts');
+  if (!sheet) sheet = ss.insertSheet('Contacts');
+  return sheet;
+}
+
+function writeContacts(contacts) {
+  var sheet = getContactsSheet();
+  var values = [CONTACT_HEADERS];
+  for (var i = 0; i < contacts.length; i++) {
+    var c = contacts[i];
+    values.push([
+      JSON.stringify(c),
+      c && c.account ? c.account : '',
+      c && c.name ? c.name : '',
+      c && c.role ? c.role : '',
+      c && c.phone ? c.phone : '',
+      c && c.email ? c.email : ''
+    ]);
+  }
+  sheet.clearContents();
+  sheet.getRange(1, 1, values.length, CONTACT_HEADERS.length).setValues(values);
+  sheet.getRange(1, 1, 1, CONTACT_HEADERS.length).setFontWeight('bold');
+  sheet.setFrozenRows(1);
+}
+
+function readContacts() {
+  try {
+    var sheet = getContactsSheet();
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) return [];
+    var col = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    var contacts = [];
+    for (var i = 0; i < col.length; i++) {
+      var raw = col[i][0];
+      if (!raw) continue;
+      try {
+        var c = JSON.parse(raw);
+        if (c && c.id) contacts.push(c);
+      } catch (e) {
+        // ligne illisible : ignorée
+      }
+    }
+    return contacts;
+  } catch (e) {
+    return [];
+  }
+}
+
+// ==== Infos de comptes (adresse, téléphone, e-mail) : feuille « Comptes » ====
+var ACCOUNT_HEADERS = ['JSON (ne pas modifier)', 'Nom', 'Adresse', 'Téléphone', 'E-mail'];
+
+function getAccountsSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Comptes');
+  if (!sheet) sheet = ss.insertSheet('Comptes');
+  return sheet;
+}
+
+function writeAccounts(accounts) {
+  var sheet = getAccountsSheet();
+  var values = [ACCOUNT_HEADERS];
+  var keys = accounts ? Object.keys(accounts) : [];
+  for (var i = 0; i < keys.length; i++) {
+    var name = keys[i];
+    var a = accounts[name] || {};
+    values.push([
+      JSON.stringify({ name: name, address: a.address || '', phone: a.phone || '', email: a.email || '' }),
+      name,
+      a.address || '',
+      a.phone || '',
+      a.email || ''
+    ]);
+  }
+  sheet.clearContents();
+  sheet.getRange(1, 1, values.length, ACCOUNT_HEADERS.length).setValues(values);
+  sheet.getRange(1, 1, 1, ACCOUNT_HEADERS.length).setFontWeight('bold');
+  sheet.setFrozenRows(1);
+}
+
+function readAccounts() {
+  try {
+    var sheet = getAccountsSheet();
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) return {};
+    var col = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    var accounts = {};
+    for (var i = 0; i < col.length; i++) {
+      var raw = col[i][0];
+      if (!raw) continue;
+      try {
+        var a = JSON.parse(raw);
+        if (a && a.name) accounts[a.name] = { address: a.address || '', phone: a.phone || '', email: a.email || '' };
+      } catch (e) {
+        // ligne illisible : ignorée
+      }
+    }
+    return accounts;
+  } catch (e) {
+    return {};
+  }
+}
+
 function doGet(e) {
   if (!checkPassword(e)) return jsonOut({ error: 'Mot de passe incorrect' });
   var p = (e && e.parameter) || {};
@@ -8221,12 +8862,12 @@ function doGet(e) {
       }
     }
     try {
-      return jsonOut({ ok: true, version: 6, config: loadEmailConfig() });
+      return jsonOut({ ok: true, version: 8, config: loadEmailConfig() });
     } catch (err) {
       return jsonOut({ ok: false, error: 'Lecture impossible : ' + errMsg(err) });
     }
   }
-  return ContentService.createTextOutput(JSON.stringify(readTasks()))
+  return ContentService.createTextOutput(JSON.stringify({ tasks: readTasks(), contacts: readContacts(), accounts: readAccounts() }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -8235,7 +8876,7 @@ function doGet(e) {
 // (une page d erreur HTML serait bloquée par le navigateur et semblerait
 // être un problème réseau).
 function handleEmailConfigSet(p) {
-  var result = { ok: true, version: 6, sent: false };
+  var result = { ok: true, version: 8, sent: false };
   var config = null;
   try {
     config = JSON.parse(p.set);
@@ -8266,9 +8907,16 @@ function doPost(e) {
   if (!checkPassword(e)) return jsonOut({ error: 'Mot de passe incorrect' });
   var body = null;
   try { body = JSON.parse(e.postData.contents); } catch (err) { body = null; }
-  // Un tableau = synchronisation des actions (une ligne par action)
+  // Un tableau = synchronisation des actions (une ligne par action) — ancien format
   if (Array.isArray(body)) {
     writeTasks(body);
+    return jsonOut({ success: true });
+  }
+  // Objet { tasks, contacts, accounts } = actions + contacts + infos de comptes
+  if (body && Array.isArray(body.tasks)) {
+    writeTasks(body.tasks);
+    if (Array.isArray(body.contacts)) writeContacts(body.contacts);
+    if (body.accounts && typeof body.accounts === 'object') writeAccounts(body.accounts);
     return jsonOut({ success: true });
   }
   // Configuration du récap e-mail via POST (compatibilité) :
@@ -8665,7 +9313,7 @@ function sendRecapEmail(config, isTest) {
         const url = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword);
         await fetch(url, {
           method: 'POST',
-          body: JSON.stringify(tasks),
+          body: JSON.stringify({ tasks: tasks, contacts: contactList, accounts: accountInfo }),
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           redirect: 'follow'
         });
@@ -8690,11 +9338,27 @@ function sendRecapEmail(config, isTest) {
           syncStatus = 'error';
           showToast('⚠ ' + data.error);
         } else if (Array.isArray(data)) {
+          // Ancien format de script : actions seules
           tasks = data;
           localStorage.setItem('taskflow-tasks', JSON.stringify(tasks));
           syncStatus = 'synced';
           render();
           showToast(`✓ ${tasks.length} action${tasks.length > 1 ? 's' : ''} chargée${tasks.length > 1 ? 's' : ''} depuis le cloud`);
+        } else if (data && Array.isArray(data.tasks)) {
+          // Nouveau format : actions + contacts
+          tasks = data.tasks;
+          localStorage.setItem('taskflow-tasks', JSON.stringify(tasks));
+          if (Array.isArray(data.contacts)) {
+            contactList = data.contacts;
+            saveContacts();
+          }
+          if (data.accounts && typeof data.accounts === 'object') {
+            accountInfo = data.accounts;
+            saveAccountInfo();
+          }
+          syncStatus = 'synced';
+          render();
+          showToast(`✓ ${tasks.length} action${tasks.length > 1 ? 's' : ''} et ${contactList.length} contact${contactList.length > 1 ? 's' : ''} chargé${contactList.length > 1 ? 's' : ''} depuis le cloud`);
         } else {
           syncStatus = 'error';
         }
@@ -8806,9 +9470,20 @@ function sendRecapEmail(config, isTest) {
           showToast('⚠ ' + data.error);
           return;
         }
-        const cloudTasks = Array.isArray(data) ? data : [];
+        const cloudTasks = Array.isArray(data) ? data : (data && Array.isArray(data.tasks) ? data.tasks : []);
+        const cloudContacts = (data && !Array.isArray(data) && Array.isArray(data.contacts)) ? data.contacts : [];
+        const cloudAccounts = (data && !Array.isArray(data) && data.accounts && typeof data.accounts === 'object') ? data.accounts : {};
         const before = tasks.length;
         tasks = mergeTasks(tasks, cloudTasks);
+        // Fusion des contacts : union par identifiant, la version locale gagne
+        const contactMap = new Map();
+        contactList.forEach(c => { if (c && c.id) contactMap.set(c.id, c); });
+        cloudContacts.forEach(c => { if (c && c.id && !contactMap.has(c.id)) contactMap.set(c.id, c); });
+        contactList = Array.from(contactMap.values());
+        saveContacts();
+        // Fusion des infos de comptes : les comptes absents en local sont récupérés
+        Object.keys(cloudAccounts).forEach(k => { if (!(k in accountInfo)) accountInfo[k] = cloudAccounts[k]; });
+        saveAccountInfo();
         localStorage.setItem('taskflow-tasks', JSON.stringify(tasks));
         render();
         // Renvoie le résultat fusionné pour que le cloud soit à jour lui aussi
@@ -8955,7 +9630,7 @@ function sendRecapEmail(config, isTest) {
         const text = await response.text();
         let data = null;
         try { data = JSON.parse(text); } catch (e) { data = null; }
-        if (data && data.ok && data.version >= 6) return 'ok';
+        if (data && data.ok && data.version >= 8) return 'ok';
         if (data) return 'old';
         return 'unreachable';
       } catch (err) {
@@ -8983,7 +9658,7 @@ function sendRecapEmail(config, isTest) {
         }
         // Un script version < 3 répond « ok » mais IGNORE la commande
         // d'enregistrement : il faut recopier le dernier code et redéployer
-        if (data.ok && !(data.version >= 6)) {
+        if (data.ok && !(data.version >= 8)) {
           showToast('⚠ Le script déployé est trop ancien (version ' + (data.version || '?') + ') — recopiez le DERNIER code et redéployez en choisissant « Version : Nouvelle »', 6000);
           const diag = document.getElementById('emailDiagResult');
           if (diag) {
@@ -9063,7 +9738,7 @@ function sendRecapEmail(config, isTest) {
         lines.push('Statut HTTP : ' + response.status);
         let parsed = null;
         try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
-        if (parsed && parsed.ok && parsed.version >= 6) {
+        if (parsed && parsed.ok && parsed.version >= 8) {
           lines.push('Script : version ' + parsed.version + ' ✓ (à jour, récap e-mail pris en charge)');
           lines.push('Récap configuré : ' + (parsed.config && parsed.config.enabled ? 'activé — ' + (parsed.config.email || '(sans adresse)') : 'désactivé'));
         } else if (parsed && parsed.ok) {
