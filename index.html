@@ -2296,6 +2296,112 @@
     }
     .view-btn svg { flex-shrink: 0; }
 
+    /* Page Comptes : tableau de lignes (une ligne par compte) */
+    .project-table {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .project-table-head {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 170px 210px;
+      gap: 0.75rem;
+      padding: 0.6rem 1rem;
+      background: #EEF1FE;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    /* En-têtes cliquables : tri en cliquant sur la colonne */
+    .pt-head {
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+      color: inherit;
+      text-transform: inherit;
+      letter-spacing: inherit;
+      cursor: pointer;
+      text-align: left;
+      transition: color 0.15s;
+    }
+    .pt-head:hover, .pt-head.active { color: #4D5FD8; }
+    .pt-head svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .pt-head.pt-col-name svg { color: currentColor; }
+    /* L'en-tête « Prochaine action » reste sur une ligne : la flèche
+       de tri est à côté du libellé (comme les autres colonnes) */
+    .pt-head.pt-col-next { flex-direction: row; align-items: center; gap: 0.3rem; }
+    .pt-head { white-space: nowrap; }
+    .project-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 170px 210px;
+      gap: 0.75rem;
+      align-items: center;
+      width: 100%;
+      padding: 0.65rem 1rem;
+      background: transparent;
+      border: none;
+      border-top: 1px solid #f1f5f9;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      transition: background 0.15s;
+    }
+    .project-row:hover { background: #EEF1FE; }
+    .pt-col-name { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+    .pt-col-name svg { color: #5B72F5; flex-shrink: 0; }
+    .pt-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .pt-go { margin-left: auto; color: #94a3b8; font-size: 1.1rem; line-height: 1; }
+    .pt-col-count { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+    .pt-count {
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.73rem;
+      font-weight: 600;
+      background: #EEF1FE;
+      color: #4D5FD8;
+      white-space: nowrap;
+    }
+    .pt-count.danger { background: #fee2e2; color: #dc2626; }
+    .pt-none { color: #cbd5e1; font-size: 0.85rem; }
+    .pt-col-next { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+    .pt-date {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #334155;
+    }
+    .pt-date svg { width: 12px; height: 12px; color: #94a3b8; flex-shrink: 0; }
+    .pt-date.overdue { color: #dc2626; }
+    .pt-date.soon { color: #d97706; }
+    .pt-next-title {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .project-row.inactive .pt-name { color: #94a3b8; font-weight: 500; }
+    .project-row.inactive .pt-col-name svg { color: #cbd5e1; }
+    @media (max-width: 640px) {
+      .project-table-head { display: none; }
+      .project-row { grid-template-columns: minmax(0,1fr) auto; row-gap: 0.3rem; padding: 0.6rem 0.75rem; }
+      .pt-col-next { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 0.5rem; }
+      .pt-next-title { flex: 1; min-width: 0; }
+    }
+
     /* Mode Projet : grille de cartes par entreprise/contact */
     .project-grid {
       display: grid;
@@ -2797,10 +2903,10 @@
         <div class="filter-row task-sort-bar" id="taskSortBar">
           <div class="sort-select">
             <div class="filter-row">
+             <button class="btn btn-primary hidden" id="newAccountBtn" style="padding:0.45rem 0.9rem;font-size:0.8rem;flex:0 0 auto;white-space:nowrap;" onclick="openAccountForm()" title="Créer un nouveau compte"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Nouveau compte</button>
              <div class="filter-group" id="periodFilters"></div>
              <div class="filter-group" id="summaryFilters"></div>
-             <select id="projectSortSelect" class="settings-select hidden" onchange="setProjectSort(this.value)" title="Trier les comptes"></select>
-             <button class="sort-dir-btn hidden" id="projectSortDirBtn" onclick="toggleProjectSortDir()" title="Inverser l'ordre des comptes"></button>
+
             </div>
             <select id="sortSelect">
               <option value="deadline">Date limite</option>
@@ -3243,6 +3349,11 @@
       const set = new Set();
       tasks.forEach(t => {
         if (t.contact && t.contact.trim()) set.add(t.contact.trim());
+      });
+      // Les comptes créés directement (sans action pour l'instant) sont
+      // aussi proposés : ils doivent apparaître dès la création d'une action
+      Object.keys(accountInfo).forEach(name => {
+        if (name && name.trim()) set.add(name.trim());
       });
       return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'));
     }
@@ -4274,21 +4385,8 @@
       document.getElementById('periodFilters').classList.toggle('hidden', !showDateBtn);
       document.getElementById('summaryFilters').innerHTML = '';
       document.getElementById('summaryFilters').classList.add('hidden');
-      // Tri des comptes (mode Comptes uniquement) : échéance la plus proche ou nom
-      const sortSel = document.getElementById('projectSortSelect');
-      if (sortSel) {
-        sortSel.innerHTML = `
-          <option value="deadline" ${projectSort === 'deadline' ? 'selected' : ''}>Trier : Échéance</option>
-          <option value="name" ${projectSort === 'name' ? 'selected' : ''}>Trier : Nom</option>
-        `;
-        sortSel.classList.toggle('hidden', taskView !== 'project');
-      }
-      // Bouton d'inversion de l'ordre des comptes (croissant / décroissant)
-      const projectDirBtn = document.getElementById('projectSortDirBtn');
-      if (projectDirBtn) {
-        projectDirBtn.innerHTML = projectSortAsc ? icons.sortAsc : icons.sortDesc;
-        projectDirBtn.classList.toggle('hidden', taskView !== 'project');
-      }
+      // Bouton « Nouveau compte » (page Comptes uniquement)
+      document.getElementById('newAccountBtn')?.classList.toggle('hidden', taskView !== 'project');
       // Hors Recherche/Comptes, la barre d'outils est masquée
       document.getElementById('taskSortBar')?.classList.toggle('project-mode', taskView !== 'tasks');
       document.getElementById('taskSortBar')?.classList.toggle('hidden', taskView !== 'tasks' && taskView !== 'project');
@@ -5430,15 +5528,16 @@
       render();
     }
 
+    // Tri de la page Comptes : clic sur l'en-tête d'une colonne ;
+    // un nouveau clic sur la même colonne inverse l'ordre
     function setProjectSort(value) {
-      projectSort = value;
-      settings.defaultProjectSort = value;
-      saveSettings();
-      render();
-    }
-
-    function toggleProjectSortDir() {
-      projectSortAsc = !projectSortAsc;
+      if (projectSort === value) {
+        projectSortAsc = !projectSortAsc;
+      } else {
+        projectSort = value;
+        settings.defaultProjectSort = value;
+        saveSettings();
+      }
       render();
     }
 
@@ -6501,7 +6600,7 @@
     function renderProjectView() {
       const container = document.getElementById('taskListContainer');
 
-      if (tasks.length === 0) {
+      if (tasks.length === 0 && Object.keys(accountInfo).length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">${icons.clipboard}</div>
@@ -6525,6 +6624,12 @@
       // Tous les contacts connus, même sans action en cours
       tasks.forEach(t => {
         const k = (t.contact || '').trim();
+        if (k) ensure(k, k, false);
+      });
+      // Comptes créés directement depuis la page Comptes (sans action
+      // pour l'instant) : affichés comme comptes sans action en cours
+      Object.keys(accountInfo).forEach(name => {
+        const k = name.trim();
         if (k) ensure(k, k, false);
       });
       // Actions sans contact (données importées) regroupées sous une carte dédiée
@@ -6553,6 +6658,12 @@
       if (projectSort === 'name') {
         // Tri alphabétique : tous les comptes, actifs et inactifs mélangés
         list = [...cards].sort((a, b) => a.name.localeCompare(b.name, 'fr') * dir);
+      } else if (projectSort === 'count') {
+        // Tri par nombre d'actions à faire : comptes actifs d'abord,
+        // sans action en cours toujours en fin de liste
+        const active = cards.filter(c => c.todo > 0).sort((a, b) => (a.todo - b.todo) * dir || a.name.localeCompare(b.name, 'fr'));
+        const inactive = cards.filter(c => c.todo === 0).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+        list = [...active, ...inactive];
       } else {
         // Tri par échéance : l'action à faire la plus proche de chaque compte,
         // comptes actifs d'abord, puis sans action en cours (quel que soit le sens)
@@ -6589,24 +6700,28 @@
       }
 
       container.innerHTML = `
-        <div class="project-grid">
+        <div class="project-table">
+          <div class="project-table-head">
+            <button class="pt-head pt-col-name ${projectSort === 'name' ? 'active' : ''}" onclick="setProjectSort('name')" title="Trier par nom">Compte ${projectSort === 'name' ? (projectSortAsc ? icons.sortAsc : icons.sortDesc) : ''}</button>
+            <button class="pt-head pt-col-count ${projectSort === 'count' ? 'active' : ''}" onclick="setProjectSort('count')" title="Trier par nombre d'actions à faire">Actions ${projectSort === 'count' ? (projectSortAsc ? icons.sortAsc : icons.sortDesc) : ''}</button>
+            <button class="pt-head pt-col-next ${projectSort === 'deadline' ? 'active' : ''}" onclick="setProjectSort('deadline')" title="Trier par prochaine échéance">Prochaine action ${projectSort === 'deadline' ? (projectSortAsc ? icons.sortAsc : icons.sortDesc) : ''}</button>
+          </div>
           ${list.map(c => {
             const dl = c.nextDeadline ? getDeadlineInfo(c.nextDeadline) : null;
             return `
-            <button class="project-card ${c.todo > 0 ? '' : 'inactive'}" data-contact-key="${c.key.replace(/"/g, '&quot;')}" onclick="openContactTasks('${c.key.replace(/'/g, "\\'")}')" title="Voir les actions de ${c.name.replace(/"/g, '&quot;')}">
-              <div class="project-card-name">${c.noContact ? icons.tag : icons.building}<span class="project-card-name-txt">${c.name}</span><span class="project-card-go">›</span></div>
-              ${c.todo > 0 && c.nextTaskTitle ? `
-                <div class="project-card-next">
-                  <div class="project-card-next-label">Prochaine action</div>
-                  <div class="project-card-next-title">${c.nextTaskTitle}</div>
-                  <div class="project-card-next-date ${dl ? dl.class : ''}">${icons.calendar} ${dl ? dl.text : ''}${c.nextTaskUrgency === 'urgent' ? ' · urgent' : ''}</div>
-                </div>` : ''}
-              <div class="project-card-stats">
+            <button class="project-row ${c.todo > 0 ? '' : 'inactive'}" data-contact-key="${c.key.replace(/"/g, '&quot;')}" onclick="openContactTasks('${c.key.replace(/'/g, "\\'")}')" title="Voir les actions de ${c.name.replace(/"/g, '&quot;')}">
+              <div class="pt-col-name">${c.noContact ? icons.tag : icons.building}<span class="pt-name">${c.name}</span><span class="pt-go">›</span></div>
+              <div class="pt-col-count">
                 ${c.todo > 0 ? `
-                  <span class="project-stat">${c.todo} à faire</span>
-                  ${c.urgent > 0 ? `<span class="project-stat urgent">${c.urgent} urgent${c.urgent > 1 ? 'es' : ''}</span>` : ''}
-                  ${c.overdue > 0 ? `<span class="project-stat overdue">${c.overdue} en retard</span>` : ''}
-                ` : `<span class="project-stat ok">Aucune action en cours</span>`}
+                  <span class="pt-count">${c.todo} à faire</span>
+                  ${c.overdue > 0 ? `<span class="pt-count danger">${c.overdue} en retard</span>` : ''}
+                ` : `<span class="pt-none">—</span>`}
+              </div>
+              <div class="pt-col-next">
+                ${c.nextDeadline && dl ? `
+                  <span class="pt-date ${dl.class}">${icons.calendar} ${dl.text}</span>
+                  ${c.nextTaskTitle ? `<span class="pt-next-title">${c.nextTaskTitle}</span>` : ''}
+                ` : `<span class="pt-none">—</span>`}
               </div>
             </button>
           `;}).join('')}
@@ -6670,6 +6785,77 @@
     }
 
     // Fenêtre de choix d'un widget : Liste ou Graphique, puis la donnée à présenter
+    // ---- Création d'un nouveau compte (depuis la page Comptes) ----
+    function openAccountForm() {
+      completingTask = null;
+      viewingContact = null;
+      detailTask = null;
+      personFormState = null;
+      modalMode = 'accountForm';
+      renderModal();
+      document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function saveAccountForm() {
+      const nameEl = document.getElementById('newAccountName');
+      const name = nameEl ? nameEl.value.trim() : '';
+      if (!name) { if (nameEl) nameEl.focus(); return; }
+      const norm = name.toLowerCase();
+      if (norm === 'sans contact') { showToast('⚠ « Sans contact » est un nom réservé'); return; }
+      // Doublon : compte ayant déjà des actions ou déjà créé
+      const exists = tasks.some(t => (t.contact || '').trim().toLowerCase() === norm)
+        || Object.keys(accountInfo).some(k => k.toLowerCase() === norm);
+      if (exists) { showToast('⚠ Ce compte existe déjà'); return; }
+      accountInfo[name] = {
+        address: (document.getElementById('newAccountAddress') || {}).value || '',
+        phone: (document.getElementById('newAccountPhone') || {}).value || '',
+        email: (document.getElementById('newAccountEmail') || {}).value || '',
+      };
+      saveAccountInfo();
+      if (cloudUrl) syncToCloud();
+      closeModal();
+      // Ouvre directement la fiche du nouveau compte (prêt à y ajouter
+      // actions et contacts) ; Retour ramène à la grille Comptes
+      openContactTasks(name);
+      showToast('✓ Compte créé — ajoutez vos actions et contacts');
+    }
+
+    function renderAccountFormModal() {
+      const modal = document.getElementById('modal');
+      modal.style.maxWidth = '440px';
+      modal.innerHTML = `
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="modal-icon indigo">${icons.building}</div>
+            <div>
+              <div class="modal-title">Nouveau compte</div>
+              <div class="modal-subtitle">Créer une fiche de compte</div>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">${icons.x}</button>
+        </div>
+        <div class="modal-body edit-form">
+          <label>Nom du compte <span class="required">*</span></label>
+          <input type="text" id="newAccountName" placeholder="Ex: Boulangerie Martin">
+
+          <label>Adresse</label>
+          <input type="text" id="newAccountAddress" placeholder="Ex: 12 rue des Lilas, 50170 Le Mont-Saint-Michel">
+
+          <label>Téléphone</label>
+          <input type="tel" id="newAccountPhone" placeholder="Ex: 02 31 00 00 00">
+
+          <label>E-mail</label>
+          <input type="email" id="newAccountEmail" placeholder="Ex: contact@entreprise.fr">
+
+          <div class="modal-actions">
+            <button class="btn btn-primary" onclick="saveAccountForm()">${icons.checkCircle} Créer le compte</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+          </div>
+        </div>
+      `;
+      setTimeout(() => document.getElementById('newAccountName')?.focus(), 100);
+    }
+
     // ---- Contacts d'un compte : formulaire d'ajout / modification ----
     let personFormState = null; // { id: null = ajout, sinon modification }
 
@@ -6919,6 +7105,11 @@
 
       if (modalMode === 'personForm') {
         renderPersonFormModal();
+        return;
+      }
+
+      if (modalMode === 'accountForm') {
+        renderAccountFormModal();
         return;
       }
 
@@ -9787,5 +9978,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4dee1226e06cd5d',t:'MTc5MjU3MTIwOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
