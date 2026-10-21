@@ -2305,7 +2305,7 @@
     }
     .project-table-head {
       display: grid;
-      grid-template-columns: minmax(0,1fr) 170px 210px;
+      grid-template-columns: minmax(0,1fr) 160px 190px 170px;
       gap: 0.75rem;
       padding: 0.6rem 1rem;
       background: #EEF1FE;
@@ -2337,7 +2337,7 @@
     .pt-head { white-space: nowrap; }
     .project-row {
       display: grid;
-      grid-template-columns: minmax(0,1fr) 170px 210px;
+      grid-template-columns: minmax(0,1fr) 160px 190px 170px;
       gap: 0.75rem;
       align-items: center;
       width: 100%;
@@ -2386,6 +2386,10 @@
     .pt-date svg { width: 12px; height: 12px; color: #94a3b8; flex-shrink: 0; }
     .pt-date.overdue { color: #dc2626; }
     .pt-date.soon { color: #d97706; }
+    .pt-date.done { color: #059669; }
+    .pt-date.done svg { color: #10b981; }
+    .pt-col-lastdone { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+    .pt-head.pt-col-lastdone { flex-direction: row; align-items: center; gap: 0.3rem; }
     .pt-next-title {
       font-size: 0.72rem;
       color: #94a3b8;
@@ -2398,7 +2402,7 @@
     @media (max-width: 640px) {
       .project-table-head { display: none; }
       .project-row { grid-template-columns: minmax(0,1fr) auto; row-gap: 0.3rem; padding: 0.6rem 0.75rem; }
-      .pt-col-next { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 0.5rem; }
+      .pt-col-next, .pt-col-lastdone { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 0.5rem; }
       .pt-next-title { flex: 1; min-width: 0; }
     }
 
@@ -6618,7 +6622,7 @@
       const expanded = expandRecurringTasks([...tasks], null);
       const map = new Map();
       const ensure = (key, displayName, isNoContact) => {
-        if (!map.has(key)) map.set(key, { key, name: displayName, noContact: !!isNoContact, todo: 0, overdue: 0, urgent: 0, nextDeadline: null, nextTaskTitle: '', nextTaskUrgency: 'normal' });
+        if (!map.has(key)) map.set(key, { key, name: displayName, noContact: !!isNoContact, todo: 0, overdue: 0, urgent: 0, nextDeadline: null, nextTaskTitle: '', nextTaskUrgency: 'normal', lastDoneAt: null, lastDoneTitle: '' });
         return map.get(key);
       };
       // Tous les contacts connus, même sans action en cours
@@ -6634,9 +6638,20 @@
       });
       // Actions sans contact (données importées) regroupées sous une carte dédiée
       if (tasks.some(t => !(t.contact || '').trim())) ensure(NO_CONTACT_KEY, 'Sans contact', true);
-      // Comptage des actions à faire
+      // Comptage des actions à faire + dernière action terminée
       expanded.forEach(t => {
-        if (t.status !== 'todo') return;
+        if (t.status !== 'todo') {
+          // Dernière action terminée du compte (occurrences récurrentes incluses)
+          if (t.completedAt) {
+            const k = (t.contact || '').trim() || NO_CONTACT_KEY;
+            const c = map.get(k);
+            if (c && (!c.lastDoneAt || t.completedAt > c.lastDoneAt)) {
+              c.lastDoneAt = t.completedAt;
+              c.lastDoneTitle = t.title;
+            }
+          }
+          return;
+        }
         const k = (t.contact || '').trim() || NO_CONTACT_KEY;
         const c = map.get(k);
         if (!c) return;
@@ -6658,6 +6673,19 @@
       if (projectSort === 'name') {
         // Tri alphabétique : tous les comptes, actifs et inactifs mélangés
         list = [...cards].sort((a, b) => a.name.localeCompare(b.name, 'fr') * dir);
+      } else if (projectSort === 'lastDone') {
+        // Tri par date de la dernière action terminée : les comptes sans
+        // action terminée restent en fin de liste dans les deux sens
+        list = [...cards].sort((a, b) => {
+          const da = a.lastDoneAt || '';
+          const db = b.lastDoneAt || '';
+          if (da !== db) {
+            if (!da) return 1;
+            if (!db) return -1;
+            return (da < db ? -1 : 1) * dir;
+          }
+          return a.name.localeCompare(b.name, 'fr');
+        });
       } else if (projectSort === 'count') {
         // Tri par nombre d'actions à faire : comptes actifs d'abord,
         // sans action en cours toujours en fin de liste
@@ -6705,6 +6733,7 @@
             <button class="pt-head pt-col-name ${projectSort === 'name' ? 'active' : ''}" onclick="setProjectSort('name')" title="Trier par nom">Compte ${projectSort === 'name' ? (projectSortAsc ? icons.sortAsc : icons.sortDesc) : ''}</button>
             <button class="pt-head pt-col-count ${projectSort === 'count' ? 'active' : ''}" onclick="setProjectSort('count')" title="Trier par nombre d'actions à faire">Actions ${projectSort === 'count' ? (projectSortAsc ? icons.sortAsc : icons.sortDesc) : ''}</button>
             <button class="pt-head pt-col-next ${projectSort === 'deadline' ? 'active' : ''}" onclick="setProjectSort('deadline')" title="Trier par prochaine échéance">Prochaine action ${projectSort === 'deadline' ? (projectSortAsc ? icons.sortAsc : icons.sortDesc) : ''}</button>
+            <button class="pt-head pt-col-lastdone ${projectSort === 'lastDone' ? 'active' : ''}" onclick="setProjectSort('lastDone')" title="Trier par date de la dernière action terminée">Dernière terminée ${projectSort === 'lastDone' ? (projectSortAsc ? icons.sortAsc : icons.sortDesc) : ''}</button>
           </div>
           ${list.map(c => {
             const dl = c.nextDeadline ? getDeadlineInfo(c.nextDeadline) : null;
@@ -6721,6 +6750,12 @@
                 ${c.nextDeadline && dl ? `
                   <span class="pt-date ${dl.class}">${icons.calendar} ${dl.text}</span>
                   ${c.nextTaskTitle ? `<span class="pt-next-title">${c.nextTaskTitle}</span>` : ''}
+                ` : `<span class="pt-none">—</span>`}
+              </div>
+              <div class="pt-col-lastdone">
+                ${c.lastDoneAt ? `
+                  <span class="pt-date done">${icons.calendarCheck} ${formatDate(c.lastDoneAt)}</span>
+                  ${c.lastDoneTitle ? `<span class="pt-next-title">${c.lastDoneTitle}</span>` : ''}
                 ` : `<span class="pt-none">—</span>`}
               </div>
             </button>
@@ -9978,5 +10013,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4dee1226e06cd5d',t:'MTc5MjU3MTIwOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4df4c06b995c6a5',t:'MTc5MjU3NTU4Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
