@@ -1982,6 +1982,25 @@
       gap: 0.375rem;
     }
     .settings-section-title svg { color: #94a3b8; }
+    /* Section Export des paramètres : boutons de choix format / données */
+    .export-choices { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .export-choice {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 0.85rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      background: white;
+      color: #64748b;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .export-choice:hover { border-color: #AEB9FA; }
+    .export-choice.active { background: #EEF1FE; border-color: #5B72F5; color: #4D5FD8; }
+
     /* Sections pliables : titre cliquable + chevron */
     .settings-section-toggle { cursor: pointer; user-select: none; }
     .settings-section-toggle:hover { color: #5B72F5; }
@@ -3005,7 +3024,8 @@
     function getPersonName(task) {
       if (!task.personId && !task.person) return '';
       const c = contactList.find(p => p.id === task.personId);
-      return c ? c.name : (task.person || '');
+      if (!c) return task.person || '';
+      return c.name || [c.firstName, c.lastName].filter(Boolean).join(' ');
     }
     // Résout un nom saisi en contact du compte donné (assignation d'action)
     function resolvePerson(account, personName) {
@@ -7979,6 +7999,211 @@
       if (e.target === e.currentTarget) closeModal();
     });
 
+    // ============ EXPORT CSV / EXCEL ============
+    let exportFormat = 'xlsx'; // 'csv' | 'xlsx'
+    let exportSelection = { actions: true, contacts: true, accounts: true };
+
+    function setExportFormat(fmt) {
+      exportFormat = fmt;
+      document.querySelectorAll('[data-export-format]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.exportFormat === fmt);
+      });
+    }
+
+    function toggleExportData(key) {
+      exportSelection[key] = !exportSelection[key];
+      const btn = document.querySelector('[data-export-data="' + key + '"]');
+      if (btn) btn.classList.toggle('active', exportSelection[key]);
+    }
+
+    // Jeux de données exportables (une feuille par donnée sélectionnée)
+    function getExportSheets() {
+      const sheets = [];
+      if (exportSelection.actions) {
+        const rows = [['Titre', 'Compte', 'Contact', 'Type', 'Échéance', 'Statut', 'Urgence', 'Catégorie', 'Tags', 'Terminée le', 'Créée le', 'Description']];
+        tasks.forEach(t => {
+          rows.push([
+            t.title || '',
+            t.contact || '',
+            getPersonName(t) || '',
+            t.type === 'rdv' ? 'Rendez-vous' : 'Tâche',
+            t.deadline || '',
+            t.status === 'done' ? 'Terminée' : 'À faire',
+            t.urgency === 'urgent' ? 'Urgent' : 'Normal',
+            (t.category || 'pro') === 'pro' ? 'Pro' : 'Perso',
+            (t.tags || []).join(', '),
+            t.completedAt ? String(t.completedAt).slice(0, 10) : '',
+            (t.createdAt || '').slice(0, 10),
+            t.description || ''
+          ]);
+        });
+        sheets.push({ name: 'Actions', rows: rows });
+      }
+      if (exportSelection.contacts) {
+        const rows = [['Compte', 'Prénom', 'Nom', 'Fonction', 'Téléphone', 'E-mail']];
+        contactList.forEach(c => {
+          rows.push([c.account || '', c.firstName || '', c.lastName || '', c.role || '', c.phone || '', c.email || '']);
+        });
+        sheets.push({ name: 'Contacts', rows: rows });
+      }
+      if (exportSelection.accounts) {
+        const rows = [['Nom', 'Adresse', 'Téléphone', 'E-mail']];
+        Object.keys(accountInfo).forEach(name => {
+          const a = accountInfo[name] || {};
+          rows.push([name, a.address || '', a.phone || '', a.email || '']);
+        });
+        sheets.push({ name: 'Comptes', rows: rows });
+      }
+      return sheets;
+    }
+
+    // ---- CSV (séparateur « ; », BOM UTF-8 pour Excel) ----
+    function buildCsv(sheets) {
+      const esc = (v) => {
+        const s = String(v == null ? '' : v);
+        return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      };
+      return '\uFEFF' + sheets.map(s => s.rows.map(r => r.map(esc).join(';')).join('\r\n')).join('\r\n\r\n');
+    }
+
+    // ---- Excel (.xlsx) généré sans dépendance : ZIP minimal + feuilles XML ----
+    function xlsxEscape(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+    }
+    function xlsxColLetter(i) {
+      let s = '';
+      i += 1;
+      while (i > 0) {
+        const m = (i - 1) % 26;
+        s = String.fromCharCode(65 + m) + s;
+        i = Math.floor((i - 1) / 26);
+      }
+      return s;
+    }
+    function buildSheetXml(rows) {
+      let xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
+      rows.forEach((row, ri) => {
+        xml += '<row r="' + (ri + 1) + '">';
+        row.forEach((cell, ci) => {
+          xml += '<c r="' + xlsxColLetter(ci) + (ri + 1) + '" t="inlineStr"><is><t xml:space="preserve">' + xlsxEscape(cell) + '</t></is></c>';
+        });
+        xml += '</row>';
+      });
+      return xml + '</sheetData></worksheet>';
+    }
+    const CRC_TABLE = (function () {
+      const t = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) {
+        let c = n;
+        for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        t[n] = c >>> 0;
+      }
+      return t;
+    })();
+    function crc32(bytes) {
+      let c = 0xFFFFFFFF;
+      for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+      return (c ^ 0xFFFFFFFF) >>> 0;
+    }
+    // ZIP minimal (méthode « stockée », sans compression) : entrée locale +
+    // répertoire central + fin de répertoire, noms en UTF-8
+    function buildZip(files) {
+      const enc = new TextEncoder();
+      const parts = [];
+      const central = [];
+      let offset = 0;
+      files.forEach(f => {
+        const nameBytes = enc.encode(f.name);
+        const crc = crc32(f.data);
+        const local = new Uint8Array(30 + nameBytes.length);
+        const dv = new DataView(local.buffer);
+        dv.setUint32(0, 0x04034b50, true);
+        dv.setUint16(4, 20, true);
+        dv.setUint16(6, 0x0800, true);
+        dv.setUint16(8, 0, true);
+        dv.setUint16(10, 0, true);
+        dv.setUint16(12, 0x21, true);
+        dv.setUint32(14, crc, true);
+        dv.setUint32(18, f.data.length, true);
+        dv.setUint32(22, f.data.length, true);
+        dv.setUint16(26, nameBytes.length, true);
+        dv.setUint16(28, 0, true);
+        local.set(nameBytes, 30);
+        parts.push(local, f.data);
+        const cd = new Uint8Array(46 + nameBytes.length);
+        const dv2 = new DataView(cd.buffer);
+        dv2.setUint32(0, 0x02014b50, true);
+        dv2.setUint16(4, 20, true);
+        dv2.setUint16(6, 20, true);
+        dv2.setUint16(8, 0x0800, true);
+        dv2.setUint16(10, 0, true);
+        dv2.setUint16(12, 0, true);
+        dv2.setUint16(14, 0x21, true);
+        dv2.setUint32(16, crc, true);
+        dv2.setUint32(20, f.data.length, true);
+        dv2.setUint32(24, f.data.length, true);
+        dv2.setUint16(28, nameBytes.length, true);
+        dv2.setUint32(42, offset, true);
+        cd.set(nameBytes, 46);
+        central.push(cd);
+        offset += local.length + f.data.length;
+      });
+      let cdSize = 0;
+      central.forEach(c => { cdSize += c.length; });
+      const end = new Uint8Array(22);
+      const dv3 = new DataView(end.buffer);
+      dv3.setUint32(0, 0x06054b50, true);
+      dv3.setUint16(8, files.length, true);
+      dv3.setUint16(10, files.length, true);
+      dv3.setUint32(12, cdSize, true);
+      dv3.setUint32(16, offset, true);
+      return new Blob(parts.concat(central, [end]), { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    }
+    function buildXlsxBlob(sheets) {
+      const enc = new TextEncoder();
+      const files = [];
+      let contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>';
+      let workbookSheets = '';
+      let workbookRels = '';
+      sheets.forEach((s, i) => {
+        const num = i + 1;
+        contentTypes += '<Override PartName="/xl/worksheets/sheet' + num + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
+        workbookSheets += '<sheet name="' + xlsxEscape(s.name) + '" sheetId="' + num + '" r:id="rId' + num + '"/>';
+        workbookRels += '<Relationship Id="rId' + num + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + num + '.xml"/>';
+        files.push({ name: 'xl/worksheets/sheet' + num + '.xml', data: enc.encode(buildSheetXml(s.rows)) });
+      });
+      contentTypes += '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/></Types>';
+      files.unshift({ name: '[Content_Types].xml', data: enc.encode(contentTypes) });
+      files.push({ name: '_rels/.rels', data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>') });
+      files.push({ name: 'xl/workbook.xml', data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' + workbookSheets + '</sheets></workbook>') });
+      files.push({ name: 'xl/_rels/workbook.xml.rels', data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + workbookRels + '</Relationships>') });
+      return buildZip(files);
+    }
+
+    function downloadExportBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    }
+
+    function exportSelectedData() {
+      const sheets = getExportSheets();
+      if (sheets.length === 0) { showToast('⚠ Sélectionnez au moins une donnée à exporter'); return; }
+      const date = new Date().toISOString().split('T')[0];
+      if (exportFormat === 'csv') {
+        downloadExportBlob(new Blob([buildCsv(sheets)], { type: 'text/csv;charset=utf-8' }), 'export-' + date + '.csv');
+      } else {
+        downloadExportBlob(buildXlsxBlob(sheets), 'export-' + date + '.xlsx');
+      }
+      showToast('✓ Export ' + (exportFormat === 'csv' ? 'CSV' : 'Excel') + ' généré (' + sheets.length + ' feuille' + (sheets.length > 1 ? 's' : '') + ')');
+    }
+
     // ============ EXPORT / IMPORT ============
     function exportData() {
       const data = JSON.stringify(tasks, null, 2);
@@ -8834,6 +9059,25 @@
               Nécessite la synchronisation cloud (Google Sheets). <a href="#" onclick="openCloudSetup();return false;" style="color:#5B72F5;">Configurer →</a>
             </p>
             `}
+          </div>
+
+          <!-- Export CSV / Excel -->
+          <div class="settings-section">
+            <div class="settings-section-title">${icons.fileText} Export</div>
+            <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:0.45rem;">
+              <div class="settings-row-label" style="margin-bottom:0;">Format</div>
+              <div class="export-choices">
+                <button type="button" class="export-choice ${exportFormat === 'csv' ? 'active' : ''}" data-export-format="csv" onclick="setExportFormat('csv')" title="Fichier texte avec séparateur point-virgule">CSV</button>
+                <button type="button" class="export-choice ${exportFormat === 'xlsx' ? 'active' : ''}" data-export-format="xlsx" onclick="setExportFormat('xlsx')" title="Classeur Excel (une feuille par donnée)">Excel (.xlsx)</button>
+              </div>
+              <div class="settings-row-label" style="margin-bottom:0;">Données à exporter</div>
+              <div class="export-choices">
+                <button type="button" class="export-choice ${exportSelection.actions ? 'active' : ''}" data-export-data="actions" onclick="toggleExportData('actions')">Actions</button>
+                <button type="button" class="export-choice ${exportSelection.contacts ? 'active' : ''}" data-export-data="contacts" onclick="toggleExportData('contacts')">Contacts</button>
+                <button type="button" class="export-choice ${exportSelection.accounts ? 'active' : ''}" data-export-data="accounts" onclick="toggleExportData('accounts')">Comptes</button>
+              </div>
+              <button class="btn btn-primary" style="margin-top:0.35rem;" onclick="exportSelectedData()">${icons.fileText} Exporter</button>
+            </div>
           </div>
 
           <!-- Export / Import -->
@@ -10052,5 +10296,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a57ddf3a0b9ce15d',t:'MTc5NDIzODM2NQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a57ddf3a0b9ce15d',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
