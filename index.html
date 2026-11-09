@@ -6780,6 +6780,20 @@
     }
 
     function closeModal() {
+      // Fermeture de l'aperçu d'une action du calendrier : l'action
+      // consultée est surlignée un court instant dans la grille
+      if (modalMode === 'taskDetail' && detailTask && taskView === 'calendar') {
+        const flashId = detailTask.id;
+        const flashDate = detailTask._date || detailTask.deadline || '';
+        requestAnimationFrame(() => {
+          const el = document.getElementById(`cal-task-${flashId}-${flashDate}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('flash-highlight');
+            setTimeout(() => el.classList.remove('flash-highlight'), 1500);
+          }
+        });
+      }
       document.getElementById('modalOverlay').classList.add('hidden');
       completingTask = null;
       periodDraft = null;
@@ -6904,17 +6918,35 @@
       document.getElementById('modalOverlay').classList.remove('hidden');
     }
 
+    // Anciens contacts enregistrés avec un seul champ « Nom » : découpage
+    // en prénom / nom pour pré-remplir le formulaire (premier mot = prénom)
+    function personSplitName(c) {
+      const parts = (c.name || '').trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
+      }
+      return { firstName: '', lastName: parts[0] || '' };
+    }
+
     function savePersonForm() {
-      const name = document.getElementById('personName').value.trim();
+      const firstName = document.getElementById('personFirstName').value.trim();
+      const lastName = document.getElementById('personLastName').value.trim();
       const role = document.getElementById('personRole').value.trim();
       const phone = document.getElementById('personPhone').value.trim();
       const email = document.getElementById('personEmail').value.trim();
-      if (!name) { document.getElementById('personName').focus(); return; }
+      // Le nom complet (affiché partout) est composé du prénom et du nom
+      const name = [firstName, lastName].filter(Boolean).join(' ');
+      if (!name) {
+        document.getElementById(firstName ? 'personLastName' : 'personFirstName').focus();
+        return;
+      }
       const account = projectContact === NO_CONTACT_KEY ? '' : (projectContact || '');
       if (personFormState && personFormState.id) {
         const c = contactList.find(p => p.id === personFormState.id);
         if (c) {
           const oldName = c.name;
+          c.firstName = firstName || undefined;
+          c.lastName = lastName || undefined;
           c.name = name;
           c.role = role || undefined;
           c.phone = phone || undefined;
@@ -6930,6 +6962,8 @@
         contactList.push({
           id: generateId(),
           account: account,
+          firstName: firstName || undefined,
+          lastName: lastName || undefined,
           name: name,
           role: role || undefined,
           phone: phone || undefined,
@@ -6971,8 +7005,11 @@
           <button class="modal-close" onclick="closeModal()">${icons.x}</button>
         </div>
         <div class="modal-body edit-form">
+          <label>Prénom</label>
+          <input type="text" id="personFirstName" value="${editing ? (editing.firstName || personSplitName(editing).firstName).replace(/"/g, '&quot;') : ''}" placeholder="Ex: Jean">
+
           <label>Nom <span class="required">*</span></label>
-          <input type="text" id="personName" value="${editing ? editing.name.replace(/"/g, '&quot;') : ''}" placeholder="Ex: Jean Dupont">
+          <input type="text" id="personLastName" value="${editing ? (editing.lastName || personSplitName(editing).lastName).replace(/"/g, '&quot;') : ''}" placeholder="Ex: Dupont">
 
           <label>Fonction</label>
           <input type="text" id="personRole" value="${editing && editing.role ? editing.role.replace(/"/g, '&quot;') : ''}" placeholder="Ex: Directeur commercial">
@@ -7368,6 +7405,7 @@
               <div style="min-width:0;">
                 <div class="modal-title" style="white-space:normal;">${t.title}</div>
                 ${contactName ? `<div class="modal-subtitle clickable"${contactAttr}>${contactName}</div>` : ''}
+                ${getPersonName(t) ? `<div class="modal-subtitle" style="display:flex;align-items:center;gap:0.3rem;">${icons.user} ${getPersonName(t)}</div>` : ''}
               </div>
             </div>
             <button class="modal-close" onclick="closeModal()">${icons.x}</button>
@@ -8968,7 +9006,7 @@ function readTasks() {
 // ==== Contacts (personnes associées aux comptes) : feuille « Contacts » ====
 // Même principe que les actions : colonne A = JSON complet (source de vérité),
 // colonnes suivantes = informations lisibles.
-var CONTACT_HEADERS = ['JSON (ne pas modifier)', 'Compte', 'Nom', 'Fonction', 'Téléphone', 'E-mail'];
+var CONTACT_HEADERS = ['JSON (ne pas modifier)', 'Compte', 'Prénom', 'Nom', 'Fonction', 'Téléphone', 'E-mail'];
 
 function getContactsSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -8985,7 +9023,8 @@ function writeContacts(contacts) {
     values.push([
       JSON.stringify(c),
       c && c.account ? c.account : '',
-      c && c.name ? c.name : '',
+      c && c.firstName ? c.firstName : '',
+      c && c.lastName ? c.lastName : '',
       c && c.role ? c.role : '',
       c && c.phone ? c.phone : '',
       c && c.email ? c.email : ''
@@ -9088,7 +9127,7 @@ function doGet(e) {
       }
     }
     try {
-      return jsonOut({ ok: true, version: 8, config: loadEmailConfig() });
+      return jsonOut({ ok: true, version: 9, config: loadEmailConfig() });
     } catch (err) {
       return jsonOut({ ok: false, error: 'Lecture impossible : ' + errMsg(err) });
     }
@@ -9102,7 +9141,7 @@ function doGet(e) {
 // (une page d erreur HTML serait bloquée par le navigateur et semblerait
 // être un problème réseau).
 function handleEmailConfigSet(p) {
-  var result = { ok: true, version: 8, sent: false };
+  var result = { ok: true, version: 9, sent: false };
   var config = null;
   try {
     config = JSON.parse(p.set);
@@ -9856,7 +9895,7 @@ function sendRecapEmail(config, isTest) {
         const text = await response.text();
         let data = null;
         try { data = JSON.parse(text); } catch (e) { data = null; }
-        if (data && data.ok && data.version >= 8) return 'ok';
+        if (data && data.ok && data.version >= 9) return 'ok';
         if (data) return 'old';
         return 'unreachable';
       } catch (err) {
@@ -9884,7 +9923,7 @@ function sendRecapEmail(config, isTest) {
         }
         // Un script version < 3 répond « ok » mais IGNORE la commande
         // d'enregistrement : il faut recopier le dernier code et redéployer
-        if (data.ok && !(data.version >= 8)) {
+        if (data.ok && !(data.version >= 9)) {
           showToast('⚠ Le script déployé est trop ancien (version ' + (data.version || '?') + ') — recopiez le DERNIER code et redéployez en choisissant « Version : Nouvelle »', 6000);
           const diag = document.getElementById('emailDiagResult');
           if (diag) {
@@ -9964,7 +10003,7 @@ function sendRecapEmail(config, isTest) {
         lines.push('Statut HTTP : ' + response.status);
         let parsed = null;
         try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
-        if (parsed && parsed.ok && parsed.version >= 8) {
+        if (parsed && parsed.ok && parsed.version >= 9) {
           lines.push('Script : version ' + parsed.version + ' ✓ (à jour, récap e-mail pris en charge)');
           lines.push('Récap configuré : ' + (parsed.config && parsed.config.enabled ? 'activé — ' + (parsed.config.email || '(sans adresse)') : 'désactivé'));
         } else if (parsed && parsed.ok) {
@@ -10013,5 +10052,5 @@ function sendRecapEmail(config, isTest) {
       });
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4df4c06b995c6a5',t:'MTc5MjU3NTU4Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a57ddf3a0b9ce15d',t:'MTc5NDIzODM2NQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a57ddf3a0b9ce15d',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
