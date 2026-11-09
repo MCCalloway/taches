@@ -2992,6 +2992,21 @@
     function saveAccountInfo() {
       localStorage.setItem('taskflow-accounts', JSON.stringify(accountInfo));
     }
+    // Tous les comptes connus : ceux ayant des actions + ceux créés
+    // directement, avec leurs informations (adresse, téléphone, e-mail)
+    function getAllAccountsData() {
+      const map = new Map();
+      const add = (name) => {
+        const k = (name || '').trim();
+        if (!k || map.has(k.toLowerCase())) return;
+        const info = getAccountInfo(k) || {};
+        map.set(k.toLowerCase(), { name: k, address: info.address || '', phone: info.phone || '', email: info.email || '' });
+      };
+      tasks.forEach(t => { if (t.contact && t.contact.trim()) add(t.contact); });
+      Object.keys(accountInfo).forEach(add);
+      return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+    }
+
     function getAccountInfo(name) {
       const norm = (name || '').trim().toLowerCase();
       if (!norm) return null;
@@ -3015,6 +3030,21 @@
     function saveContacts() {
       localStorage.setItem('taskflow-contacts', JSON.stringify(contactList));
     }
+    // Anciens contacts enregistrés avec un seul champ « Nom » complet :
+    // découpage en prénom / nom (premier mot = prénom), au chargement et
+    // après chaque récupération depuis le cloud
+    function normalizeContactNames() {
+      let changed = false;
+      contactList.forEach(c => {
+        if ((!c.firstName || !c.lastName) && c.name) {
+          const parts = personSplitName(c);
+          if (!c.firstName && parts.firstName) { c.firstName = parts.firstName; changed = true; }
+          if (!c.lastName && parts.lastName) { c.lastName = parts.lastName; changed = true; }
+        }
+      });
+      if (changed) saveContacts();
+    }
+    normalizeContactNames();
     function getAccountContacts(account) {
       const norm = (account || '').trim().toLowerCase();
       if (!norm) return [];
@@ -8048,9 +8078,8 @@
       }
       if (exportSelection.accounts) {
         const rows = [['Nom', 'Adresse', 'Téléphone', 'E-mail']];
-        Object.keys(accountInfo).forEach(name => {
-          const a = accountInfo[name] || {};
-          rows.push([name, a.address || '', a.phone || '', a.email || '']);
+        getAllAccountsData().forEach(a => {
+          rows.push([a.name, a.address, a.phone, a.email]);
         });
         sheets.push({ name: 'Comptes', rows: rows });
       }
@@ -9822,7 +9851,7 @@ function sendRecapEmail(config, isTest) {
         const url = cloudUrl + (cloudUrl.includes('?') ? '&' : '?') + 'pwd=' + encodeURIComponent(cloudPassword);
         await fetch(url, {
           method: 'POST',
-          body: JSON.stringify({ tasks: tasks, contacts: contactList, accounts: accountInfo }),
+          body: JSON.stringify({ tasks: tasks, contacts: contactList, accounts: getAllAccountsData().reduce(function (o, a) { o[a.name] = { address: a.address, phone: a.phone, email: a.email }; return o; }, {}) }),
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           redirect: 'follow'
         });
@@ -9859,6 +9888,7 @@ function sendRecapEmail(config, isTest) {
           localStorage.setItem('taskflow-tasks', JSON.stringify(tasks));
           if (Array.isArray(data.contacts)) {
             contactList = data.contacts;
+            normalizeContactNames();
             saveContacts();
           }
           if (data.accounts && typeof data.accounts === 'object') {
@@ -9989,6 +10019,7 @@ function sendRecapEmail(config, isTest) {
         contactList.forEach(c => { if (c && c.id) contactMap.set(c.id, c); });
         cloudContacts.forEach(c => { if (c && c.id && !contactMap.has(c.id)) contactMap.set(c.id, c); });
         contactList = Array.from(contactMap.values());
+        normalizeContactNames();
         saveContacts();
         // Fusion des infos de comptes : les comptes absents en local sont récupérés
         Object.keys(cloudAccounts).forEach(k => { if (!(k in accountInfo)) accountInfo[k] = cloudAccounts[k]; });
